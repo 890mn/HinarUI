@@ -5,7 +5,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 
@@ -13,8 +12,6 @@
 #define UI_NAME "HinarUI"
 #define SELECTED_COLOR SSD1306_WHITE
 #define UNSELECTED_COLOR SSD1306_BLACK
-
-
 
 class Menu {
 public:
@@ -32,8 +29,7 @@ private:
     void drawSelectedIcon(int x, int y);
     void drawUnselectedIcon(int x, int y);
     void drawModuleIcons();
-    void drawCompressedIcon(int x, int y, int step, int totalSteps);
-    void drawExpandedIcon(int x, int y, int step, int totalSteps);
+    void drawIconTransition(int x, int size, bool isSquare);
 };
 
 #endif
