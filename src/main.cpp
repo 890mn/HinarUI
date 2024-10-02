@@ -26,21 +26,32 @@ void setup() {
 }
 
 void loop() {
-    if (digitalRead(KEY_LEFT) == LOW) {
-        if (menu.getModuleNum() > 0) { // 防止越界
-            menu.animateSelection(-1); // 向左切换动画
-            menu.selectModule(menu.getModuleNum() - 1); // 更新选中的模块
+    static unsigned long lastDebounceTime = 0;
+    const unsigned long debounceDelay = 200;  // 去抖动延迟，200ms
+
+    int keyLeftState = digitalRead(KEY_LEFT);
+    int keyRightState = digitalRead(KEY_RIGHT);
+
+    unsigned long currentTime = millis();
+
+    // 按键去抖动处理
+    if ((currentTime - lastDebounceTime) > debounceDelay) {
+        if (keyLeftState == LOW) {
+            if (menu.getModuleNum() > 0) {  // 防止越界
+                menu.animateSelection(-1);  // 向左切换动画
+                menu.selectModule(menu.getModuleNum() - 1);  // 更新选中的模块
+            }
+            lastDebounceTime = currentTime;  // 更新去抖时间
         }
-        delay(20);
+
+        if (keyRightState == LOW) {
+            if (menu.getModuleNum() < 4) {  // 防止越界，假设有5个模块
+                menu.animateSelection(1);  // 向右切换动画
+                menu.selectModule(menu.getModuleNum() + 1);  // 更新选中的模块
+            }
+            lastDebounceTime = currentTime;  // 更新去抖时间
+        }
     }
 
-    if (digitalRead(KEY_RIGHT) == LOW) {
-        if (menu.getModuleNum() < 2) { // 防止越界，假设有3个场景
-            menu.animateSelection(1); // 向右切换动画
-            menu.selectModule(menu.getModuleNum() + 1); // 更新选中的模块
-        }
-        delay(20);
-    }
-
-    menu.draw();
+    menu.draw();  // 持续绘制界面
 }
