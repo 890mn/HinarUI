@@ -13,7 +13,7 @@ void Menu::init() {
     display.setCursor(0, 0);
 
     drawTopBar();
-    drawModuleIcons();
+    drawModuleIcons(0);
     drawFrame();
     display.display();
 }
@@ -41,7 +41,8 @@ void Menu::drawTopBar() {
     display.print(UI_NAME);
 }
 
-void Menu::drawSelectedIcon(IconWithLabel icon) {
+void Menu::drawSelectedIcon(IconWithLabel& icon) {
+    icon.width = 30;
     display.drawRect(icon.x, icon.y, icon.width, icon.height, SELECTED_COLOR);
 
     // 绘制类根号
@@ -53,7 +54,9 @@ void Menu::drawSelectedIcon(IconWithLabel icon) {
     display.print(icon.label);
 }
 
-void Menu::drawUnselectedIcon(IconWithLabel icon) {
+void Menu::drawUnselectedIcon(IconWithLabel& icon) {
+    icon.width = 20;
+
     int slantOffset = 10;
     display.drawLine(icon.x, icon.y, icon.x + icon.width, icon.y, SELECTED_COLOR);
     display.drawLine(icon.x - slantOffset, icon.y + icon.height, icon.x + icon.width - slantOffset, icon.y + icon.height, SELECTED_COLOR);
@@ -61,19 +64,21 @@ void Menu::drawUnselectedIcon(IconWithLabel icon) {
     display.drawLine(icon.x + icon.width, icon.y, icon.x + icon.width - slantOffset, icon.y + icon.height, SELECTED_COLOR);
 }
 
-void Menu::drawModuleIcons() {
-    int startX = 10;  // 起始位置
+void Menu::drawModuleIcons(int offset) {
+    int startX = 10 + offset; 
+    bool next = false;
 
     for (int i = 0; i < 5; ++i) {
         int xPos = startX + i * 40;
-        if (i == selectedModule) {
-            selectedIcon.x = xPos;
-            selectedIcon.y = 20;
-            drawSelectedIcon(selectedIcon);
-        } else {
-            unselectedIcon.x = xPos;
-            unselectedIcon.y = 20;
-            drawUnselectedIcon(unselectedIcon);
+        Icon.x = xPos;
+        Icon.y = 25;
+
+        if (i == currentModulePointer) {  // 指针指向的模块为主选框
+            drawSelectedIcon(Icon);
+            next = true;
+        } else {  
+            Icon.x += next == true ? 40 : 0;  
+            drawUnselectedIcon(Icon);
         }
     }
 }
@@ -81,34 +86,17 @@ void Menu::drawModuleIcons() {
 void Menu::draw() {
     display.clearDisplay();
     drawTopBar();
-    drawModuleIcons();
+    drawModuleIcons(0);
     drawFrame();
     display.display();
 }
 
 int Menu::getModuleNum() {
-    return selectedModule;
+    return currentModulePointer;
 }
 
 void Menu::selectModule(int index) {
-    selectedModule = index;
-}
-
-void Menu::drawModuleIconsWithOffset(int offset) {
-    int startX = 10 + offset;  // 根据偏移量调整起始位置
-
-    for (int i = 0; i < 5; ++i) {
-        int xPos = startX + i * 40;
-        if (i == selectedModule) {
-            selectedIcon.x = xPos;
-            selectedIcon.y = 20;
-            drawSelectedIcon(selectedIcon);
-        } else {
-            unselectedIcon.x = xPos;
-            unselectedIcon.y = 20;
-            drawUnselectedIcon(unselectedIcon);
-        }
-    }
+    currentModulePointer = index;  // 更新指针到当前索引
 }
 
 void Menu::animateSelection(bool toRight) {
@@ -116,14 +104,14 @@ void Menu::animateSelection(bool toRight) {
     animationStep = 0;  // 重置动画步数
     int offset = toRight ? 40 : -40;  // 根据方向调整偏移量
 
-    while (animationStep <= totalSteps) {
+    while (animationStep < totalSteps) {  // 不超过总步数
         float progress = (float)animationStep / totalSteps;  // 计算当前动画进度
         int currentOffset = offset * progress;  // 动态计算当前的偏移量
 
         // 清屏并根据偏移量重新绘制模块
         display.clearDisplay();
         drawTopBar();
-        drawModuleIconsWithOffset(currentOffset);  // 调用带有偏移量的绘制函数
+        drawModuleIcons(currentOffset); 
         drawFrame();
         display.display();
 
@@ -131,15 +119,16 @@ void Menu::animateSelection(bool toRight) {
         delay(50);  // 控制每帧之间的延迟，确保动画流畅
     }
 
-    // 最后一步更新模块位置
-    if (toRight) {
-        selectedModule = (selectedModule + 1) % 5;
-    } else {
-        selectedModule = (selectedModule - 1 + 5) % 5;
-    }
+    // 动画结束，直接设置最终状态并绘制
+    //if (toRight)
+    //    currentModulePointer = (currentModulePointer + 1) % 5;
+    //else 
+    //    currentModulePointer = (currentModulePointer - 1 + 5) % 5;
 
+    // 最后一步，直接绘制到最终状态
+    //draw();
+    
     isAnimating = false;
-    draw();  // 最终刷新显示，确保动画结束后正确显示
 }
 
 bool Menu::isAnimationComplete() {

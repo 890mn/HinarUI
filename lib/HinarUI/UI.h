@@ -7,7 +7,7 @@
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
-#define STEP_COUNT 3  // 动画帧数控制
+#define STEP_COUNT 5  // 动画帧数控制
 
 #define PAGE_NAME "Home"
 #define UI_NAME "HinarUI"
@@ -24,10 +24,10 @@ public:
     bool isAnimationComplete();  // 动画完成检测
     
 private:
-    int selectedModule = 0;  // 当前选中的模块
     String modules[5] = {"Mod1", "Mod2", "Mod3", "Mod4", "Mod5"};  // 模块名
     int animationStep = 0;  // 当前动画步数
     int totalSteps = STEP_COUNT;  // 动画总步数
+    int currentModulePointer = 0;
     
     struct IconWithLabel {
         int x;
@@ -36,19 +36,14 @@ private:
         int height;
         String label;
     };
-
-    IconWithLabel selectedIcon = { .x = 0, .y = 0, .width = 30, .height = 30};  // 选中模块的图标
-    IconWithLabel unselectedIcon = { .x = 0, .y = 0, .width = 20, .height = 30};  // 未选中模块的图标
+    IconWithLabel Icon = { .x = 0, .y = 0, .width = 20, .height = 30};
 
     // UI 相关绘制函数
     void drawTopBar();
     void drawFrame();
-    void drawSelectedIcon(IconWithLabel icon);
-    void drawUnselectedIcon(IconWithLabel icon);
-    void drawModuleIcons();
-    
-    // 带偏移的图标绘制，用于动画过渡
-    void drawModuleIconsWithOffset(int offset);
+    void drawSelectedIcon(IconWithLabel& icon);
+    void drawUnselectedIcon(IconWithLabel& icon);
+    void drawModuleIcons(int offset);
 };
 
 #endif

@@ -36,23 +36,23 @@ void loop() {
         int keyLeftState = digitalRead(KEY_LEFT);
         int keyRightState = digitalRead(KEY_RIGHT);
 
-        // 处理左键按下，向左切换模块
+        // 处理左键按下
         if (keyLeftState == LOW && menu.getModuleNum() > 0) {
-            menu.animateSelection(false);  // false 表示向左
-            menu.selectModule(menu.getModuleNum() - 1);
+            menu.animateSelection(false);  // 左移
+            menu.selectModule(menu.getModuleNum() - 1);  // 更新指针
             isAnimating = true;
             lastButtonPress = currentTime;
         }
-        // 处理右键按下，向右切换模块
+        // 处理右键按下
         else if (keyRightState == LOW && menu.getModuleNum() < 4) {
-            menu.animateSelection(true);  // true 表示向右
-            menu.selectModule(menu.getModuleNum() + 1);
+            menu.animateSelection(true);  // 右移
+            menu.selectModule(menu.getModuleNum() + 1);  // 更新指针
             isAnimating = true;
             lastButtonPress = currentTime;
         }
     }
 
-    // 检查动画是否完成
+    // 检查动画完成状态
     if (isAnimating && menu.isAnimationComplete()) {
         isAnimating = false;
     }
