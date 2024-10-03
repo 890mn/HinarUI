@@ -21,10 +21,14 @@ public:
     void selectModule(int index);
     void animateSelection(int direction);
     int getModuleNum();
+    bool isAnimationComplete();  // 动画完成检测
     
 private:
     int selectedModule = 0;
     const char* modules[5] = {"Mod1", "Mod2", "Mod3", "Mod4", "Mod5"};
+    int animationStep = 0;  // 动画当前步数
+    const int totalSteps = 10;  // 动画总步数
+    
     void drawTopBar();
     void drawFrame();
     void drawSelectedIcon(int x, int y);
