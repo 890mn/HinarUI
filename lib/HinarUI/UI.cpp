@@ -72,6 +72,7 @@ void Menu::drawModuleIcons(int offset) {
         int xPos = startX + i * 40;
         Icon.x = xPos;
         Icon.y = 25;
+        Icon.label = modules[i];
 
         if (i == currentModulePointer) {  // 指针指向的模块为主选框
             drawSelectedIcon(Icon);
