@@ -41,31 +41,24 @@ void Menu::drawTopBar() {
     display.print(UI_NAME);
 }
 
-void Menu::drawSelectedIcon(int x, int y) {
-    x += 5;
-    y += 5;
+void Menu::drawSelectedIcon(IconWithLabel icon) {
+    display.drawRect(icon.x, icon.y, icon.width, icon.height, SELECTED_COLOR);
 
-    display.drawRect(x, y, 30, 30, SELECTED_COLOR);
+    // 绘制类根号
+    display.drawLine(icon.x + icon.width - 1, icon.y + icon.height - 1, icon.x + icon.width + 8, icon.y + icon.height - 10, SELECTED_COLOR);
+    display.drawLine(icon.x + icon.width + 8, icon.y + icon.height - 10, icon.x + icon.width + 28, icon.y + icon.height - 10, SELECTED_COLOR);
 
-    display.drawLine(x + 29, y + 29, x + 38, y + 20, SELECTED_COLOR); // 斜线
-    display.drawLine(x + 38, y + 20, x + 58, y + 20, SELECTED_COLOR); // 水平线
-
-    display.setCursor(x + 40, y + 10);
-    display.print(modules[selectedModule]);
+    // 绘制文字
+    display.setCursor(icon.x + icon.width + 10, icon.y + 10);
+    display.print(icon.label);
 }
 
-void Menu::drawUnselectedIcon(int x, int y) {
-    x += 5;
-    y += 5;
-
-    int height = 30;
-    int width = 20;
+void Menu::drawUnselectedIcon(IconWithLabel icon) {
     int slantOffset = 10;
-
-    display.drawLine(x, y, x + width, y, SELECTED_COLOR);
-    display.drawLine(x - slantOffset, y + height, x + width - slantOffset, y + height, SELECTED_COLOR);
-    display.drawLine(x, y, x - slantOffset, y + height, SELECTED_COLOR);
-    display.drawLine(x + width, y, x + width - slantOffset, y + height, SELECTED_COLOR);
+    display.drawLine(icon.x, icon.y, icon.x + icon.width, icon.y, SELECTED_COLOR);
+    display.drawLine(icon.x - slantOffset, icon.y + icon.height, icon.x + icon.width - slantOffset, icon.y + icon.height, SELECTED_COLOR);
+    display.drawLine(icon.x, icon.y, icon.x - slantOffset, icon.y + icon.height, SELECTED_COLOR);
+    display.drawLine(icon.x + icon.width, icon.y, icon.x + icon.width - slantOffset, icon.y + icon.height, SELECTED_COLOR);
 }
 
 void Menu::drawModuleIcons() {
@@ -74,9 +67,13 @@ void Menu::drawModuleIcons() {
     for (int i = 0; i < 5; ++i) {
         int xPos = startX + i * 40;
         if (i == selectedModule) {
-            drawSelectedIcon(xPos, 20);
+            selectedIcon.x = xPos;
+            selectedIcon.y = 20;
+            drawSelectedIcon(selectedIcon);
         } else {
-            drawUnselectedIcon(xPos, 20);
+            unselectedIcon.x = xPos;
+            unselectedIcon.y = 20;
+            drawUnselectedIcon(unselectedIcon);
         }
     }
 }
@@ -89,63 +86,61 @@ void Menu::draw() {
     display.display();
 }
 
-void Menu::selectModule(int index) {
-    selectedModule = index;
-}
-
-void Menu::drawIconTransition(int x, float progress, bool toSquare) {
-    int startWidth = toSquare ? 20 : 30;
-    int endWidth = toSquare ? 30 : 20;
-
-    // 平滑过渡，减少清屏
-    int currentWidth = startWidth + (endWidth - startWidth) * progress;
-
-    int height = 30;
-    int slantOffset = 10 * (1.0f - progress);  // 动态调整斜边偏移量
-
-    display.drawLine(x, 20, x + currentWidth, 20, SELECTED_COLOR);
-    display.drawLine(x - slantOffset, 50, x + currentWidth - slantOffset, 50, SELECTED_COLOR);
-    display.drawLine(x, 20, x - slantOffset, 50, SELECTED_COLOR);
-    display.drawLine(x + currentWidth, 20, x + currentWidth - slantOffset, 50, SELECTED_COLOR);
-}
-
-void Menu::animateModuleCollapse(int index) {
-    int xPos = 10 + index * 40;
-    display.fillRect(xPos + 40, 20, 30, 30, UNSELECTED_COLOR);  // 清除文字和类根号
-}
-
-void Menu::animateModuleExpand(int index) {
-    int xPos = 10 + index * 40;
-    drawSelectedIcon(xPos, 20);  // 绘制模块
-}
-
 int Menu::getModuleNum() {
     return selectedModule;
 }
 
-void Menu::animateSelection(bool toRight) {
-    animationStep = 0;  // 重置动画步数
+void Menu::selectModule(int index) {
+    selectedModule = index;
+}
 
-    int selectedXPos = 10 + selectedModule * 40;  // 计算当前模块的X位置
-    int targetXPos = toRight ? selectedXPos + 40 : selectedXPos - 40;  // 根据方向确定目标位置
+void Menu::drawModuleIconsWithOffset(int offset) {
+    int startX = 10 + offset;  // 根据偏移量调整起始位置
 
-    while (animationStep < totalSteps) {
-        float progress = (float)animationStep / totalSteps;  // 计算当前动画进度
-
-        // 根据方向调用动画效果
-        if (toRight) {
-            drawIconTransition(selectedXPos, progress, false);  // 主选变未选
-            drawIconTransition(targetXPos, progress, true);     // 未选变主选
+    for (int i = 0; i < 5; ++i) {
+        int xPos = startX + i * 40;
+        if (i == selectedModule) {
+            selectedIcon.x = xPos;
+            selectedIcon.y = 20;
+            drawSelectedIcon(selectedIcon);
         } else {
-            drawIconTransition(selectedXPos, progress, false);  // 主选变未选
-            drawIconTransition(targetXPos, progress, true);     // 未选变主选
+            unselectedIcon.x = xPos;
+            unselectedIcon.y = 20;
+            drawUnselectedIcon(unselectedIcon);
         }
-
-        animationStep++;
-        delay(50);  // 控制动画帧的延迟
     }
 }
 
+void Menu::animateSelection(bool toRight) {
+    isAnimating = true;
+    animationStep = 0;  // 重置动画步数
+    int offset = toRight ? 40 : -40;  // 根据方向调整偏移量
+
+    while (animationStep <= totalSteps) {
+        float progress = (float)animationStep / totalSteps;  // 计算当前动画进度
+        int currentOffset = offset * progress;  // 动态计算当前的偏移量
+
+        // 清屏并根据偏移量重新绘制模块
+        display.clearDisplay();
+        drawTopBar();
+        drawModuleIconsWithOffset(currentOffset);  // 调用带有偏移量的绘制函数
+        drawFrame();
+        display.display();
+
+        animationStep++;
+        delay(50);  // 控制每帧之间的延迟，确保动画流畅
+    }
+
+    // 最后一步更新模块位置
+    if (toRight) {
+        selectedModule = (selectedModule + 1) % 5;
+    } else {
+        selectedModule = (selectedModule - 1 + 5) % 5;
+    }
+
+    isAnimating = false;
+    draw();  // 最终刷新显示，确保动画结束后正确显示
+}
 
 bool Menu::isAnimationComplete() {
     return animationStep >= totalSteps;  // 当步数超过总步数时，动画完成
