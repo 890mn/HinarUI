@@ -93,30 +93,7 @@ void Menu::selectModule(int index) {
     selectedModule = index;
 }
 
-void Menu::animateMainToUnselected(int index, float progress) {
-    int xPos = 10 + index * 40;
-
-    // 确保动画只进行一次
-    if (progress < 0.5) {
-        drawIconTransition(xPos, progress * 2, 1, false); // 正方形线性变为平行四边形
-        animateModuleCollapse(index);  // 收回类根号和文字
-    } else {
-        drawUnselectedIcon(xPos, 20);  // 渲染为平行四边形
-    }
-}
-
-void Menu::animateUnselectedToMain(int index, float progress) {
-    int xPos = 10 + index * 40;
-
-    // 确保动画只进行一次
-    if (progress < 0.5) {
-        drawIconTransition(xPos, progress * 2, 1, true);  // 平行四边形变为正方形
-    } else {
-        animateModuleExpand(index);  // 展开类根号和文字
-    }
-}
-
-void Menu::drawIconTransition(int x, float progress, int totalSteps, bool toSquare) {
+void Menu::drawIconTransition(int x, float progress, bool toSquare) {
     int startWidth = toSquare ? 20 : 30;
     int endWidth = toSquare ? 30 : 20;
 
@@ -146,16 +123,29 @@ int Menu::getModuleNum() {
     return selectedModule;
 }
 
-void Menu::animateSelection(int direction) {
+void Menu::animateSelection(bool toRight) {
     animationStep = 0;  // 重置动画步数
-    
+
+    int selectedXPos = 10 + selectedModule * 40;  // 计算当前模块的X位置
+    int targetXPos = toRight ? selectedXPos + 40 : selectedXPos - 40;  // 根据方向确定目标位置
+
     while (animationStep < totalSteps) {
-        // 执行动画的每一步
-        drawIconTransition(/*x=*/0, animationStep, totalSteps, direction == 1);
+        float progress = (float)animationStep / totalSteps;  // 计算当前动画进度
+
+        // 根据方向调用动画效果
+        if (toRight) {
+            drawIconTransition(selectedXPos, progress, false);  // 主选变未选
+            drawIconTransition(targetXPos, progress, true);     // 未选变主选
+        } else {
+            drawIconTransition(selectedXPos, progress, false);  // 主选变未选
+            drawIconTransition(targetXPos, progress, true);     // 未选变主选
+        }
+
         animationStep++;
         delay(50);  // 控制动画帧的延迟
     }
 }
+
 
 bool Menu::isAnimationComplete() {
     return animationStep >= totalSteps;  // 当步数超过总步数时，动画完成

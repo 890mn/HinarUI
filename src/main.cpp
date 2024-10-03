@@ -10,16 +10,16 @@ Menu menu;
 
 const int KEY_LEFT = 18;
 const int KEY_RIGHT = 19;
-bool isAnimating = false;   // 动画状态标志
-unsigned long lastButtonPress = 0;  // 上次按钮按下的时间
-const unsigned long debounceDelay = 200;  // 按键防抖延迟
+bool isAnimating = false;
+unsigned long lastButtonPress = 0;
+const unsigned long debounceDelay = 200;
 
 void setup() {
     Serial.begin(115200);
 
     if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
         Serial.println(F("SSD1306 allocation failed"));
-        while (1);
+        while (1);  // 停止程序
     }
 
     pinMode(KEY_LEFT, INPUT_PULLUP);
@@ -29,39 +29,33 @@ void setup() {
 }
 
 void loop() {
-    unsigned long currentTime = millis();  // 当前时间
-    int keyLeftState = digitalRead(KEY_LEFT);   // 检测左键状态
-    int keyRightState = digitalRead(KEY_RIGHT); // 检测右键状态
+    unsigned long currentTime = millis();
 
-    // 检测按键是否被按下，且没有动画正在进行，并且防止按钮抖动
+    // 防抖和动画状态检查
     if (!isAnimating && (currentTime - lastButtonPress) > debounceDelay) {
-        if (keyLeftState == LOW) {
-            // 如果当前不是第一个模块
-            if (menu.getModuleNum() > 0) {
-                menu.animateSelection(-1);  // 向左切换动画
-                menu.selectModule(menu.getModuleNum() - 1);  // 更新选中的模块
-                isAnimating = true;  // 动画开始
-            }
-            lastButtonPress = currentTime;  // 记录按键按下时间
+        int keyLeftState = digitalRead(KEY_LEFT);
+        int keyRightState = digitalRead(KEY_RIGHT);
+
+        // 处理左键按下
+        if (keyLeftState == LOW && menu.getModuleNum() > 0) {
+            menu.animateSelection(-1);
+            menu.selectModule(menu.getModuleNum() - 1);
+            isAnimating = true;
+            lastButtonPress = currentTime;
         }
-        else if (keyRightState == LOW) {
-            // 如果当前不是最后一个模块
-            if (menu.getModuleNum() < 4) {  // 假设有5个模块
-                menu.animateSelection(1);  // 向右切换动画
-                menu.selectModule(menu.getModuleNum() + 1);  // 更新选中的模块
-                isAnimating = true;  // 动画开始
-            }
-            lastButtonPress = currentTime;  // 记录按键按下时间
+        // 处理右键按下
+        else if (keyRightState == LOW && menu.getModuleNum() < 4) {
+            menu.animateSelection(1);
+            menu.selectModule(menu.getModuleNum() + 1);
+            isAnimating = true;
+            lastButtonPress = currentTime;
         }
     }
 
-    // 处理动画完成后，允许按键再次触发
-    if (isAnimating) {
-        // 检测动画是否完成
-        if (menu.isAnimationComplete()) {
-            isAnimating = false;  // 动画完成，重置标志
-        }
+    // 检查动画完成状态
+    if (isAnimating && menu.isAnimationComplete()) {
+        isAnimating = false;
     }
 
-    menu.draw();  // 绘制界面
+    menu.draw();  // 更新显示
 }
