@@ -9,7 +9,7 @@
 #define UNSELECTED_OFFSET 10
 #define SCREEN_WIDTH      128
 #define SCREEN_HEIGHT     64
-#define STEP_COUNT        5 
+#define STEP_COUNT        8 
 #define MODULE_MAX        5
 
 #define PAGE_NAME "Home"
@@ -44,6 +44,10 @@ private:
     void drawSelectedIcon(IconWithLabel& icon);
     void drawUnselectedIcon(IconWithLabel& icon);
     void drawModuleIcons(int offset);
+
+    void wordShrink(IconWithLabel& icon);
+    void wordGrow(IconWithLabel& icon);
+    void rectTrans(IconWithLabel& icon);
 };
 
 #endif
