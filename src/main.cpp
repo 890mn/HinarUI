@@ -1,25 +1,22 @@
-#include <Wire.h>
 #include <Arduino.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-
 #include "UI.h"
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 Menu menu;
 
-const int KEY_LEFT = 18;
+const int KEY_LEFT  = 18;
 const int KEY_RIGHT = 19;
-bool isAnimating = false;
+
+bool          isAnimating     = false;
+unsigned long currentTime     = 0;
 unsigned long lastButtonPress = 0;
-const unsigned long debounceDelay = 200;
 
 void setup() {
     Serial.begin(115200);
 
     if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
         Serial.println(F("SSD1306 allocation failed"));
-        while (1);  // 停止程序
+        while (1);
     }
 
     pinMode(KEY_LEFT, INPUT_PULLUP);
@@ -29,33 +26,27 @@ void setup() {
 }
 
 void loop() {
-    unsigned long currentTime = millis();
+    currentTime = millis();
 
-    // 防抖和动画状态检查
-    if (!isAnimating && (currentTime - lastButtonPress) > debounceDelay) {
+    if (!isAnimating && (currentTime - lastButtonPress) > DEBOU_DELAY) {
         int keyLeftState = digitalRead(KEY_LEFT);
         int keyRightState = digitalRead(KEY_RIGHT);
+        int currentPointer = menu.getModuleNum();
 
-        // 处理左键按下
-        if (keyLeftState == LOW && menu.getModuleNum() > 0) {
-            menu.animateSelection(false);  // 左移
-            menu.selectModule(menu.getModuleNum() - 1);  // 更新指针
+        if (keyLeftState == LOW) {
             isAnimating = true;
+            if (currentPointer < 0) currentPointer = MODULE_MAX - 1;
+            menu.animateSelection(false);
+            menu.updatePointer(--currentPointer);        
             lastButtonPress = currentTime;
         }
-        // 处理右键按下
-        else if (keyRightState == LOW && menu.getModuleNum() < 4) {
-            menu.animateSelection(true);  // 右移
-            menu.selectModule(menu.getModuleNum() + 1);  // 更新指针
+        else if (keyRightState == LOW) {
             isAnimating = true;
+            if (currentPointer > MODULE_MAX - 1) currentPointer = 0;
+            menu.animateSelection(true);
+            menu.updatePointer(++currentPointer);
             lastButtonPress = currentTime;
         }
     }
-
-    // 检查动画完成状态
-    if (isAnimating && menu.isAnimationComplete()) {
-        isAnimating = false;
-    }
-
-    menu.draw();  // 更新显示
+    menu.draw(0);
 }
