@@ -7,11 +7,11 @@ extern bool             isAnimating;
 void Menu::init() {
     display.clearDisplay();
     display.setTextSize(1);
-    display.setTextColor(SSD1306_WHITE);
+    display.setTextColor(SELECTED_COLOR);
     display.setCursor(0, 0);
 
     drawTopBar();
-    drawModuleIcons(0);
+    drawModuleIcons(0, true);
     drawFrame();
     display.display();
 }
@@ -19,35 +19,35 @@ void Menu::init() {
 void Menu::draw(int offset) {
     display.clearDisplay();
     drawTopBar();
-    drawModuleIcons(offset);
+    drawModuleIcons(offset, false);
     drawFrame();
     display.display();
 }
 
-int Menu::getModuleNum() {
-    return modulePointer;
-}
-
-void Menu::updatePointer(int index) {
-    modulePointer = index;
-}
-
 void Menu::animateSelection(bool toRight) {
+    if ((modulePointer == 0 && toRight) || (modulePointer == MODULE_MAX - 1 && !toRight)) {
+        reboundAnimation();
+        //display.setCursor(4, 4);
+        //display.print("ERROR");
+        //display.display();
+        isAnimating = false;
+        return;
+    }
+
     isAnimating = true;
     animationStep = 0; 
     int offset = toRight ? 35 : -35;
+    int currentOffset = offset / totalSteps; 
 
     while (animationStep < totalSteps) {
-        float progress = (float)animationStep / totalSteps;
-        int currentOffset = offset * progress; 
-
         draw(currentOffset);
-
         animationStep++;
         delay(50);
     }
+    toRight ? --modulePointer : ++modulePointer;
     isAnimating = false;
 }
+
 
 //Private
 void Menu::drawFrame() {
@@ -96,49 +96,54 @@ void Menu::drawUnselectedIcon(IconWithLabel& icon) {
     display.drawLine(icon.x + icon.width, icon.y, icon.x + icon.width - UNSELECTED_OFFSET, icon.y + icon.height, SELECTED_COLOR);
 }
 
-void Menu::drawModuleIcons(int offset) {
-    int startX = 10 + offset; 
+void Menu::drawModuleIcons(int offset, bool init) {
+    IconTrans = Icon;
+    IconTrans.x += offset; 
+    Icon = IconTrans;
     bool next = false;
-    bool prev = false;
 
-    for (int i = 0; i < 5; ++i) {
-        int xPos = startX + i * 40;
-        Icon.x = xPos;
-        Icon.y = 25;
-        Icon.label = modules[i];
+    for (int i = 0; i < MODULE_MAX; ++i) {
+        IconTrans.label = modules[i];
+        Serial.println(IconTrans.x);
 
-        // 判断当前模块是否为主选模块
+        // MainModule
         if (i == modulePointer) {  
-            // 当前模块为主选模块，进行动画处理
+            //display.drawCircle(IconTrans.x + 15, IconTrans.y + 15, 2, SELECTED_COLOR); //Debug
             if (animationStep < totalSteps / 2) {
-                drawSelectedIcon(Icon);  // 主选变为未选的前半段动画
-                wordShrink(Icon);        // 隐藏文字和类根号
+                drawSelectedIcon(IconTrans);  // module
+                wordShrink(IconTrans);        // shrink word-root
             } else {
-                rectTrans(Icon);         // 未选变为主选的后半段动画
+                rectTransPall(IconTrans);         // rect->pall
+            }
+        }
+        // MainModule right first
+        else if ((i == modulePointer + 1) && !init) {
+            int tmp = IconTrans.x;
+            IconTrans.x += (totalSteps - animationStep) * (35 / totalSteps);
+            if (animationStep < totalSteps / 2) {
+                pallTransRect(IconTrans);  // pall->rect
+            } else {
+                drawSelectedIcon(IconTrans);  // module
+                wordGrow(IconTrans);          // grow word-root
             }
             next = true;
-        }
-        // 判断左侧未选模块变为主选模块的情况
-        else if (i == (modulePointer - 1 + 5) % 5 && !next) {
-            if (animationStep < totalSteps / 2) {
-                rectTrans(Icon);  // 未选模块变为主选块的动画（平行四边形变正方形）
-            } else {
-                drawSelectedIcon(Icon);  // 动画完成后变为主选模块
-                wordGrow(Icon);          // 逐步生成类根号和文字
-            }
-            prev = true;
+            IconTrans.x = tmp;
         }
         else {
-            // 处理未选模块逻辑
-            Icon.width = 20;  // 确保未选模块是平行四边形的宽度
+            IconTrans.width = 20;  // 确保未选模块是平行四边形的宽度
             if (next) {
-                Icon.x += 35;  // 主选右侧的未选模块位移
+                IconTrans.x += 35;  // 主选右侧的未选模块位移
             }
-            if (prev) {
-                Icon.x -= 35;  // 主选左侧的未选模块位移
+            if ((i == modulePointer + 1) && init) {
+                IconTrans.x += 35;
             }
-            drawUnselectedIcon(Icon);
+            //if (prev) {
+            //    Icon.x -= 35;  // 主选左侧的未选模块位移
+            //}
+            drawUnselectedIcon(IconTrans);
         }
+        //if (i == 0) Icon = IconTrans;
+        IconTrans.x += 40;
     }
 }
 
@@ -150,7 +155,7 @@ void Menu::wordShrink(IconWithLabel& icon) {
     // 修改覆盖区域，确保完全隐藏类根号
     display.fillRect(icon.x + 30 + shrinkX * (wordStep - shrinkI), 
                      icon.y + 10, 
-                     35 - shrinkX * shrinkI,  // 覆盖剩余部分
+                     shrinkX * shrinkI,  // 覆盖剩余部分
                      25, UNSELECTED_COLOR);
 }
 
@@ -181,7 +186,32 @@ void Menu::wordGrow(IconWithLabel& icon) {
     }
 }
 
-void Menu::rectTrans(IconWithLabel& icon) {
+void Menu::pallTransRect(IconWithLabel& icon) {
+    int rectStep = STEP_COUNT / 2;
+    int transI = animationStep - totalSteps / 2;
+    float transX = 10.0 / rectStep;  // 每一步的缩放量
+
+    int x1 = icon.x;
+    int y1 = icon.y;
+    int x2 = icon.x + icon.width;
+    int y2 = icon.y;
+    int x3 = icon.x + icon.width;
+    int y3 = icon.y + icon.height;
+    int x4 = icon.x;
+    int y4 = icon.y + icon.height;
+
+    // 逐步调整左上角（x1）和右下角（x3）的横坐标
+    int newX1 = x1 - (transX * transI);  // 左上角向左拉
+    int newX3 = x3 + (transX * transI);  // 右下角向右拉
+
+    // 绘制平行四边形逐步变为正方形的过程
+    display.drawLine(newX1, y1, x2, y2, SELECTED_COLOR);  // 上边
+    display.drawLine(x2, y2, newX3, y3, SELECTED_COLOR);  // 右边
+    display.drawLine(newX3, y3, x4, y4, SELECTED_COLOR);  // 下边
+    display.drawLine(x4, y4, newX1, y1, SELECTED_COLOR);  // 左边
+}
+
+void Menu::rectTransPall(IconWithLabel& icon) {
     int rectStep = STEP_COUNT / 2;
     int transI = animationStep - totalSteps / 2;
     float transX = 10.0 / rectStep;  // 每一步的缩放量
@@ -203,4 +233,8 @@ void Menu::rectTrans(IconWithLabel& icon) {
     display.drawLine(x2, y2, newX3, y3, SELECTED_COLOR); 
     display.drawLine(newX3, y3, newX4, y4, SELECTED_COLOR); 
     display.drawLine(newX4, y4, x1, y1, SELECTED_COLOR);
+}
+
+void Menu::reboundAnimation() {
+    // 预留回弹动画的逻辑，可以在这里实现回弹效果
 }

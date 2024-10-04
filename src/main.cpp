@@ -31,22 +31,16 @@ void loop() {
     if (!isAnimating && (currentTime - lastButtonPress) > DEBOU_DELAY) {
         int keyLeftState = digitalRead(KEY_LEFT);
         int keyRightState = digitalRead(KEY_RIGHT);
-        int currentPointer = menu.getModuleNum();
 
         if (keyLeftState == LOW) {
             isAnimating = true;
-            if (currentPointer < 0) currentPointer = MODULE_MAX - 1;
-            menu.animateSelection(false);
-            menu.updatePointer(--currentPointer);        
+            menu.animateSelection(false);    
             lastButtonPress = currentTime;
         }
         else if (keyRightState == LOW) {
             isAnimating = true;
-            if (currentPointer > MODULE_MAX - 1) currentPointer = 0;
             menu.animateSelection(true);
-            menu.updatePointer(++currentPointer);
             lastButtonPress = currentTime;
         }
     }
-    menu.draw(0);
 }

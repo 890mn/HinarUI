@@ -20,9 +20,7 @@ class Menu {
 public:
     void   init();
     void   draw(int offset);
-    void   updatePointer(int index);
     void   animateSelection(bool toRight);
-    int    getModuleNum();
 
 private:
     String modules[MODULE_MAX] = {"Mod1", "Mod2", "Mod3", "Mod4", "Mod5"};
@@ -36,18 +34,21 @@ private:
         int    height;
         String label;
     };
-    IconWithLabel Icon = { .x = 0, .y = 0, .width = 20, .height = 30};
+    IconWithLabel Icon      = {.x = 10, .y = 25, .height = 30};
+    IconWithLabel IconTrans = {         .y = 25, .height = 30};
 
     void drawTopBar();
     void drawFrame();
 
     void drawSelectedIcon(IconWithLabel& icon);
     void drawUnselectedIcon(IconWithLabel& icon);
-    void drawModuleIcons(int offset);
+    void drawModuleIcons(int offset, bool init);
 
     void wordShrink(IconWithLabel& icon);
     void wordGrow(IconWithLabel& icon);
-    void rectTrans(IconWithLabel& icon);
+    void pallTransRect(IconWithLabel& icon);
+    void rectTransPall(IconWithLabel& icon);
+    void reboundAnimation();
 };
 
 #endif
