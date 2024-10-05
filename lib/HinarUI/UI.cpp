@@ -81,11 +81,23 @@ void Menu::drawSelectedIcon(IconWithLabel& icon) {
 
 void Menu::drawUnselectedIcon(IconWithLabel& icon) {
     icon.width = 20;
+   // 左上到右上
+    display.drawLine(icon.x + 2, icon.y, icon.x + icon.width - 2, icon.y, SELECTED_COLOR);
+    // 左下到右下
+    display.drawLine(icon.x - UNSELECTED_OFFSET + 2, icon.y + icon.height, icon.x + icon.width - UNSELECTED_OFFSET - 2, icon.y + icon.height, SELECTED_COLOR);
+    // 左上到左下
+    display.drawLine(icon.x, icon.y + 2, icon.x - UNSELECTED_OFFSET, icon.y + icon.height - 2, SELECTED_COLOR);
+    // 右上到右下
+    display.drawLine(icon.x + icon.width, icon.y + 2, icon.x + icon.width - UNSELECTED_OFFSET, icon.y + icon.height - 2, SELECTED_COLOR);
 
-    display.drawLine(icon.x, icon.y, icon.x + icon.width, icon.y, SELECTED_COLOR);
-    display.drawLine(icon.x - UNSELECTED_OFFSET, icon.y + icon.height, icon.x + icon.width - UNSELECTED_OFFSET, icon.y + icon.height, SELECTED_COLOR);
-    display.drawLine(icon.x, icon.y, icon.x - UNSELECTED_OFFSET, icon.y + icon.height, SELECTED_COLOR);
-    display.drawLine(icon.x + icon.width, icon.y, icon.x + icon.width - UNSELECTED_OFFSET, icon.y + icon.height, SELECTED_COLOR);
+    // 左上圆角
+    display.drawCircleHelper(icon.x + 2, icon.y + 2, 2, 1, SELECTED_COLOR);
+    // 右上圆角
+    display.drawCircleHelper(icon.x + icon.width - 2, icon.y + 2, 2, 2, SELECTED_COLOR);
+    // 左下圆角
+    display.drawCircleHelper(icon.x - UNSELECTED_OFFSET + 2, icon.y + icon.height - 2, 2, 8, SELECTED_COLOR);
+    // 右下圆角
+    display.drawCircleHelper(icon.x + icon.width - UNSELECTED_OFFSET - 2, icon.y + icon.height - 2, 2, 4, SELECTED_COLOR);
 }
 
 void Menu::drawModuleIcons(int offset, bool init) {
@@ -216,16 +228,26 @@ void Menu::pallTransRect(IconWithLabel& icon) {
     int newX1 = x1 - (transX * transI);  // 左上角向左拉
     int newX3 = x3 + (transX * transI);  // 右下角向右拉
 
-    // 绘制平行四边形逐步变为正方形的过程
-    display.drawLine(newX1, y1, x2, y2, SELECTED_COLOR);  // 上边
-    display.drawLine(x2, y2, newX3, y3, SELECTED_COLOR);  // 右边
-    display.drawLine(newX3, y3, x4, y4, SELECTED_COLOR);  // 下边
-    display.drawLine(x4, y4, newX1, y1, SELECTED_COLOR);  // 左边
+    // 添加圆角
+    int radius = 2;
+
+    // 线条调整，留出圆角空间
+    display.drawLine(newX1 + radius, y1, x2 - radius, y2, SELECTED_COLOR); // 左上到右上
+    display.drawLine(x2, y2 + radius, newX3, y3 - radius, SELECTED_COLOR); // 右上到右下
+    display.drawLine(newX3 - radius, y3, x4 + radius, y4, SELECTED_COLOR); // 右下到左下
+    display.drawLine(x4, y4 - radius, newX1, y1 + radius, SELECTED_COLOR); // 左下到左上
+
+    // 绘制圆角
+    display.drawCircleHelper(newX1 + radius, y1 + radius, radius, 1, SELECTED_COLOR); // 左上角
+    display.drawCircleHelper(x2 - radius, y2 + radius, radius, 2, SELECTED_COLOR); // 右上角
+    display.drawCircleHelper(newX3 - radius, y3 - radius, radius, 4, SELECTED_COLOR); // 右下角
+    display.drawCircleHelper(x4 + radius, y4 - radius, radius, 8, SELECTED_COLOR); // 左下角
 }
 
 void Menu::rectTransPall(IconWithLabel& icon) {
     int rectStep = STEP_COUNT / 2;
-    int transI = animationStep - totalStep / 2;
+    float progress = (float)(animationStep - totalStep / 2) / (rectStep);
+    float easedProgress = easeInOut(progress);
 
     int x1 = icon.x;
     int y1 = icon.y;
@@ -236,15 +258,33 @@ void Menu::rectTransPall(IconWithLabel& icon) {
     int x4 = icon.x;
     int y4 = icon.y + icon.height;
 
-    // 确保右侧宽度逐步缩减，从30缩到20
-    int newX2 = x2 - (10.0 / rectStep) * transI;
-    int newX3 = x3 - (15.0 / rectStep) * transI;
-    int newX4 = x4 - (10.0 / rectStep) * transI;
+    // 确保右侧宽度逐步缩减，从30缩到20，使用缓动函数调整步进
+    int newX2 = x2 - 10.0 * easedProgress;
+    int newX3 = x3 - 15.0 * easedProgress;
+    int newX4 = x4 - 10.0 * easedProgress;
 
-    display.drawLine(x1, y1, newX2, y2, SELECTED_COLOR); 
-    display.drawLine(newX2, y2, newX3, y3, SELECTED_COLOR); 
-    display.drawLine(newX3, y3, newX4, y4, SELECTED_COLOR); 
-    display.drawLine(newX4, y4, x1, y1, SELECTED_COLOR);
+    // 添加圆角
+    int radius = 2;
+
+    // 线条调整，留出圆角空间
+    display.drawLine(x1 + radius, y1, newX2 - radius, y2, SELECTED_COLOR); // 左上到右上
+    display.drawLine(newX2, y2 + radius, newX3, y3 - radius, SELECTED_COLOR); // 右上到右下
+    display.drawLine(newX3 - radius, y3, newX4 + radius, y4, SELECTED_COLOR); // 右下到左下
+    display.drawLine(newX4, y4 - radius, x1, y1 + radius, SELECTED_COLOR); // 左下到左上
+
+    // 绘制圆角
+    display.drawCircleHelper(x1 + radius, y1 + radius, radius, 1, SELECTED_COLOR); // 左上角
+    display.drawCircleHelper(newX2 - radius, y2 + radius, radius, 2, SELECTED_COLOR); // 右上角
+    display.drawCircleHelper(newX3 - radius, y3 - radius, radius, 4, SELECTED_COLOR); // 右下角
+    display.drawCircleHelper(newX4 + radius, y4 - radius, radius, 8, SELECTED_COLOR); // 左下角
+}
+
+float Menu::easeInOut(float t) {
+    if (t < 0.2) {
+        return 2 * t * t;
+    } else {
+        return -1 + (4 - 2 * t) * t;
+    }
 }
 
 void Menu::reboundAnimation() {

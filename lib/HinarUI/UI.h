@@ -49,6 +49,7 @@ private:
     void pallTransRect(IconWithLabel& icon);
     void rectTransPall(IconWithLabel& icon);
 
+    float easeInOut(float t);
     void reboundAnimation();
 };
 
