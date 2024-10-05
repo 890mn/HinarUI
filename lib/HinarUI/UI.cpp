@@ -134,14 +134,13 @@ void Menu::drawModuleIcons(int offset, bool init) {
                 display.drawRoundRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, 5, SELECTED_COLOR); 
                 wordGrow(IconTrans);          // grow word-root
 
-                if (i == MODULE_MAX - 1) {
-                    // 绘制左半圆
-                    display.drawCircleHelper(24, 55, 65, 0x2, SELECTED_COLOR);
+                if (i == MODULE_MAX - 1 && animationStep > totalStep - 2) {
+                    display.drawCircleHelper(24, 60, 65, 0x2, SELECTED_COLOR);
+                    display.fillRect(47, 1, 28, 20, UNSELECTED_COLOR);
 
-                    // 绘制左半圆上排列的名称
-                    display.setCursor(41, 20);  // 设置mod1名称的起始位置
+                    display.setCursor(44, 21);
                     display.print(modules[0]);
-                    display.setCursor(56, 52);  // 设置mod4名称的起始位置
+                    display.setCursor(53, 52);
                     display.print(modules[MODULE_MAX-2]);
                 }
             }
