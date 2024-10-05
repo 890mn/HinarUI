@@ -25,9 +25,8 @@ public:
 private:
     String modules[MODULE_MAX] = {"Mod1", "Mod2", "Mod3", "Mod4", "Mod5"};
     int    animationStep       = 0;
-    int    totalStep          = STEP_COUNT;
+    int    totalStep           = STEP_COUNT;
     int    modulePointer       = 0;
-    bool   status_1            = true;
     struct IconWithLabel {
         int    x;
         int    y;
@@ -35,8 +34,8 @@ private:
         int    height;
         String label;
     };
-    IconWithLabel Icon      = {.x = 10, .y = 25, .height = 30};
-    IconWithLabel IconTrans = {         .y = 25, .height = 30};
+    IconWithLabel Icon      = {.x = 10, .y = 25, .width = 20, .height = 30, .label = "INIT"};
+    IconWithLabel IconTrans = {         .y = 25, .width = 20, .height = 30, .label = "INIT"};
 
     void drawTopBar();
     void drawFrame();

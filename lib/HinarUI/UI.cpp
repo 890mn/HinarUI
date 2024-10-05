@@ -48,7 +48,6 @@ void Menu::animateSelection(bool toRight) {
     isAnimating = false;
 }
 
-
 //Private
 void Menu::drawFrame() {
     display.drawLine(0  , 0 , 127, 0 , SELECTED_COLOR); // TOP    1
@@ -101,10 +100,16 @@ void Menu::drawModuleIcons(int offset, bool init) {
     IconTrans.x += offset; 
     Icon = IconTrans;
     bool next = false;
+    //bool prev = false;
 
     for (int i = 0; i < MODULE_MAX; ++i) {
         IconTrans.label = modules[i];
-        Serial.println(IconTrans.x);
+
+        if (i == modulePointer + 1 && init) {
+            IconTrans.x += 40;
+            //prev = true;
+            continue;
+        }
 
         // MainModule
         if (i == modulePointer) {  
@@ -113,13 +118,15 @@ void Menu::drawModuleIcons(int offset, bool init) {
                 drawSelectedIcon(IconTrans);  // module
                 wordShrink(IconTrans);        // shrink word-root
             } else {
+                //if (prev) IconTrans.x += 40;
                 rectTransPall(IconTrans);         // rect->pall
             }
         }
         // MainModule right first
-        else if ((i == modulePointer + 1) && !init) {
-            int tmp = IconTrans.x;
-            IconTrans.x += (totalStep - animationStep) * (35 / totalStep);
+        else if (i == modulePointer + 1) {
+            int tmp = IconTrans.x + 10;
+            IconTrans.x += (totalStep - animationStep) * (30 / totalStep);
+
             if (animationStep < totalStep / 2) {
                 pallTransRect(IconTrans);  // pall->rect
             } else {
@@ -133,10 +140,7 @@ void Menu::drawModuleIcons(int offset, bool init) {
         else {
             IconTrans.width = 20;  // 确保未选模块是平行四边形的宽度
             if (next) {
-                IconTrans.x += 35;  // 主选右侧的未选模块位移
-            }
-            if ((i == modulePointer + 1) && init) {
-                IconTrans.x += 35;
+                IconTrans.x += 40;  // 主选右侧的未选模块位移
             }
             //if (prev) {
             //    Icon.x -= 35;  // 主选左侧的未选模块位移
@@ -144,20 +148,17 @@ void Menu::drawModuleIcons(int offset, bool init) {
             drawUnselectedIcon(IconTrans);
         }
         //if (i == 0) Icon = IconTrans;
-        IconTrans.x += 40;
+        IconTrans.x += 35;
     }
 }
 
 void Menu::wordShrink(IconWithLabel& icon) {
     int wordStep = STEP_COUNT / 2;
     int shrinkI = animationStep;
-    float shrinkX = 35.0 / wordStep;  // 缩减量
+    float shrinkX = 35.0 / wordStep;
 
-    // 修改覆盖区域，确保完全隐藏类根号
-    display.fillRect(icon.x + 30 + shrinkX * (wordStep - shrinkI), 
-                     icon.y + 10, 
-                     shrinkX * shrinkI,  // 覆盖剩余部分
-                     25, UNSELECTED_COLOR);
+    display.fillRect(icon.x + 30 + shrinkX * (wordStep - shrinkI), icon.y + 10, 
+                     shrinkX * shrinkI, 20, UNSELECTED_COLOR);
 }
 
 void Menu::wordGrow(IconWithLabel& icon) {
@@ -168,7 +169,6 @@ void Menu::wordGrow(IconWithLabel& icon) {
     int startX = icon.x + icon.width - 1;
     int startY = icon.y + icon.height - 1;
     
-    //icon.x + icon.width + 8, icon.y + icon.height - 10
     int endX1 = icon.x + icon.width + 8;
     int endY1 = icon.y + icon.height - 10;
 
@@ -176,7 +176,6 @@ void Menu::wordGrow(IconWithLabel& icon) {
     int currentEndY1 = startY - 18 / wordStep * progress;
 
     int horizontalProgress = growI - wordStep / 2;
-    int endX2 = endX1 + 20;
     int currentEndX2 = endX1 + 60 / wordStep * horizontalProgress; 
 
     if (modules[modulePointer + 1] == icon.label) {
@@ -188,7 +187,7 @@ void Menu::wordGrow(IconWithLabel& icon) {
             display.drawLine(startX, startY, currentEndX1, currentEndY1, SELECTED_COLOR); 
         }
 
-        if (animationStep == totalStep - 1) {
+        if (animationStep > totalStep - 4) {
             display.setCursor(icon.x + icon.width + 10, icon.y + 10); 
             display.setTextColor(SELECTED_COLOR);
             display.print(icon.label);
@@ -224,23 +223,23 @@ void Menu::pallTransRect(IconWithLabel& icon) {
 void Menu::rectTransPall(IconWithLabel& icon) {
     int rectStep = STEP_COUNT / 2;
     int transI = animationStep - totalStep / 2;
-    float transX = 10.0 / rectStep;  // 每一步的缩放量
 
     int x1 = icon.x;
     int y1 = icon.y;
-    int x2 = icon.x + icon.width;
+    int x2 = icon.x + 30;
     int y2 = icon.y;
-    int x3 = icon.x + icon.width;
+    int x3 = icon.x + 25;
     int y3 = icon.y + icon.height;
     int x4 = icon.x;
     int y4 = icon.y + icon.height;
 
     // 确保右侧宽度逐步缩减，从30缩到20
-    int newX3 = x3 - (transX * transI);  
-    int newX4 = x4 - (transX * transI);
+    int newX2 = x2 - (10.0 / rectStep) * transI;
+    int newX3 = x3 - (15.0 / rectStep) * transI;
+    int newX4 = x4 - (10.0 / rectStep) * transI;
 
-    display.drawLine(x1, y1, x2, y2, SELECTED_COLOR); 
-    display.drawLine(x2, y2, newX3, y3, SELECTED_COLOR); 
+    display.drawLine(x1, y1, newX2, y2, SELECTED_COLOR); 
+    display.drawLine(newX2, y2, newX3, y3, SELECTED_COLOR); 
     display.drawLine(newX3, y3, newX4, y4, SELECTED_COLOR); 
     display.drawLine(newX4, y4, x1, y1, SELECTED_COLOR);
 }
