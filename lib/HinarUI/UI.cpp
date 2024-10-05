@@ -5,44 +5,37 @@ extern bool             isAnimating;
 
 //public
 void Menu::init() {
-    display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(SELECTED_COLOR);
     display.setCursor(0, 0);
-
-    drawTopBar();
-    drawModuleIcons(0, true);
-    drawFrame();
-    display.display();
+    draw(0, true);
 }
 
-void Menu::draw(int offset) {
+void Menu::draw(int offset, bool init) {
     display.clearDisplay();
     drawTopBar();
-    drawModuleIcons(offset, false);
+    drawModuleIcons(offset, init);
     drawFrame();
     display.display();
 }
 
 void Menu::animateSelection(bool toRight) {
-    if ((modulePointer == 0 && toRight) || (modulePointer == MODULE_MAX - 1 && !toRight)) {
-        reboundAnimation();
-        //display.setCursor(4, 4);
-        //display.print("ERROR");
-        //display.display();
-        isAnimating = false;
-        return;
-    }
-
-    isAnimating = true;
-    animationStep = 0; 
-    int offset = toRight ? 35 : -35;
-    int currentOffset = offset / totalStep; 
+    animationStep = 0;
+    int offset = toRight ? 45 : -45;
+    int currentOffset = offset / totalStep;
 
     while (animationStep < totalStep) {
-        draw(currentOffset);
+        draw(currentOffset, false);
         animationStep++;
         delay(50);
+    }
+
+    if (modulePointer == MODULE_MAX - 1) {
+        modulePointer = 0;
+        Icon = {.x = 10, .y = 25, .width = 20, .height = 30, .label = "INIT"};
+        draw(0, true);
+        isAnimating = false;
+        return;
     }
     toRight ? --modulePointer : ++modulePointer;
     isAnimating = false;
@@ -75,7 +68,7 @@ void Menu::drawTopBar() {
 
 void Menu::drawSelectedIcon(IconWithLabel& icon) {
     icon.width = 30;
-    display.drawRect(icon.x, icon.y, icon.width, icon.height, SELECTED_COLOR);
+    display.drawRoundRect(icon.x, icon.y, icon.width, icon.height, 5, SELECTED_COLOR);
 
     // ROOT
     display.drawLine(icon.x + icon.width - 1, icon.y + icon.height - 1, icon.x + icon.width + 8, icon.y + icon.height - 10, SELECTED_COLOR);
@@ -100,25 +93,32 @@ void Menu::drawModuleIcons(int offset, bool init) {
     IconTrans.x += offset; 
     Icon = IconTrans;
     bool next = false;
-    //bool prev = false;
+
+    if (init) {
+        for (int i = 0; i < MODULE_MAX; ++i) {
+            IconTrans.label = modules[i];
+            if (i == 0) {
+                drawSelectedIcon(IconTrans);
+                IconTrans.x += 75;
+            } else {
+                drawUnselectedIcon(IconTrans);
+                IconTrans.x += 35;
+            }
+        } 
+        return;
+    }
 
     for (int i = 0; i < MODULE_MAX; ++i) {
         IconTrans.label = modules[i];
-
-        if (i == modulePointer + 1 && init) {
-            IconTrans.x += 40;
-            //prev = true;
-            continue;
-        }
+        Serial.println(IconTrans.x);
 
         // MainModule
         if (i == modulePointer) {  
-            //display.drawCircle(IconTrans.x + 15, IconTrans.y + 15, 2, SELECTED_COLOR); //Debug
+            //display.drawCircle(IconTrans.x + 15, IconTrans.y + 15, 2, SELECTED_COLOR); //MainModule Debug
             if (animationStep < totalStep / 2) {
                 drawSelectedIcon(IconTrans);  // module
                 wordShrink(IconTrans);        // shrink word-root
             } else {
-                //if (prev) IconTrans.x += 40;
                 rectTransPall(IconTrans);         // rect->pall
             }
         }
@@ -131,23 +131,27 @@ void Menu::drawModuleIcons(int offset, bool init) {
                 pallTransRect(IconTrans);  // pall->rect
             } else {
                 IconTrans.height = IconTrans.width = 30;
-                display.drawRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, SELECTED_COLOR); // module
+                display.drawRoundRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, 5, SELECTED_COLOR); 
                 wordGrow(IconTrans);          // grow word-root
+
+                if (i == MODULE_MAX - 1) {
+                    // 绘制左半圆
+                    display.drawCircleHelper(24, 55, 65, 0x2, SELECTED_COLOR);
+
+                    // 绘制左半圆上排列的名称
+                    display.setCursor(41, 20);  // 设置mod1名称的起始位置
+                    display.print(modules[0]);
+                    display.setCursor(56, 52);  // 设置mod4名称的起始位置
+                    display.print(modules[MODULE_MAX-2]);
+                }
             }
             next = true;
             IconTrans.x = tmp;
         }
         else {
-            IconTrans.width = 20;  // 确保未选模块是平行四边形的宽度
-            if (next) {
-                IconTrans.x += 40;  // 主选右侧的未选模块位移
-            }
-            //if (prev) {
-            //    Icon.x -= 35;  // 主选左侧的未选模块位移
-            //}
+            if (next) IconTrans.x += 40;
             drawUnselectedIcon(IconTrans);
         }
-        //if (i == 0) Icon = IconTrans;
         IconTrans.x += 35;
     }
 }

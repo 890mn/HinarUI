@@ -19,7 +19,7 @@
 class Menu {
 public:
     void   init();
-    void   draw(int offset);
+    void   draw(int offset, bool init);
     void   animateSelection(bool toRight);
 
 private:
@@ -48,6 +48,7 @@ private:
     void wordGrow(IconWithLabel& icon);
     void pallTransRect(IconWithLabel& icon);
     void rectTransPall(IconWithLabel& icon);
+
     void reboundAnimation();
 };
 
