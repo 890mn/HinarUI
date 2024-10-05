@@ -37,9 +37,9 @@ void Menu::animateSelection(bool toRight) {
     isAnimating = true;
     animationStep = 0; 
     int offset = toRight ? 35 : -35;
-    int currentOffset = offset / totalSteps; 
+    int currentOffset = offset / totalStep; 
 
-    while (animationStep < totalSteps) {
+    while (animationStep < totalStep) {
         draw(currentOffset);
         animationStep++;
         delay(50);
@@ -109,7 +109,7 @@ void Menu::drawModuleIcons(int offset, bool init) {
         // MainModule
         if (i == modulePointer) {  
             //display.drawCircle(IconTrans.x + 15, IconTrans.y + 15, 2, SELECTED_COLOR); //Debug
-            if (animationStep < totalSteps / 2) {
+            if (animationStep < totalStep / 2) {
                 drawSelectedIcon(IconTrans);  // module
                 wordShrink(IconTrans);        // shrink word-root
             } else {
@@ -119,11 +119,12 @@ void Menu::drawModuleIcons(int offset, bool init) {
         // MainModule right first
         else if ((i == modulePointer + 1) && !init) {
             int tmp = IconTrans.x;
-            IconTrans.x += (totalSteps - animationStep) * (35 / totalSteps);
-            if (animationStep < totalSteps / 2) {
+            IconTrans.x += (totalStep - animationStep) * (35 / totalStep);
+            if (animationStep < totalStep / 2) {
                 pallTransRect(IconTrans);  // pall->rect
             } else {
-                drawSelectedIcon(IconTrans);  // module
+                IconTrans.height = IconTrans.width = 30;
+                display.drawRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, SELECTED_COLOR); // module
                 wordGrow(IconTrans);          // grow word-root
             }
             next = true;
@@ -161,25 +162,34 @@ void Menu::wordShrink(IconWithLabel& icon) {
 
 void Menu::wordGrow(IconWithLabel& icon) {
     int wordStep = STEP_COUNT / 2;
-    int growI = animationStep - totalSteps / 2;
-    float growX = 35.0 / wordStep;
+    int growI = animationStep - totalStep / 2;
+    int progress = growI;
 
-    if (modules[modulePointer] == icon.label) {
-        int startX = icon.x + icon.width;  // 正方形的右下角
-        int startY = icon.y + icon.height;
+    int startX = icon.x + icon.width - 1;
+    int startY = icon.y + icon.height - 1;
+    
+    //icon.x + icon.width + 8, icon.y + icon.height - 10
+    int endX1 = icon.x + icon.width + 8;
+    int endY1 = icon.y + icon.height - 10;
 
-        int endX1 = startX + growX * growI;
-        int endY1 = startY - growX * growI;
+    int currentEndX1 = startX + 18 / wordStep * progress;  // 9 * 2
+    int currentEndY1 = startY - 18 / wordStep * progress;
 
-        display.drawLine(startX, startY, endX1, endY1, SELECTED_COLOR);  // 斜线
-        if (growI > wordStep / 2) {
-            int endX2 = endX1 + growX * (growI - wordStep / 2);
-            display.drawLine(endX1, endY1, endX2, endY1, SELECTED_COLOR);  // 水平线
+    int horizontalProgress = growI - wordStep / 2;
+    int endX2 = endX1 + 20;
+    int currentEndX2 = endX1 + 60 / wordStep * horizontalProgress; 
+
+    if (modules[modulePointer + 1] == icon.label) {
+        if (growI >= wordStep / 2) {
+            display.drawLine(startX, startY, endX1, endY1, SELECTED_COLOR); 
+            display.drawLine(endX1, endY1, currentEndX2, endY1, SELECTED_COLOR);
+        }
+        else {
+            display.drawLine(startX, startY, currentEndX1, currentEndY1, SELECTED_COLOR); 
         }
 
-        // 显示文字
-        if (growI == wordStep - 1) {
-            display.setCursor(icon.x + icon.width + 5, icon.y + 5);
+        if (animationStep == totalStep - 1) {
+            display.setCursor(icon.x + icon.width + 10, icon.y + 10); 
             display.setTextColor(SELECTED_COLOR);
             display.print(icon.label);
         }
@@ -188,7 +198,7 @@ void Menu::wordGrow(IconWithLabel& icon) {
 
 void Menu::pallTransRect(IconWithLabel& icon) {
     int rectStep = STEP_COUNT / 2;
-    int transI = animationStep - totalSteps / 2;
+    int transI = animationStep - totalStep / 2;
     float transX = 10.0 / rectStep;  // 每一步的缩放量
 
     int x1 = icon.x;
@@ -213,7 +223,7 @@ void Menu::pallTransRect(IconWithLabel& icon) {
 
 void Menu::rectTransPall(IconWithLabel& icon) {
     int rectStep = STEP_COUNT / 2;
-    int transI = animationStep - totalSteps / 2;
+    int transI = animationStep - totalStep / 2;
     float transX = 10.0 / rectStep;  // 每一步的缩放量
 
     int x1 = icon.x;

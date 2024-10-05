@@ -9,7 +9,7 @@
 #define UNSELECTED_OFFSET 10
 #define SCREEN_WIDTH      128
 #define SCREEN_HEIGHT     64
-#define STEP_COUNT        8 
+#define STEP_COUNT        12 
 #define MODULE_MAX        5
 
 #define PAGE_NAME "Home"
@@ -25,8 +25,9 @@ public:
 private:
     String modules[MODULE_MAX] = {"Mod1", "Mod2", "Mod3", "Mod4", "Mod5"};
     int    animationStep       = 0;
-    int    totalSteps          = STEP_COUNT;
+    int    totalStep          = STEP_COUNT;
     int    modulePointer       = 0;
+    bool   status_1            = true;
     struct IconWithLabel {
         int    x;
         int    y;
