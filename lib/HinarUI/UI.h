@@ -20,7 +20,7 @@
 #define FLOWSPEED_SLOW    35
 
 // Module Setting
-#define MODULE_MAX        5
+#define MODULE_MAX        3
 #define MODULE_OFFSET     45
 #define MODULE_DIRECTION  -1
 #define RADIUS_PALL       2
@@ -37,12 +37,12 @@ public:
     void   renderStart();
 
 private:
-    String modules[MODULE_MAX] = {"Mod1", "Mod2", "Mod3", "Mod4", "Mod5"};
+    String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3"};
 
     int    curStep             = 0;
     int    totalStep           = STEP_COUNT;
     int    offsetSlice         = MODULE_DIRECTION * MODULE_OFFSET / STEP_COUNT;
-    
+
     int    modulePointer       = 0;
     int    flowSpeed           = FLOWSPEED_NORMAL;
     struct IconWithLabel {

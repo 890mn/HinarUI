@@ -3,7 +3,6 @@
 extern Adafruit_SSD1306 display;
 extern bool             isAnimating;
 
-//public
 void Menu::init() {
     display.setTextSize(1);
     display.setTextColor(SELECTED_COLOR);
@@ -39,9 +38,8 @@ void Menu::renderStart() {
     isAnimating = false;
 }
 
-//Private
 float Menu::easeInOut(float t) {
-    if (t < 0.4) {
+    if (t < 0.7) {
         return 2 * t * t;
     } else {
         return -1 + (4 - 2 * t) * t;
@@ -134,7 +132,7 @@ void Menu::drawModules(int offset, bool init) {
             IconTrans.label = modules[i];
             if (i == 0) {
                 drawSeleModule(IconTrans);
-                IconTrans.x += 75;
+                IconTrans.x += 85;
             } else {
                 drawUnseleModule(IconTrans);
                 IconTrans.x += 35;
@@ -173,13 +171,16 @@ void Menu::drawModules(int offset, bool init) {
                 wordGrow(IconTrans);         // grow word-root
 
                 if (i == MODULE_MAX - 1 && curStep > totalStep - 2) {
-                    display.drawCircleHelper(24, 60, 65, 0x2, SELECTED_COLOR);
-                    display.fillRect(47, 1, 28, 20, UNSELECTED_COLOR);
-
-                    display.setCursor(44, 21);
+                    // PREV&NEXT
+                    display.setCursor(45, 20);
                     display.print(modules[0]);
-                    display.setCursor(53, 52);
+                    display.setCursor(57, 52);
                     display.print(modules[MODULE_MAX-2]);
+
+                    // UP-CHOOSE
+                    display.drawRoundRect(85, 20, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                    display.fillRoundRect(90, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                    display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
                 }
             }
             next = true;
@@ -196,7 +197,7 @@ void Menu::drawModules(int offset, bool init) {
 void Menu::wordShrink(IconWithLabel& icon) {
     int wordStep = STEP_COUNT / 2;
     int shrinkI = curStep;
-    float shrinkX = 35.0 / wordStep;
+    float shrinkX = 45.0 / wordStep;
 
     display.fillRect(icon.x + 30 + shrinkX * (wordStep - shrinkI), icon.y + 10, 
                      shrinkX * shrinkI, 20, UNSELECTED_COLOR);
@@ -215,11 +216,11 @@ void Menu::wordGrow(IconWithLabel& icon) {
     int currentEndX1 = startX + 18 / wordStep * growI;  // 9 * 2
     int currentEndY1 = startY - 18 / wordStep * growI;
 
-    int horizontalProgress = growI - wordStep / 2;
-    int currentEndX2 = endX1 + 60 / wordStep * horizontalProgress; 
+    int horizontalProgress = growI - wordStep * 3 / 7;
+    int currentEndX2 = endX1 + 50 / wordStep * horizontalProgress; 
 
     if (modules[modulePointer + 1] == icon.label) {
-        if (growI >= wordStep / 2) {
+        if (growI >= wordStep * 3 / 7) {
             display.drawLine(startX, startY, endX1, endY1, SELECTED_COLOR); 
             display.drawLine(endX1, endY1, currentEndX2, endY1, SELECTED_COLOR);
         }
