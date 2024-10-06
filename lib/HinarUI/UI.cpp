@@ -14,34 +14,40 @@ void Menu::init() {
 void Menu::draw(int offset, bool init) {
     display.clearDisplay();
     drawTopBar();
-    drawModuleIcons(offset, init);
+    drawModules(offset, init);
     drawFrame();
     display.display();
 }
 
-void Menu::animateSelection(bool toRight) {
-    animationStep = 0;
-    int offset = toRight ? 45 : -45;
-    int currentOffset = offset / totalStep;
+void Menu::renderStart() {
+    curStep = 0;
 
-    while (animationStep < totalStep) {
-        draw(currentOffset, false);
-        animationStep++;
-        delay(50);
+    while (curStep < totalStep) {
+        draw(-45 / totalStep, false);
+        curStep++;
+        delay(flowSpeed);
     }
 
     if (modulePointer == MODULE_MAX - 1) {
         modulePointer = 0;
-        Icon = {.x = 10, .y = 25, .width = 20, .height = 30, .label = "INIT"};
+        Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true);
         isAnimating = false;
         return;
     }
-    toRight ? --modulePointer : ++modulePointer;
+    ++modulePointer;
     isAnimating = false;
 }
 
 //Private
+float Menu::easeInOut(float t) {
+    if (t < 0.4) {
+        return 2 * t * t;
+    } else {
+        return -1 + (4 - 2 * t) * t;
+    }
+}
+
 void Menu::drawFrame() {
     display.drawLine(0  , 0 , 127, 0 , SELECTED_COLOR); // TOP    1
     display.drawLine(0  , 0 , 0  , 15, SELECTED_COLOR); // LEFT   1
@@ -66,41 +72,58 @@ void Menu::drawTopBar() {
     display.print(UI_NAME);
 }
 
-void Menu::drawSelectedIcon(IconWithLabel& icon) {
+void Menu::drawSeleModule(IconWithLabel& icon) {
     icon.width = 30;
-    display.drawRoundRect(icon.x, icon.y, icon.width, icon.height, 5, SELECTED_COLOR);
+    display.drawRoundRect(icon.x, icon.y, icon.width, icon.height, RADIUS_RECT, SELECTED_COLOR);
 
-    // ROOT
-    display.drawLine(icon.x + icon.width - 1, icon.y + icon.height - 1, icon.x + icon.width + 8, icon.y + icon.height - 10, SELECTED_COLOR);
-    display.drawLine(icon.x + icon.width + 8, icon.y + icon.height - 10, icon.x + icon.width + 28, icon.y + icon.height - 10, SELECTED_COLOR);
+    // 1 - ROOT
+    display.drawLine(icon.x + icon.width - 1, icon.y + icon.height - 1,
+                     icon.x + icon.width + 8, icon.y + icon.height - 10, SELECTED_COLOR);
+    display.drawLine(icon.x + icon.width + 8, icon.y + icon.height - 10,
+                     icon.x + icon.width + 28, icon.y + icon.height - 10, SELECTED_COLOR);
 
-    // NAME
+    // 2 - NAME
     display.setCursor(icon.x + icon.width + 10, icon.y + 10);
     display.print(icon.label);
 }
 
-void Menu::drawUnselectedIcon(IconWithLabel& icon) {
+void Menu::drawUnseleModule(IconWithLabel& icon) {
     icon.width = 20;
-   // 左上到右上
-    display.drawLine(icon.x + 2, icon.y, icon.x + icon.width - 2, icon.y, SELECTED_COLOR);
-    // 左下到右下
-    display.drawLine(icon.x - UNSELECTED_OFFSET + 2, icon.y + icon.height, icon.x + icon.width - UNSELECTED_OFFSET - 2, icon.y + icon.height, SELECTED_COLOR);
-    // 左上到左下
-    display.drawLine(icon.x, icon.y + 2, icon.x - UNSELECTED_OFFSET, icon.y + icon.height - 2, SELECTED_COLOR);
-    // 右上到右下
-    display.drawLine(icon.x + icon.width, icon.y + 2, icon.x + icon.width - UNSELECTED_OFFSET, icon.y + icon.height - 2, SELECTED_COLOR);
 
-    // 左上圆角
-    display.drawCircleHelper(icon.x + 2, icon.y + 2, 2, 1, SELECTED_COLOR);
-    // 右上圆角
-    display.drawCircleHelper(icon.x + icon.width - 2, icon.y + 2, 2, 2, SELECTED_COLOR);
-    // 左下圆角
-    display.drawCircleHelper(icon.x - UNSELECTED_OFFSET + 2, icon.y + icon.height - 2, 2, 8, SELECTED_COLOR);
-    // 右下圆角
-    display.drawCircleHelper(icon.x + icon.width - UNSELECTED_OFFSET - 2, icon.y + icon.height - 2, 2, 4, SELECTED_COLOR);
+    // 1 - LEFT-TOP
+    display.drawCircleHelper(icon.x + 2, icon.y + 2,
+                             RADIUS_PALL, 1, SELECTED_COLOR);
+
+    // 2 - LEFT-TOP -> LEFT-BOTTOM
+    display.drawLine(icon.x, icon.y + 2,
+                     icon.x - 10, icon.y + icon.height - 2, SELECTED_COLOR);          
+
+    // 2 - LEFT-TOP -> RIGHT-TOP
+    display.drawLine(icon.x + 2, icon.y,
+                     icon.x + icon.width - 2, icon.y, SELECTED_COLOR);
+
+    // 3 - LEFT-BOTTOM
+    display.drawCircleHelper(icon.x - 10 + 2, icon.y + icon.height - 2,
+                             RADIUS_PALL, 8, SELECTED_COLOR);
+
+    // 3 - RIGHT-TOP
+    display.drawCircleHelper(icon.x + icon.width - 2, icon.y + 2,
+                             RADIUS_PALL, 2, SELECTED_COLOR);          
+
+    // 4 - RIGHT-TOP -> RIGHT-BOTTOM
+    display.drawLine(icon.x + icon.width, icon.y + 2,
+                     icon.x + icon.width - 10, icon.y + icon.height - 2, SELECTED_COLOR);
+
+    // 4 - LEFT-BOTTOM -> RIGHT-BOTTOM
+    display.drawLine(icon.x - 10 + 2, icon.y + icon.height,
+                     icon.x + icon.width - 10 - 2, icon.y + icon.height, SELECTED_COLOR);
+
+    // 5 - RIGHT-BOTTOM
+    display.drawCircleHelper(icon.x + icon.width - 10 - 2, icon.y + icon.height - 2,
+                             RADIUS_PALL, 4, SELECTED_COLOR);     
 }
 
-void Menu::drawModuleIcons(int offset, bool init) {
+void Menu::drawModules(int offset, bool init) {
     IconTrans = Icon;
     IconTrans.x += offset; 
     Icon = IconTrans;
@@ -110,10 +133,10 @@ void Menu::drawModuleIcons(int offset, bool init) {
         for (int i = 0; i < MODULE_MAX; ++i) {
             IconTrans.label = modules[i];
             if (i == 0) {
-                drawSelectedIcon(IconTrans);
+                drawSeleModule(IconTrans);
                 IconTrans.x += 75;
             } else {
-                drawUnselectedIcon(IconTrans);
+                drawUnseleModule(IconTrans);
                 IconTrans.x += 35;
             }
         } 
@@ -122,31 +145,34 @@ void Menu::drawModuleIcons(int offset, bool init) {
 
     for (int i = 0; i < MODULE_MAX; ++i) {
         IconTrans.label = modules[i];
-        Serial.println(IconTrans.x);
 
         // MainModule
         if (i == modulePointer) {  
-            //display.drawCircle(IconTrans.x + 15, IconTrans.y + 15, 2, SELECTED_COLOR); //MainModule Debug
-            if (animationStep < totalStep / 2) {
-                drawSelectedIcon(IconTrans);  // module
+            //MainModule Debug
+            //display.drawCircle(IconTrans.x + 15, IconTrans.y + 15, 2, SELECTED_COLOR); 
+
+            if (curStep < totalStep / 2) {
+                drawSeleModule(IconTrans);    // module-selected
                 wordShrink(IconTrans);        // shrink word-root
             } else {
-                rectTransPall(IconTrans);         // rect->pall
+                rectTransPall(IconTrans);     // rect->pall
             }
         }
+
         // MainModule right first
         else if (i == modulePointer + 1) {
             int tmp = IconTrans.x + 10;
-            IconTrans.x += (totalStep - animationStep) * (30 / totalStep);
+            IconTrans.x += (totalStep - curStep) * (30 / totalStep);
 
-            if (animationStep < totalStep / 2) {
-                pallTransRect(IconTrans);  // pall->rect
+            if (curStep < totalStep / 2) {
+                pallTransRect(IconTrans);     // pall->rect
             } else {
                 IconTrans.height = IconTrans.width = 30;
-                display.drawRoundRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, 5, SELECTED_COLOR); 
-                wordGrow(IconTrans);          // grow word-root
+                display.drawRoundRect(IconTrans.x, IconTrans.y,
+                                      IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR); 
+                wordGrow(IconTrans);         // grow word-root
 
-                if (i == MODULE_MAX - 1 && animationStep > totalStep - 2) {
+                if (i == MODULE_MAX - 1 && curStep > totalStep - 2) {
                     display.drawCircleHelper(24, 60, 65, 0x2, SELECTED_COLOR);
                     display.fillRect(47, 1, 28, 20, UNSELECTED_COLOR);
 
@@ -161,7 +187,7 @@ void Menu::drawModuleIcons(int offset, bool init) {
         }
         else {
             if (next) IconTrans.x += 40;
-            drawUnselectedIcon(IconTrans);
+            drawUnseleModule(IconTrans);
         }
         IconTrans.x += 35;
     }
@@ -169,7 +195,7 @@ void Menu::drawModuleIcons(int offset, bool init) {
 
 void Menu::wordShrink(IconWithLabel& icon) {
     int wordStep = STEP_COUNT / 2;
-    int shrinkI = animationStep;
+    int shrinkI = curStep;
     float shrinkX = 35.0 / wordStep;
 
     display.fillRect(icon.x + 30 + shrinkX * (wordStep - shrinkI), icon.y + 10, 
@@ -178,8 +204,7 @@ void Menu::wordShrink(IconWithLabel& icon) {
 
 void Menu::wordGrow(IconWithLabel& icon) {
     int wordStep = STEP_COUNT / 2;
-    int growI = animationStep - totalStep / 2;
-    int progress = growI;
+    int growI = curStep - totalStep / 2;
 
     int startX = icon.x + icon.width - 1;
     int startY = icon.y + icon.height - 1;
@@ -187,8 +212,8 @@ void Menu::wordGrow(IconWithLabel& icon) {
     int endX1 = icon.x + icon.width + 8;
     int endY1 = icon.y + icon.height - 10;
 
-    int currentEndX1 = startX + 18 / wordStep * progress;  // 9 * 2
-    int currentEndY1 = startY - 18 / wordStep * progress;
+    int currentEndX1 = startX + 18 / wordStep * growI;  // 9 * 2
+    int currentEndY1 = startY - 18 / wordStep * growI;
 
     int horizontalProgress = growI - wordStep / 2;
     int currentEndX2 = endX1 + 60 / wordStep * horizontalProgress; 
@@ -202,7 +227,7 @@ void Menu::wordGrow(IconWithLabel& icon) {
             display.drawLine(startX, startY, currentEndX1, currentEndY1, SELECTED_COLOR); 
         }
 
-        if (animationStep > totalStep - 4) {
+        if (curStep > totalStep - 4) {
             display.setCursor(icon.x + icon.width + 10, icon.y + 10); 
             display.setTextColor(SELECTED_COLOR);
             display.print(icon.label);
@@ -210,83 +235,62 @@ void Menu::wordGrow(IconWithLabel& icon) {
     }
 }
 
+void Menu::pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int rightBottomX, int leftBottomX) {
+    // 1 - LEFT-TOP
+    display.drawCircleHelper(leftTopX + RADIUS_PALL, icon.y + RADIUS_PALL,
+                             RADIUS_PALL, 1, SELECTED_COLOR);
+
+    // 2 - LEFT-BOTTOM -> LEFT-TOP
+    display.drawLine(leftBottomX, icon.y + icon.height - RADIUS_PALL,
+                     leftTopX, icon.y + RADIUS_PALL, SELECTED_COLOR);    
+
+    // 2 - LEFT-TOP -> RIGHT-TOP
+    display.drawLine(leftTopX + RADIUS_PALL, icon.y,
+                     rightTopX - RADIUS_PALL, icon.y, SELECTED_COLOR); 
+
+    // 3 - RIGHT-TOP
+    display.drawCircleHelper(rightTopX - RADIUS_PALL, icon.y + RADIUS_PALL,
+                             RADIUS_PALL, 2, SELECTED_COLOR);
+
+    // 3 - LEFT-BOTTOM
+    display.drawCircleHelper(leftBottomX + RADIUS_PALL, icon.y + icon.height - RADIUS_PALL,
+                             RADIUS_PALL, 8, SELECTED_COLOR);
+
+    // 4 - RIGHT-TOP -> RIGHT-BOTTOM
+    display.drawLine(rightTopX, icon.y + RADIUS_PALL,
+                             rightBottomX, icon.y + icon.height - RADIUS_PALL, SELECTED_COLOR); 
+
+    // 4 - RIGHT-BOTTOM -> LEFT-BOTTOM
+    display.drawLine(rightBottomX - RADIUS_PALL, icon.y + icon.height,
+                             leftBottomX + RADIUS_PALL, icon.y + icon.height, SELECTED_COLOR); 
+
+    // 5 - RIGHT-BOTTOM
+    display.drawCircleHelper(rightBottomX - RADIUS_PALL, icon.y + icon.height - RADIUS_PALL,
+                             RADIUS_PALL, 4, SELECTED_COLOR);
+}
+
 void Menu::pallTransRect(IconWithLabel& icon) {
     int rectStep = STEP_COUNT / 2;
-    int transI = animationStep - totalStep / 2;
-    float transX = 10.0 / rectStep;  // 每一步的缩放量
+    int transI = curStep - totalStep / 2;
+    float transX = 10.0 / rectStep;
 
-    int x1 = icon.x;
-    int y1 = icon.y;
-    int x2 = icon.x + icon.width;
-    int y2 = icon.y;
-    int x3 = icon.x + icon.width;
-    int y3 = icon.y + icon.height;
-    int x4 = icon.x;
-    int y4 = icon.y + icon.height;
+    int leftTopX = icon.x - (transX * transI);
+    int rightTopX = icon.x + icon.width;
+    int rightBottomX = icon.x + icon.width + (transX * transI);
+    int leftBottomX = icon.x;
 
-    // 逐步调整左上角（x1）和右下角（x3）的横坐标
-    int newX1 = x1 - (transX * transI);  // 左上角向左拉
-    int newX3 = x3 + (transX * transI);  // 右下角向右拉
-
-    // 添加圆角
-    int radius = 2;
-
-    // 线条调整，留出圆角空间
-    display.drawLine(newX1 + radius, y1, x2 - radius, y2, SELECTED_COLOR); // 左上到右上
-    display.drawLine(x2, y2 + radius, newX3, y3 - radius, SELECTED_COLOR); // 右上到右下
-    display.drawLine(newX3 - radius, y3, x4 + radius, y4, SELECTED_COLOR); // 右下到左下
-    display.drawLine(x4, y4 - radius, newX1, y1 + radius, SELECTED_COLOR); // 左下到左上
-
-    // 绘制圆角
-    display.drawCircleHelper(newX1 + radius, y1 + radius, radius, 1, SELECTED_COLOR); // 左上角
-    display.drawCircleHelper(x2 - radius, y2 + radius, radius, 2, SELECTED_COLOR); // 右上角
-    display.drawCircleHelper(newX3 - radius, y3 - radius, radius, 4, SELECTED_COLOR); // 右下角
-    display.drawCircleHelper(x4 + radius, y4 - radius, radius, 8, SELECTED_COLOR); // 左下角
+    pallTrans(icon, leftTopX, rightTopX, rightBottomX, leftBottomX);
 }
 
 void Menu::rectTransPall(IconWithLabel& icon) {
     int rectStep = STEP_COUNT / 2;
-    float progress = (float)(animationStep - totalStep / 2) / (rectStep);
+    float progress = (float)(curStep - totalStep / 2) / rectStep;
     float easedProgress = easeInOut(progress);
 
-    int x1 = icon.x;
-    int y1 = icon.y;
-    int x2 = icon.x + 30;
-    int y2 = icon.y;
-    int x3 = icon.x + 25;
-    int y3 = icon.y + icon.height;
-    int x4 = icon.x;
-    int y4 = icon.y + icon.height;
+    int leftTopX = icon.x;
+    int rightTopX = icon.x + 30 - 10.0 * easedProgress;
+    int rightBottomX = icon.x + 25 - 15.0 * easedProgress;
+    int leftBottomX = icon.x - 10.0 * easedProgress;
 
-    // 确保右侧宽度逐步缩减，从30缩到20，使用缓动函数调整步进
-    int newX2 = x2 - 10.0 * easedProgress;
-    int newX3 = x3 - 15.0 * easedProgress;
-    int newX4 = x4 - 10.0 * easedProgress;
-
-    // 添加圆角
-    int radius = 2;
-
-    // 线条调整，留出圆角空间
-    display.drawLine(x1 + radius, y1, newX2 - radius, y2, SELECTED_COLOR); // 左上到右上
-    display.drawLine(newX2, y2 + radius, newX3, y3 - radius, SELECTED_COLOR); // 右上到右下
-    display.drawLine(newX3 - radius, y3, newX4 + radius, y4, SELECTED_COLOR); // 右下到左下
-    display.drawLine(newX4, y4 - radius, x1, y1 + radius, SELECTED_COLOR); // 左下到左上
-
-    // 绘制圆角
-    display.drawCircleHelper(x1 + radius, y1 + radius, radius, 1, SELECTED_COLOR); // 左上角
-    display.drawCircleHelper(newX2 - radius, y2 + radius, radius, 2, SELECTED_COLOR); // 右上角
-    display.drawCircleHelper(newX3 - radius, y3 - radius, radius, 4, SELECTED_COLOR); // 右下角
-    display.drawCircleHelper(newX4 + radius, y4 - radius, radius, 8, SELECTED_COLOR); // 左下角
-}
-
-float Menu::easeInOut(float t) {
-    if (t < 0.2) {
-        return 2 * t * t;
-    } else {
-        return -1 + (4 - 2 * t) * t;
-    }
-}
-
-void Menu::reboundAnimation() {
-    // 预留回弹动画的逻辑，可以在这里实现回弹效果
+    pallTrans(icon, leftTopX, rightTopX, rightBottomX, leftBottomX);
 }
