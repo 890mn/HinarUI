@@ -20,14 +20,16 @@
 #define FLOWSPEED_SLOW    35
 
 // Module Setting
-#define MODULE_MAX        3
+#define MODULE_MAX        6
 #define MODULE_OFFSET     45
 #define MODULE_DIRECTION  -1
+#define MODULE_FORWARD    3
+#define MODULE_BACKWARD   MODULE_MAX - MODULE_FORWARD
+
 #define RADIUS_PALL       2
 #define RADIUS_RECT       5
 
 // TopBar Setting
-#define PAGE_NAME "Home"
 #define UI_NAME   "HinarUI"
 
 class Menu {
@@ -37,8 +39,8 @@ public:
     void   renderStart();
 
 private:
-    String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3"};
-
+    String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3", "BACK1", "BACK2", "BACK3"};
+    String PAGE_NAME           = "FORWARD";
     int    curStep             = 0;
     int    totalStep           = STEP_COUNT;
     int    offsetSlice         = MODULE_DIRECTION * MODULE_OFFSET / STEP_COUNT;
@@ -70,6 +72,8 @@ private:
     void pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int rightBottomX, int leftBottomX);
     void pallTransRect(IconWithLabel& icon);
     void rectTransPall(IconWithLabel& icon);
+
+    void renderBackward();
 };
 
 #endif

@@ -20,6 +20,7 @@ void Menu::draw(int offset, bool init) {
 
 void Menu::renderStart() {
     curStep = 0;
+    PAGE_NAME = modulePointer == MODULE_FORWARD - 2 ? "BACKWARD" : "FORWARD";
 
     while (curStep < totalStep) {
         draw(-45 / totalStep, false);
@@ -27,7 +28,7 @@ void Menu::renderStart() {
         delay(flowSpeed);
     }
 
-    if (modulePointer == MODULE_MAX - 1) {
+    if (modulePointer == MODULE_FORWARD - 1) {
         modulePointer = 0;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true);
@@ -141,7 +142,7 @@ void Menu::drawModules(int offset, bool init) {
         return;
     }
 
-    for (int i = 0; i < MODULE_MAX; ++i) {
+    for (int i = 0; i < MODULE_FORWARD; ++i) {
         IconTrans.label = modules[i];
 
         // MainModule
@@ -170,17 +171,8 @@ void Menu::drawModules(int offset, bool init) {
                                       IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR); 
                 wordGrow(IconTrans);         // grow word-root
 
-                if (i == MODULE_MAX - 1 && curStep > totalStep - 2) {
-                    // PREV&NEXT
-                    display.setCursor(45, 20);
-                    display.print(modules[0]);
-                    display.setCursor(57, 52);
-                    display.print(modules[MODULE_MAX-2]);
-
-                    // UP-CHOOSE
-                    display.drawRoundRect(85, 20, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-                    display.fillRoundRect(90, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-                    display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                if (i == MODULE_FORWARD - 1 && curStep > totalStep - 2) {
+                    renderBackward();
                 }
             }
             next = true;
@@ -294,4 +286,16 @@ void Menu::rectTransPall(IconWithLabel& icon) {
     int leftBottomX = icon.x - 10.0 * easedProgress;
 
     pallTrans(icon, leftTopX, rightTopX, rightBottomX, leftBottomX);
+}
+
+void Menu::renderBackward() {
+    display.fillRoundRect(90, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+
+    if (curStep == totalStep - 1) {
+        delay(30);
+        display.setCursor(57, 52);
+        display.print(modules[MODULE_FORWARD]);
+
+        display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+    }
 }

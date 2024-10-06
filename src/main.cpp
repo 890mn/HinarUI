@@ -4,7 +4,7 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 Menu menu;
 
-const int KEY_PRESS  = 18;
+const int KEY_UP  = 18;
 const int KEY_RIGHT = 19;
 
 bool          isAnimating     = false;
@@ -19,7 +19,7 @@ void setup() {
         while (1);
     }
 
-    pinMode(KEY_PRESS, INPUT_PULLUP);
+    pinMode(KEY_UP, INPUT_PULLUP);
     pinMode(KEY_RIGHT, INPUT_PULLUP);
 
     menu.init();
@@ -29,11 +29,10 @@ void loop() {
     currentTime = millis();
 
     if (!isAnimating && (currentTime - lastButtonPress) > 200) {
-        int keyPressState = digitalRead(KEY_PRESS);
+        int keyUpState = digitalRead(KEY_UP);
         int keyRightState = digitalRead(KEY_RIGHT);
 
-        if (keyPressState == LOW) {
-            //isAnimating = true;
+        if (keyUpState == LOW && isAnimating) {
             //menu.animateSelection();    
             //lastButtonPress = currentTime;
         }
