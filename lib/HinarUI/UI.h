@@ -34,9 +34,8 @@
 
 class Menu {
 public:
-    void   init();
-    void   draw(int offset, bool init);
-    void   renderStart();
+    void create();
+    void loop();
 
 private:
     String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3", "BACK1", "BACK2", "BACK3"};
@@ -58,8 +57,10 @@ private:
     IconWithLabel Icon      = {.x = 10, .y = 25, .width = 20, .height = 30, .label = "INIT"};
     IconWithLabel IconTrans = {         .y = 25, .width = 20, .height = 30, .label = "INIT"};
 
-    float easeInOut(float t);
+    void renderForward();
+    void renderBackward();
 
+    void draw(int offset, bool init);
     void drawTopBar();
     void drawFrame();
 
@@ -74,7 +75,7 @@ private:
     void pallTransRect(IconWithLabel& icon);
     void rectTransPall(IconWithLabel& icon);
 
-    void renderBackward();
+    float easeInOut(float t);    
 };
 
 #endif

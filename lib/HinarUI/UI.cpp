@@ -1,13 +1,38 @@
 #include "UI.h"
 
-extern Adafruit_SSD1306 display;
-extern bool             isAnimating;
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-void Menu::init() {
+bool          isAnimating     = false;
+unsigned long currentTime     = 0;
+unsigned long lastButtonPress = 0;
+
+int KEY_UP  = 18;
+int KEY_RIGHT = 19;
+
+void Menu::create() {
     display.setTextSize(1);
     display.setTextColor(SELECTED_COLOR);
     display.setCursor(0, 0);
     draw(0, true);
+}
+
+void Menu::loop() {
+    currentTime = millis();
+
+    if (!isAnimating && (currentTime - lastButtonPress) > 200) {
+        int keyUpState = digitalRead(KEY_UP);
+        int keyRightState = digitalRead(KEY_RIGHT);
+
+        if (keyUpState == LOW && isAnimating) {
+            //menu.animateSelection();    
+            //lastButtonPress = currentTime;
+        }
+        else if (keyRightState == LOW) {
+            isAnimating = true;
+            renderForward();
+            lastButtonPress = currentTime;
+        }
+    }
 }
 
 void Menu::draw(int offset, bool init) {
@@ -16,35 +41,6 @@ void Menu::draw(int offset, bool init) {
     drawModules(offset, init);
     drawFrame();
     display.display();
-}
-
-void Menu::renderStart() {
-    curStep = 0;
-    PAGE_NAME = modulePointer == MODULE_FORWARD - 2 ? "BACKWARD" : "FORWARD";
-
-    while (curStep < totalStep) {
-        draw(-45 / totalStep, false);
-        curStep++;
-        delay(flowSpeed);
-    }
-
-    if (modulePointer == MODULE_FORWARD - 1) {
-        modulePointer = 0;
-        Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
-        draw(0, true);
-        isAnimating = false;
-        return;
-    }
-    ++modulePointer;
-    isAnimating = false;
-}
-
-float Menu::easeInOut(float t) {
-    if (t < 0.7) {
-        return 2 * t * t;
-    } else {
-        return -1 + (4 - 2 * t) * t;
-    }
 }
 
 void Menu::drawFrame() {
@@ -273,6 +269,27 @@ void Menu::rectTransPall(IconWithLabel& icon) {
               icon.x + 25 - 15.0 * progress, icon.x - 10.0 * progress);
 }
 
+void Menu::renderForward() {
+    curStep = 0;
+    PAGE_NAME = modulePointer == MODULE_FORWARD - 2 ? "BACKWARD" : "FORWARD";
+
+    while (curStep < totalStep) {
+        draw(-45 / totalStep, false);
+        curStep++;
+        delay(flowSpeed);
+    }
+
+    if (modulePointer == MODULE_FORWARD - 1) {
+        modulePointer = 0;
+        Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
+        draw(0, true);
+        isAnimating = false;
+        return;
+    }
+    ++modulePointer;
+    isAnimating = false;
+}
+
 void Menu::renderBackward() {
     display.fillRoundRect(90, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
 
@@ -282,5 +299,13 @@ void Menu::renderBackward() {
         display.print(modules[MODULE_FORWARD]);
 
         display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+    }
+}
+
+float Menu::easeInOut(float t) {
+    if (t < 0.7) {
+        return 2 * t * t;
+    } else {
+        return -1 + (4 - 2 * t) * t;
     }
 }
