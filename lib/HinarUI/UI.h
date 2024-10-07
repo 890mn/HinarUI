@@ -42,6 +42,7 @@ private:
     String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3", "BACK1", "BACK2", "BACK3"};
     String PAGE_NAME           = "FORWARD";
     int    curStep             = 0;
+    int    wordStep            = STEP_COUNT / 2;
     int    totalStep           = STEP_COUNT;
     int    offsetSlice         = MODULE_DIRECTION * MODULE_OFFSET / STEP_COUNT;
 

@@ -187,17 +187,14 @@ void Menu::drawModules(int offset, bool init) {
 }
 
 void Menu::wordShrink(IconWithLabel& icon) {
-    int wordStep = STEP_COUNT / 2;
-    int shrinkI = curStep;
-    float shrinkX = 45.0 / wordStep;
+    float shrinkOffset = 45.0 / wordStep;
 
-    display.fillRect(icon.x + 30 + shrinkX * (wordStep - shrinkI), icon.y + 10, 
-                     shrinkX * shrinkI, 20, UNSELECTED_COLOR);
+    display.fillRect(icon.x + 30 + shrinkOffset * (wordStep - curStep), icon.y + 10, 
+                     shrinkOffset * curStep, 20, UNSELECTED_COLOR);
 }
 
 void Menu::wordGrow(IconWithLabel& icon) {
-    int wordStep = STEP_COUNT / 2;
-    int growI = curStep - totalStep / 2;
+    int growOffset = curStep - wordStep;
 
     int startX = icon.x + icon.width - 1;
     int startY = icon.y + icon.height - 1;
@@ -205,14 +202,13 @@ void Menu::wordGrow(IconWithLabel& icon) {
     int endX1 = icon.x + icon.width + 8;
     int endY1 = icon.y + icon.height - 10;
 
-    int currentEndX1 = startX + 18 / wordStep * growI;  // 9 * 2
-    int currentEndY1 = startY - 18 / wordStep * growI;
+    int currentEndX1 = startX + 18 / wordStep * growOffset;  // 9 * 2
+    int currentEndY1 = startY - 18 / wordStep * growOffset;
 
-    int horizontalProgress = growI - wordStep * 3 / 7;
-    int currentEndX2 = endX1 + 50 / wordStep * horizontalProgress; 
+    int currentEndX2 = endX1 + 50 / wordStep * (growOffset - wordStep * 3 / 7); 
 
     if (modules[modulePointer + 1] == icon.label) {
-        if (growI >= wordStep * 3 / 7) {
+        if (growOffset >= wordStep * 3 / 7) {
             display.drawLine(startX, startY, endX1, endY1, SELECTED_COLOR); 
             display.drawLine(endX1, endY1, currentEndX2, endY1, SELECTED_COLOR);
         }
@@ -263,29 +259,18 @@ void Menu::pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int right
 }
 
 void Menu::pallTransRect(IconWithLabel& icon) {
-    int rectStep = STEP_COUNT / 2;
-    int transI = curStep - totalStep / 2;
-    float transX = 10.0 / rectStep;
+    int transOffset = (curStep - wordStep) * 10 / wordStep; 
 
-    int leftTopX = icon.x - (transX * transI);
-    int rightTopX = icon.x + icon.width;
-    int rightBottomX = icon.x + icon.width + (transX * transI);
-    int leftBottomX = icon.x;
-
-    pallTrans(icon, leftTopX, rightTopX, rightBottomX, leftBottomX);
+    pallTrans(icon, icon.x - transOffset, icon.x + icon.width,
+              icon.x + icon.width + transOffset, icon.x);
 }
 
 void Menu::rectTransPall(IconWithLabel& icon) {
-    int rectStep = STEP_COUNT / 2;
-    float progress = (float)(curStep - totalStep / 2) / rectStep;
-    float easedProgress = easeInOut(progress);
+    int transOffset = (curStep - wordStep) / wordStep;
+    float progress = easeInOut(transOffset);
 
-    int leftTopX = icon.x;
-    int rightTopX = icon.x + 30 - 10.0 * easedProgress;
-    int rightBottomX = icon.x + 25 - 15.0 * easedProgress;
-    int leftBottomX = icon.x - 10.0 * easedProgress;
-
-    pallTrans(icon, leftTopX, rightTopX, rightBottomX, leftBottomX);
+    pallTrans(icon, icon.x, icon.x + 30 - 10.0 * progress,
+              icon.x + 25 - 15.0 * progress, icon.x - 10.0 * progress);
 }
 
 void Menu::renderBackward() {
