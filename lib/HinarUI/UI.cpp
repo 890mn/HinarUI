@@ -2,14 +2,17 @@
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-bool          isAnimating     = false;
-unsigned long currentTime     = 0;
-unsigned long lastButtonPress = 0;
-
-int KEY_UP  = 18;
-int KEY_RIGHT = 19;
-
 void Menu::create() {
+    Serial.begin(115200);
+
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+        Serial.println(F("SSD1306 allocation failed"));
+        while (1);
+    }
+
+    pinMode(KEY_UP, INPUT_PULLUP);
+    pinMode(KEY_RIGHT, INPUT_PULLUP);
+
     display.setTextSize(1);
     display.setTextColor(SELECTED_COLOR);
     display.setCursor(0, 0);
@@ -19,13 +22,14 @@ void Menu::create() {
 void Menu::loop() {
     currentTime = millis();
 
-    if (!isAnimating && (currentTime - lastButtonPress) > 200) {
+    if (!isAnimating && (currentTime - lastButtonPress) > 150) {
         int keyUpState = digitalRead(KEY_UP);
         int keyRightState = digitalRead(KEY_RIGHT);
 
-        if (keyUpState == LOW && isAnimating) {
-            //menu.animateSelection();    
-            //lastButtonPress = currentTime;
+        if (keyUpState == LOW && isbackward) {
+            isAnimating = true;
+            renderBackward();    
+            lastButtonPress = currentTime;
         }
         else if (keyRightState == LOW) {
             isAnimating = true;
@@ -168,6 +172,16 @@ void Menu::drawModules(int offset, bool init) {
                 wordGrow(IconTrans);         // grow word-root
 
                 if (i == MODULE_FORWARD - 1 && curStep > totalStep - 2) {
+                    display.fillRoundRect(90, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+
+                    if (curStep == totalStep - 1) {
+                        delay(30);
+                        display.setCursor(57, 52);
+                        display.print(modules[MODULE_FORWARD]);
+
+                        display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                    }
+                    isbackward = true;
                     renderBackward();
                 }
             }
@@ -291,15 +305,8 @@ void Menu::renderForward() {
 }
 
 void Menu::renderBackward() {
-    display.fillRoundRect(90, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
 
-    if (curStep == totalStep - 1) {
-        delay(30);
-        display.setCursor(57, 52);
-        display.print(modules[MODULE_FORWARD]);
-
-        display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-    }
+    isAnimating = false;
 }
 
 float Menu::easeInOut(float t) {

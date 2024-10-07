@@ -29,9 +29,11 @@
 #define RADIUS_PALL       2
 #define RADIUS_RECT       5
 
+#define KEY_UP            18
+#define KEY_RIGHT         19
+
 // TopBar Setting
 #define UI_NAME   "HinarUI"
-
 class Menu {
 public:
     void create();
@@ -47,6 +49,12 @@ private:
 
     int    modulePointer       = 0;
     int    flowSpeed           = FLOWSPEED_NORMAL;
+
+    bool   isAnimating         = false;
+    bool   isbackward          = false;
+
+    int    currentTime         = 0;
+    int    lastButtonPress     = 0;
     struct IconWithLabel {
         int    x;
         int    y;
