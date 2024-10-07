@@ -269,14 +269,14 @@ void Menu::pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int right
 }
 
 void Menu::pallTransRect(IconWithLabel& icon) {
-    int transOffset = (curStep - wordStep) * 10 / wordStep; 
+    int transOffset = (curStep - wordStep) * (10 / wordStep); 
 
     pallTrans(icon, icon.x - transOffset, icon.x + icon.width,
               icon.x + icon.width + transOffset, icon.x);
 }
 
 void Menu::rectTransPall(IconWithLabel& icon) {
-    int transOffset = (curStep - wordStep) / wordStep;
+    float transOffset = (float)(curStep - wordStep) / wordStep;
     float progress = easeInOut(transOffset);
 
     pallTrans(icon, icon.x, icon.x + 30 - 10.0 * progress,
