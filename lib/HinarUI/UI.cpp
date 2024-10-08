@@ -146,7 +146,7 @@ void Menu::drawForwardModules(int offset, bool init) {
         return;
     }
 
-    for (int i = 0; i < MODULE_FORWARD; ++i) {
+    for (int i = 0; i <= MODULE_FORWARD; ++i) {
         IconTrans.label = modules[i];
 
         // MainModule
@@ -175,16 +175,16 @@ void Menu::drawForwardModules(int offset, bool init) {
                                       IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR); 
                 wordGrow(IconTrans);         // grow word-root
 
-                if (i == MODULE_FORWARD - 1 && curStep > totalStep - 2) {
+                if (i == MODULE_FORWARD && curStep > totalStep - 2) {
                     display.fillRoundRect(90, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-
+                    
                     if (curStep == totalStep - 1) {
                         delay(30);
                         display.setCursor(57, 52);
-                        display.print(modules[MODULE_FORWARD]);
+                        display.print(modules[MODULE_FORWARD+1]);
 
                         display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-                    }
+                    }                  
                     isbackward = true;
                 }
             }
@@ -201,8 +201,6 @@ void Menu::drawForwardModules(int offset, bool init) {
 
 void Menu::drawBackwardModules(int offset, bool init) {
     IconTrans = {.x = 10, .y = 25, .width = 30, .height = 30, .label = modules[MODULE_FORWARD-1]};  
-    //display.fillRect(52 + 12, 6 * pow(12, 0.5) - 2 + 40, 45, 8, UNSELECTED_COLOR);
-
     display.drawRoundRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR);
 
     // 1 - ROOT
@@ -211,7 +209,7 @@ void Menu::drawBackwardModules(int offset, bool init) {
     display.drawLine(IconTrans.x + IconTrans.width + 8 , IconTrans.y + IconTrans.height - 10,
                      IconTrans.x + IconTrans.width + 28, IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
 
-    for (int i = MODULE_BACKWARD - 1; i < MODULE_MAX; ++i) {
+    for (int i = MODULE_BACKWARD; i < MODULE_MAX; ++i) {
         IconTrans.label = modules[i];
         
         // MIDDLE -> UP
@@ -222,10 +220,10 @@ void Menu::drawBackwardModules(int offset, bool init) {
             display.setCursor(51 + offsetX, 35 - offsetY);
             display.print(IconTrans.label);
 
-            if (curStep < totalStep / 2) {
-                
+            if (curStep < totalStep / 4) {
+                display.fillRoundRect(89 + offsetX, 35 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             } else {
-                
+                display.drawRoundRect(89 + offsetX, 35 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             }
         }
 
@@ -237,10 +235,10 @@ void Menu::drawBackwardModules(int offset, bool init) {
             display.setCursor(62 - offsetX, 50 - offsetY);
             display.print(IconTrans.label);
 
-            if (curStep < totalStep / 2) {
-                
+            if (curStep == totalStep - 1) {
+                display.fillRoundRect(100 - offsetX, 50 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             } else {
-                
+                display.drawRoundRect(100 - offsetX, 50 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             }
         }
 
@@ -251,12 +249,7 @@ void Menu::drawBackwardModules(int offset, bool init) {
 
             display.setCursor(72 - offsetX, 65 - offsetY);
             display.print(IconTrans.label);
-
-            if (curStep < totalStep / 2) {
-                
-            } else {
-                
-            }
+            display.drawRoundRect(110 - offsetX, 65 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
         }
     }
 }
@@ -360,7 +353,7 @@ void Menu::rectTransPall(IconWithLabel& icon) {
 
 void Menu::renderForward() {
     curStep = 0;
-    PAGE_NAME = forwardPointer == MODULE_FORWARD - 2 ? "BACKWARD" : "FORWARD";
+    PAGE_NAME = forwardPointer == MODULE_FORWARD - 1 ? "BACKWARD" : "FORWARD";
 
     while (curStep < totalStep) {
         draw(-45 / totalStep, false, true);
@@ -368,9 +361,9 @@ void Menu::renderForward() {
         delay(flowSpeed);
     }
 
-    if (forwardPointer == MODULE_FORWARD - 1) {
+    if (forwardPointer == MODULE_FORWARD) {
         forwardPointer = 0;
-        backwardPointer = MODULE_FORWARD - 1;
+        backwardPointer = MODULE_FORWARD;
         isbackward = false;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true, true);
@@ -389,7 +382,7 @@ void Menu::renderBackward() {
         delay(flowSpeed);
     }
 
-    if (backwardPointer == MODULE_MAX - 1) {
+    if (backwardPointer == MODULE_MAX - 2) {
         isAnimating = false;
         return;
     }

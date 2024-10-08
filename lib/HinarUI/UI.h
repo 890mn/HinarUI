@@ -47,7 +47,7 @@ private:
     int    totalStep           = STEP_COUNT;
 
     int    forwardPointer      = 0;
-    int    backwardPointer     = MODULE_FORWARD - 1;
+    int    backwardPointer     = MODULE_FORWARD;
     int    flowSpeed           = FLOWSPEED_NORMAL;
 
     bool   isAnimating         = false;
