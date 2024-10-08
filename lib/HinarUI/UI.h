@@ -45,9 +45,9 @@ private:
     int    curStep             = 0;
     int    wordStep            = STEP_COUNT / 2;
     int    totalStep           = STEP_COUNT;
-    int    offsetSlice         = MODULE_DIRECTION * MODULE_OFFSET / STEP_COUNT;
 
-    int    modulePointer       = 0;
+    int    forwardPointer      = 0;
+    int    backwardPointer     = MODULE_FORWARD - 1;
     int    flowSpeed           = FLOWSPEED_NORMAL;
 
     bool   isAnimating         = false;
@@ -68,16 +68,18 @@ private:
     void renderForward();
     void renderBackward();
 
-    void draw(int offset, bool init);
+    void draw(int offset, bool init, bool isForward);
     void drawTopBar();
     void drawFrame();
 
     void drawSeleModule(IconWithLabel& icon);
     void drawUnseleModule(IconWithLabel& icon);
-    void drawModules(int offset, bool init);
+    void drawForwardModules(int offset, bool init);
+    void drawBackwardModules(int offset, bool init);
 
     void wordShrink(IconWithLabel& icon);
     void wordGrow(IconWithLabel& icon);
+    void wordTrans(IconWithLabel& icon, bool fromLow);
     
     void pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int rightBottomX, int leftBottomX);
     void pallTransRect(IconWithLabel& icon);
