@@ -142,7 +142,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                 drawUnseleModule(IconTrans);
                 IconTrans.x += 35;
             }
-        } 
+        }
         return;
     }
 
@@ -186,7 +186,6 @@ void Menu::drawForwardModules(int offset, bool init) {
                         display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
                     }
                     isbackward = true;
-                    renderBackward();
                 }
             }
             next = true;
@@ -201,16 +200,28 @@ void Menu::drawForwardModules(int offset, bool init) {
 }
 
 void Menu::drawBackwardModules(int offset, bool init) {
-    IconTrans = Icon;
-    IconTrans.x += offset; 
-    Icon = IconTrans;
+    IconTrans = {.x = 10, .y = 25, .width = 30, .height = 30, .label = modules[MODULE_FORWARD-1]};  
+    //display.fillRect(52 + 12, 6 * pow(12, 0.5) - 2 + 40, 45, 8, UNSELECTED_COLOR);
+
+    display.drawRoundRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR);
+
+    // 1 - ROOT
+    display.drawLine(IconTrans.x + IconTrans.width - 1 , IconTrans.y + IconTrans.height - 1,
+                     IconTrans.x + IconTrans.width + 8 , IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
+    display.drawLine(IconTrans.x + IconTrans.width + 8 , IconTrans.y + IconTrans.height - 10,
+                     IconTrans.x + IconTrans.width + 28, IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
 
     for (int i = MODULE_BACKWARD - 1; i < MODULE_MAX; ++i) {
         IconTrans.label = modules[i];
-
-        // MainModule
+        
+        // MIDDLE -> UP
         if (i == backwardPointer) {  
-            wordTrans(IconTrans, false);
+            int offsetX = curStep;
+            int offsetY = 4 * pow(curStep, 0.5);
+
+            display.setCursor(51 + offsetX, 35 - offsetY);
+            display.print(IconTrans.label);
+
             if (curStep < totalStep / 2) {
                 
             } else {
@@ -218,19 +229,35 @@ void Menu::drawBackwardModules(int offset, bool init) {
             }
         }
 
-        // MainModule right first
-        else if (i == backwardPointer + 1) {
-            wordTrans(IconTrans, true);
+        // LOW -> MIDDLE
+        else if (i == backwardPointer + 1) { 
+            int offsetX = curStep;
+            int offsetY = 0.125 * pow(curStep, 2);
+
+            display.setCursor(62 - offsetX, 50 - offsetY);
+            display.print(IconTrans.label);
+
             if (curStep < totalStep / 2) {
                 
             } else {
                 
             }
         }
-        else {
-            drawUnseleModule(IconTrans);
-        }
 
+        // OUT -> LOW
+        else if (i == backwardPointer + 2) { 
+            int offsetX = curStep;
+            int offsetY = 0.125 * pow(curStep, 2);
+
+            display.setCursor(72 - offsetX, 65 - offsetY);
+            display.print(IconTrans.label);
+
+            if (curStep < totalStep / 2) {
+                
+            } else {
+                
+            }
+        }
     }
 }
 
@@ -275,14 +302,11 @@ void Menu::wordGrow(IconWithLabel& icon) {
 void Menu::wordTrans(IconWithLabel& icon, bool fromLow) {
     int offsetX = curStep;
 
-    int offsetY = fromLow ? 0.125 * pow(curStep, 2) : 4 * pow(curStep, 0.5);
+    int offsetY = fromLow ? 0.125 * pow(curStep, 2) : 6 * pow(curStep, 0.5) - 2;
 
-    display.clearDisplay();
-
-    fromLow ? display.setCursor(52 - offsetX, 40 - offsetY) : display.setCursor(52 + offsetX, 40 - offsetY);
+    fromLow ? display.setCursor(62 - offsetX, 50 - offsetY) : display.setCursor(52 + offsetX, 40 - offsetY);
     
     display.print(icon.label);
-    display.display();
 }
 
 void Menu::pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int rightBottomX, int leftBottomX) {
@@ -346,6 +370,8 @@ void Menu::renderForward() {
 
     if (forwardPointer == MODULE_FORWARD - 1) {
         forwardPointer = 0;
+        backwardPointer = MODULE_FORWARD - 1;
+        isbackward = false;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true, true);
         isAnimating = false;
@@ -358,11 +384,16 @@ void Menu::renderForward() {
 void Menu::renderBackward() {
     curStep = 0;
     while (curStep < totalStep) {
-        //wordTrans(IconTrans, true);
-        draw(0 , false, true);
+        draw(1, false, false);
         curStep++;
         delay(flowSpeed);
     }
+
+    if (backwardPointer == MODULE_MAX - 1) {
+        isAnimating = false;
+        return;
+    }
+    ++backwardPointer;
     isAnimating = false;
 }
 
