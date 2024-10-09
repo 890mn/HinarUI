@@ -20,31 +20,43 @@
 #define FLOWSPEED_SLOW    35
 
 // Module Setting
-#define MODULE_MAX        3
+#define MODULE_MAX        9
 #define MODULE_OFFSET     45
 #define MODULE_DIRECTION  -1
+#define MODULE_FORWARD    3
+#define MODULE_BACKWARD   MODULE_MAX - MODULE_FORWARD
+
 #define RADIUS_PALL       2
 #define RADIUS_RECT       5
 
-// TopBar Setting
-#define PAGE_NAME "Home"
-#define UI_NAME   "HinarUI"
+#define KEY_UP            18
+#define KEY_RIGHT         19
 
+// TopBar Setting
+#define UI_NAME   "HinarUI"
 class Menu {
 public:
-    void   init();
-    void   draw(int offset, bool init);
-    void   renderStart();
+    void create();
+    void loop();
 
 private:
-    String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3"};
-
+    String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3", "BACK1", "BACK2", "BACK3", "BACK4", "BACK5", "BACK6"};
+    String PAGE_NAME           = "FORWARD";
     int    curStep             = 0;
+    int    wordStep            = STEP_COUNT / 2;
     int    totalStep           = STEP_COUNT;
-    int    offsetSlice         = MODULE_DIRECTION * MODULE_OFFSET / STEP_COUNT;
 
-    int    modulePointer       = 0;
+    int    forwardPointer      = 0;
+    int    backwardPointer     = MODULE_FORWARD;
     int    flowSpeed           = FLOWSPEED_NORMAL;
+
+    bool   isAnimating         = false;
+    bool   isbackward          = false;
+
+    int    currentTime         = 0;
+    int    lastButtonPress     = 0;
+
+    int    backMartix[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
     struct IconWithLabel {
         int    x;
         int    y;
@@ -55,21 +67,27 @@ private:
     IconWithLabel Icon      = {.x = 10, .y = 25, .width = 20, .height = 30, .label = "INIT"};
     IconWithLabel IconTrans = {         .y = 25, .width = 20, .height = 30, .label = "INIT"};
 
-    float easeInOut(float t);
+    void renderForward();
+    void renderBackward();
 
+    void draw(int offset, bool init, bool isForward);
     void drawTopBar();
     void drawFrame();
 
     void drawSeleModule(IconWithLabel& icon);
     void drawUnseleModule(IconWithLabel& icon);
-    void drawModules(int offset, bool init);
+    void drawForwardModules(int offset, bool init);
+    void drawBackwardModules();
 
     void wordShrink(IconWithLabel& icon);
     void wordGrow(IconWithLabel& icon);
+    void wordTrans(IconWithLabel& icon, bool fromLow);
     
     void pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int rightBottomX, int leftBottomX);
     void pallTransRect(IconWithLabel& icon);
     void rectTransPall(IconWithLabel& icon);
+
+    float easeInOut(float t);    
 };
 
 #endif
