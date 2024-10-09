@@ -22,19 +22,48 @@ void Menu::create() {
 void Menu::loop() {
     currentTime = millis();
 
-    if (!isAnimating && (currentTime - lastButtonPress) > 150) {
+    if (!isAnimating) {
         int keyUpState = digitalRead(KEY_UP);
         int keyRightState = digitalRead(KEY_RIGHT);
 
         if (keyUpState == LOW && isbackward) {
-            isAnimating = true;
-            renderBackward();    
-            lastButtonPress = currentTime;
+            if (UpPT == 0) {
+                UpPT = currentTime;
+            } else if ((currentTime - UpPT) > Threshold) {
+                // long
+                flowSpeed = FLOWSPEED_FAST_PLUS;
+                isAnimating = true;
+                renderBackward();
+                UpPT = 0;
+            }
+        } else if (UpPT > 0) {
+            if ((currentTime - UpPT) <= Threshold) {
+                // short
+                flowSpeed = FLOWSPEED_NORMAL;
+                isAnimating = true;
+                renderBackward();
+            }
+            UpPT = 0;
         }
-        else if (keyRightState == LOW) {
-            isAnimating = true;
-            renderForward();
-            lastButtonPress = currentTime;
+
+        if (keyRightState == LOW) {
+            if (RightPT == 0) {
+                RightPT = currentTime;
+            } else if ((currentTime - RightPT) > Threshold) {
+                // long
+                flowSpeed = FLOWSPEED_FAST_PLUS;
+                isAnimating = true;
+                renderForward();
+                RightPT = 0;
+            }
+        } else if (RightPT > 0) {
+            if ((currentTime - RightPT) <= Threshold) {
+                // short
+                flowSpeed = FLOWSPEED_NORMAL;
+                isAnimating = true;
+                renderForward();
+            }
+            RightPT = 0;
         }
     }
 }
@@ -310,16 +339,6 @@ void Menu::wordGrow(IconWithLabel& icon) {
     //}
 }
 
-void Menu::wordTrans(IconWithLabel& icon, bool fromLow) {
-    int offsetX = curStep;
-
-    int offsetY = fromLow ? 0.125 * pow(curStep, 2) : 6 * pow(curStep, 0.5) - 2;
-
-    fromLow ? display.setCursor(62 - offsetX, 50 - offsetY) : display.setCursor(52 + offsetX, 40 - offsetY);
-    
-    display.print(icon.label);
-}
-
 void Menu::pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int rightBottomX, int leftBottomX) {
     // 1 - LEFT-TOP
     display.drawCircleHelper(leftTopX + RADIUS_PALL, icon.y + RADIUS_PALL,
@@ -381,7 +400,7 @@ void Menu::renderForward() {
 
     if (forwardPointer == MODULE_FORWARD) {
         forwardPointer = 0;
-        backMartix[0] = {MODULE_FORWARD};
+        backMartix[0] = MODULE_FORWARD;
         isbackward = false;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true, true);
