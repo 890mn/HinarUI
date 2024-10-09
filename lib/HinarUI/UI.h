@@ -20,7 +20,7 @@
 #define FLOWSPEED_SLOW    35
 
 // Module Setting
-#define MODULE_MAX        6
+#define MODULE_MAX        9
 #define MODULE_OFFSET     45
 #define MODULE_DIRECTION  -1
 #define MODULE_FORWARD    3
@@ -40,7 +40,7 @@ public:
     void loop();
 
 private:
-    String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3", "BACK1", "BACK2", "BACK3"};
+    String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3", "BACK1", "BACK2", "BACK3", "BACK4", "BACK5", "BACK6"};
     String PAGE_NAME           = "FORWARD";
     int    curStep             = 0;
     int    wordStep            = STEP_COUNT / 2;

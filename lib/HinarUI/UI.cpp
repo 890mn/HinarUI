@@ -185,10 +185,11 @@ void Menu::drawForwardModules(int offset, bool init) {
 
                         display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
                     }   
+                
                     for (int i = 1; i < MODULE_BACKWARD; ++i) {
                         backMartix[i] = backMartix[i - 1] + 1;
                     }
-                    backMartix[MODULE_BACKWARD] = MODULE_FORWARD;               
+                    backMartix[MODULE_BACKWARD] = MODULE_FORWARD;
                     isbackward = true;
                 }
             }
@@ -380,6 +381,12 @@ void Menu::renderForward() {
 
 void Menu::renderBackward() {
     curStep = 0;
+    
+    while (curStep < totalStep) {
+        draw(1, false, false);
+        curStep++;
+        delay(flowSpeed);
+    }
 
     for (int i = 1; i < MODULE_BACKWARD + 1; ++i) {
         backMartix[i - 1] = backMartix[i];
@@ -390,12 +397,7 @@ void Menu::renderBackward() {
     } else {
         backMartix[MODULE_BACKWARD] = backMartix[MODULE_BACKWARD - 1] + 1;
     }
-    
-    while (curStep < totalStep) {
-        draw(1, false, false);
-        curStep++;
-        delay(flowSpeed);
-    }
+
     isAnimating = false;
 }
 
