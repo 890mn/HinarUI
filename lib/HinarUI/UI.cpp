@@ -45,7 +45,7 @@ void Menu::draw(int offset, bool init, bool isForward) {
     if (isForward) {
         drawForwardModules(offset, init);
     } else {
-        drawBackwardModules(offset, init);
+        drawBackwardModules();
     }
     drawFrame();
     display.display();
@@ -160,6 +160,19 @@ void Menu::drawForwardModules(int offset, bool init) {
             } else {
                 rectTransPall(IconTrans);     // rect->pall
             }
+
+            if (forwardPointer == MODULE_FORWARD) {
+                IconTrans.label = modules[0];
+                IconTrans.x += (totalStep - curStep) * (30 / totalStep) + 40;
+                if (curStep < totalStep / 2) {
+                    pallTransRect(IconTrans);     // pall->rect
+                } else {
+                    IconTrans.height = IconTrans.width = 30;
+                    display.drawRoundRect(IconTrans.x, IconTrans.y,
+                                        IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR); 
+                    wordGrow(IconTrans);         // grow word-root
+                }
+            }
         }
 
         // MainModule right first
@@ -204,7 +217,7 @@ void Menu::drawForwardModules(int offset, bool init) {
     }
 }
 
-void Menu::drawBackwardModules(int offset, bool init) {
+void Menu::drawBackwardModules() {
     IconTrans = {.x = 10, .y = 25, .width = 30, .height = 30, .label = modules[MODULE_FORWARD-1]};  
     display.drawRoundRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR);
 
@@ -280,7 +293,7 @@ void Menu::wordGrow(IconWithLabel& icon) {
 
     int currentEndX2 = endX1 + 50 / wordStep * (growOffset - wordStep * 3 / 7); 
 
-    if (modules[forwardPointer + 1] == icon.label) {
+    //if (modules[forwardPointer + 1] == icon.label) {
         if (growOffset >= wordStep * 3 / 7) {
             display.drawLine(startX, startY, endX1, endY1, SELECTED_COLOR); 
             display.drawLine(endX1, endY1, currentEndX2, endY1, SELECTED_COLOR);
@@ -294,7 +307,7 @@ void Menu::wordGrow(IconWithLabel& icon) {
             display.setTextColor(SELECTED_COLOR);
             display.print(icon.label);
         }
-    }
+    //}
 }
 
 void Menu::wordTrans(IconWithLabel& icon, bool fromLow) {
@@ -381,7 +394,7 @@ void Menu::renderForward() {
 
 void Menu::renderBackward() {
     curStep = 0;
-    
+
     while (curStep < totalStep) {
         draw(1, false, false);
         curStep++;

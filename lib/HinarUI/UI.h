@@ -77,7 +77,7 @@ private:
     void drawSeleModule(IconWithLabel& icon);
     void drawUnseleModule(IconWithLabel& icon);
     void drawForwardModules(int offset, bool init);
-    void drawBackwardModules(int offset, bool init);
+    void drawBackwardModules();
 
     void wordShrink(IconWithLabel& icon);
     void wordGrow(IconWithLabel& icon);
