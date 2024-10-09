@@ -55,6 +55,8 @@ private:
 
     int    currentTime         = 0;
     int    lastButtonPress     = 0;
+
+    int    backMartix[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
     struct IconWithLabel {
         int    x;
         int    y;

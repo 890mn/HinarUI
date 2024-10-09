@@ -177,14 +177,18 @@ void Menu::drawForwardModules(int offset, bool init) {
 
                 if (i == MODULE_FORWARD && curStep > totalStep - 2) {
                     display.fillRoundRect(90, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-                    
+
                     if (curStep == totalStep - 1) {
                         delay(30);
                         display.setCursor(57, 52);
                         display.print(modules[MODULE_FORWARD+1]);
 
                         display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-                    }                  
+                    }   
+                    for (int i = 1; i < MODULE_BACKWARD; ++i) {
+                        backMartix[i] = backMartix[i - 1] + 1;
+                    }
+                    backMartix[MODULE_BACKWARD] = MODULE_FORWARD;               
                     isbackward = true;
                 }
             }
@@ -208,16 +212,16 @@ void Menu::drawBackwardModules(int offset, bool init) {
                      IconTrans.x + IconTrans.width + 8 , IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
     display.drawLine(IconTrans.x + IconTrans.width + 8 , IconTrans.y + IconTrans.height - 10,
                      IconTrans.x + IconTrans.width + 28, IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
-
-    for (int i = MODULE_BACKWARD; i < MODULE_MAX; ++i) {
-        IconTrans.label = modules[i];
+    
+    for (int i = 0; i < MODULE_BACKWARD; ++i) {
+        IconTrans.label = modules[backMartix[i]];
         
         // MIDDLE -> UP
-        if (i == backwardPointer) {  
+        if (i == 0) {  
             int offsetX = curStep;
             int offsetY = 4 * pow(curStep, 0.5);
 
-            display.setCursor(51 + offsetX, 35 - offsetY);
+            display.setCursor(49 + offsetX, 34 - offsetY);
             display.print(IconTrans.label);
 
             if (curStep < totalStep / 4) {
@@ -228,11 +232,11 @@ void Menu::drawBackwardModules(int offset, bool init) {
         }
 
         // LOW -> MIDDLE
-        else if (i == backwardPointer + 1) { 
+        else if (i == 1) { 
             int offsetX = curStep;
             int offsetY = 0.125 * pow(curStep, 2);
 
-            display.setCursor(62 - offsetX, 50 - offsetY);
+            display.setCursor(60 - offsetX, 49 - offsetY);
             display.print(IconTrans.label);
 
             if (curStep == totalStep - 1) {
@@ -243,7 +247,7 @@ void Menu::drawBackwardModules(int offset, bool init) {
         }
 
         // OUT -> LOW
-        else if (i == backwardPointer + 2) { 
+        else if (i == 2) { 
             int offsetX = curStep;
             int offsetY = 0.125 * pow(curStep, 2);
 
@@ -363,7 +367,7 @@ void Menu::renderForward() {
 
     if (forwardPointer == MODULE_FORWARD) {
         forwardPointer = 0;
-        backwardPointer = MODULE_FORWARD;
+        backMartix[0] = {MODULE_FORWARD};
         isbackward = false;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true, true);
@@ -376,17 +380,22 @@ void Menu::renderForward() {
 
 void Menu::renderBackward() {
     curStep = 0;
+
+    for (int i = 1; i < MODULE_BACKWARD + 1; ++i) {
+        backMartix[i - 1] = backMartix[i];
+    }
+
+    if (backMartix[MODULE_BACKWARD - 1] == MODULE_MAX - 1) {
+        backMartix[MODULE_BACKWARD] = MODULE_BACKWARD;
+    } else {
+        backMartix[MODULE_BACKWARD] = backMartix[MODULE_BACKWARD - 1] + 1;
+    }
+    
     while (curStep < totalStep) {
         draw(1, false, false);
         curStep++;
         delay(flowSpeed);
     }
-
-    if (backwardPointer == MODULE_MAX - 2) {
-        isAnimating = false;
-        return;
-    }
-    ++backwardPointer;
     isAnimating = false;
 }
 
