@@ -104,9 +104,10 @@ void Menu::drawTopBar() {
     display.print(UI_NAME);
 }
 
-void Menu::drawSeleModule(IconWithLabel& icon) {
+void Menu::drawSeleModule(Module& icon) {
     icon.width = 30;
     display.drawRoundRect(icon.x, icon.y, icon.width, icon.height, RADIUS_RECT, SELECTED_COLOR);
+    //display.drawBitmap(icon.x + 3, icon.y + 3, bitmap_github, 24, 24, SELECTED_COLOR);
 
     // 1 - ROOT
     display.drawLine(icon.x + icon.width - 1, icon.y + icon.height - 1,
@@ -119,7 +120,7 @@ void Menu::drawSeleModule(IconWithLabel& icon) {
     display.print(icon.label);
 }
 
-void Menu::drawUnseleModule(IconWithLabel& icon) {
+void Menu::drawUnseleModule(Module& icon) {
     icon.width = 20;
 
     // 1 - LEFT-TOP
@@ -166,9 +167,11 @@ void Menu::drawForwardModules(int offset, bool init) {
             IconTrans.label = modules[i];
             if (i == 0) {
                 drawSeleModule(IconTrans);
+                display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_setting, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
                 IconTrans.x += 85;
             } else {
                 drawUnseleModule(IconTrans);
+                display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_github, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
                 IconTrans.x += 35;
             }
         }
@@ -182,6 +185,7 @@ void Menu::drawForwardModules(int offset, bool init) {
         if (i == forwardPointer) {  
             //MainModule Debug
             //display.drawCircle(IconTrans.x + 15, IconTrans.y + 15, 2, SELECTED_COLOR); 
+            //display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_setting, 24, 24, SELECTED_COLOR);
 
             if (curStep < totalStep / 2) {
                 drawSeleModule(IconTrans);    // module-selected
@@ -208,6 +212,7 @@ void Menu::drawForwardModules(int offset, bool init) {
         else if (i == forwardPointer + 1) {
             int tmp = IconTrans.x + 10;
             IconTrans.x += (totalStep - curStep) * (30 / totalStep);
+            //display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_github, 24, 24, SELECTED_COLOR);
 
             if (curStep < totalStep / 2) {
                 pallTransRect(IconTrans);     // pall->rect
@@ -301,14 +306,14 @@ void Menu::drawBackwardModules() {
     }
 }
 
-void Menu::wordShrink(IconWithLabel& icon) {
+void Menu::wordShrink(Module& icon) {
     float shrinkOffset = 45.0 / wordStep;
 
     display.fillRect(icon.x + 30 + shrinkOffset * (wordStep - curStep), icon.y + 10, 
                      shrinkOffset * curStep, 20, UNSELECTED_COLOR);
 }
 
-void Menu::wordGrow(IconWithLabel& icon) {
+void Menu::wordGrow(Module& icon) {
     int growOffset = curStep - wordStep;
 
     int startX = icon.x + icon.width - 1;
@@ -339,7 +344,7 @@ void Menu::wordGrow(IconWithLabel& icon) {
     //}
 }
 
-void Menu::pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int rightBottomX, int leftBottomX) {
+void Menu::pallTrans(Module& icon, int leftTopX, int rightTopX, int rightBottomX, int leftBottomX) {
     // 1 - LEFT-TOP
     display.drawCircleHelper(leftTopX + RADIUS_PALL, icon.y + RADIUS_PALL,
                              RADIUS_PALL, 1, SELECTED_COLOR);
@@ -373,14 +378,14 @@ void Menu::pallTrans(IconWithLabel& icon, int leftTopX, int rightTopX, int right
                              RADIUS_PALL, 4, SELECTED_COLOR);
 }
 
-void Menu::pallTransRect(IconWithLabel& icon) {
+void Menu::pallTransRect(Module& icon) {
     int transOffset = (curStep - wordStep) * (10 / wordStep); 
 
     pallTrans(icon, icon.x - transOffset, icon.x + icon.width,
               icon.x + icon.width + transOffset, icon.x);
 }
 
-void Menu::rectTransPall(IconWithLabel& icon) {
+void Menu::rectTransPall(Module& icon) {
     float transOffset = (float)(curStep - wordStep) / wordStep;
     float progress = easeInOut(transOffset);
 
