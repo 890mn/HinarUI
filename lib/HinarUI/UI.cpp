@@ -107,7 +107,6 @@ void Menu::drawTopBar() {
 void Menu::drawSeleModule(Module& icon) {
     icon.width = 30;
     display.drawRoundRect(icon.x, icon.y, icon.width, icon.height, RADIUS_RECT, SELECTED_COLOR);
-    //display.drawBitmap(icon.x + 3, icon.y + 3, bitmap_github, 24, 24, SELECTED_COLOR);
 
     // 1 - ROOT
     display.drawLine(icon.x + icon.width - 1, icon.y + icon.height - 1,
@@ -167,11 +166,11 @@ void Menu::drawForwardModules(int offset, bool init) {
             IconTrans.label = modules[i];
             if (i == 0) {
                 drawSeleModule(IconTrans);
-                display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_setting, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+                display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_diode, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
                 IconTrans.x += 85;
             } else {
                 drawUnseleModule(IconTrans);
-                display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_github, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+                //display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_github, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
                 IconTrans.x += 35;
             }
         }
@@ -180,12 +179,13 @@ void Menu::drawForwardModules(int offset, bool init) {
 
     for (int i = 0; i <= MODULE_FORWARD; ++i) {
         IconTrans.label = modules[i];
+        IconTrans.icon = icons[i];
 
         // MainModule
         if (i == forwardPointer) {  
             //MainModule Debug
             //display.drawCircle(IconTrans.x + 15, IconTrans.y + 15, 2, SELECTED_COLOR); 
-            //display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_setting, 24, 24, SELECTED_COLOR);
+            display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, icons[i], 24, 24, SELECTED_COLOR);
 
             if (curStep < totalStep / 2) {
                 drawSeleModule(IconTrans);    // module-selected
@@ -212,7 +212,7 @@ void Menu::drawForwardModules(int offset, bool init) {
         else if (i == forwardPointer + 1) {
             int tmp = IconTrans.x + 10;
             IconTrans.x += (totalStep - curStep) * (30 / totalStep);
-            //display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_github, 24, 24, SELECTED_COLOR);
+            display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, IconTrans.icon, 24, 24, SELECTED_COLOR);
 
             if (curStep < totalStep / 2) {
                 pallTransRect(IconTrans);     // pall->rect

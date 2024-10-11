@@ -47,7 +47,7 @@ private:
     String modules[MODULE_MAX] = {"Mod-1", "Mod-2", "Mod-3",
                                   "BACK1", "BACK2", "BACK3", "BACK4", "BACK5", "BACK6"};
     
-    //unsigned char* icons[MODULE_MAX] = {bitmap_github};
+    unsigned char icons[MODULE_MAX][72] = {*bitmap_github, *bitmap_setting};
     int backMartix[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
 
     int    curStep             = 0;
@@ -71,7 +71,7 @@ private:
         int width;
         int height;
         String label;
-        unsigned char icon;
+        unsigned char* icon;
     };
     Module Icon      = {.x = 10, .y = 25, .width = 20, .height = 30, .label = "INIT"};
     Module IconTrans = {         .y = 25, .width = 20, .height = 30, .label = "INIT"};
