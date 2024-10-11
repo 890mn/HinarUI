@@ -32,8 +32,10 @@
 #define RADIUS_PALL         2
 #define RADIUS_RECT         5
 
-#define KEY_UP              18
-#define KEY_RIGHT           19
+#define KEY_ENTER           18
+#define KEY_RIGHT           27
+#define KEY_BACK            19
+
 
 // TopBar Setting
 #define UI_NAME             "HinarUI"

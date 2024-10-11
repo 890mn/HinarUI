@@ -10,8 +10,9 @@ void Menu::create() {
         while (1);
     }
 
-    pinMode(KEY_UP, INPUT_PULLUP);
+    pinMode(KEY_ENTER, INPUT_PULLUP);
     pinMode(KEY_RIGHT, INPUT_PULLUP);
+    pinMode(KEY_BACK , INPUT_PULLUP);
 
     display.setTextSize(1);
     display.setTextColor(SELECTED_COLOR);
@@ -23,7 +24,7 @@ void Menu::loop() {
     currentTime = millis();
 
     if (!isAnimating) {
-        int keyUpState = digitalRead(KEY_UP);
+        int keyUpState = digitalRead(KEY_ENTER);
         int keyRightState = digitalRead(KEY_RIGHT);
 
         if (keyUpState == LOW && isbackward) {
@@ -172,7 +173,7 @@ void Menu::drawForwardModules(int offset, bool init) {
             } else {
                 drawUnseleModule(IconTrans);
                 display.drawBitmap(IconTrans.x, IconTrans.y + 3, bitmap_clock, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
-                IconTrans.x += 35;
+                IconTrans.x += 50;
             }
         }
         return;
@@ -200,6 +201,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                 IconTrans.x += (totalStep - curStep) * (30 / totalStep) + 40;
                 
                 if (curStep < totalStep / 2) {
+                    IconTrans.width = 20;
                     pallTransRect(IconTrans);     // pall->rect
                 } else {
                     IconTrans.height = IconTrans.width = 30;
