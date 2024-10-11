@@ -107,15 +107,16 @@ void Menu::drawTopBar() {
 void Menu::drawSeleModule(Module& icon) {
     icon.width = 30;
     display.drawRoundRect(icon.x, icon.y, icon.width, icon.height, RADIUS_RECT, SELECTED_COLOR);
+    display.drawFastVLine(icon.x + icon.width - 1, icon.y + 2, icon.height - 2, UNSELECTED_COLOR);
 
     // 1 - ROOT
-    display.drawLine(icon.x + icon.width - 1, icon.y + icon.height - 1,
-                     icon.x + icon.width + 8, icon.y + icon.height - 10, SELECTED_COLOR);
-    display.drawLine(icon.x + icon.width + 8, icon.y + icon.height - 10,
-                     icon.x + icon.width + 28, icon.y + icon.height - 10, SELECTED_COLOR);
+    display.drawLine(icon.x + icon.width - 4, icon.y + icon.height - 1,
+                     icon.x + icon.width + 5, icon.y + icon.height - 10, SELECTED_COLOR);
+    display.drawLine(icon.x + icon.width + 5, icon.y + icon.height - 10,
+                     icon.x + icon.width + 25, icon.y + icon.height - 10, SELECTED_COLOR);
 
     // 2 - NAME
-    display.setCursor(icon.x + icon.width + 10, icon.y + 10);
+    display.setCursor(icon.x + icon.width + 8, icon.y + 10);
     display.print(icon.label);
 }
 
@@ -143,8 +144,8 @@ void Menu::drawUnseleModule(Module& icon) {
                              RADIUS_PALL, 2, SELECTED_COLOR);          
 
     // 4 - RIGHT-TOP -> RIGHT-BOTTOM
-    display.drawLine(icon.x + icon.width, icon.y + 2,
-                     icon.x + icon.width - 10, icon.y + icon.height - 2, SELECTED_COLOR);
+    //display.drawLine(icon.x + icon.width, icon.y + 2,
+    //                 icon.x + icon.width - 10, icon.y + icon.height - 2, SELECTED_COLOR);
 
     // 4 - LEFT-BOTTOM -> RIGHT-BOTTOM
     display.drawLine(icon.x - 10 + 2, icon.y + icon.height,
@@ -170,7 +171,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                 IconTrans.x += 85;
             } else {
                 drawUnseleModule(IconTrans);
-                //display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_github, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+                display.drawBitmap(IconTrans.x, IconTrans.y + 3, bitmap_clock, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
                 IconTrans.x += 35;
             }
         }
@@ -185,7 +186,7 @@ void Menu::drawForwardModules(int offset, bool init) {
         if (i == forwardPointer) {  
             //MainModule Debug
             //display.drawCircle(IconTrans.x + 15, IconTrans.y + 15, 2, SELECTED_COLOR); 
-            display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, icons[i], 24, 24, SELECTED_COLOR);
+            display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, IconTrans.icon, 24, 24, SELECTED_COLOR);
 
             if (curStep < totalStep / 2) {
                 drawSeleModule(IconTrans);    // module-selected
@@ -197,12 +198,14 @@ void Menu::drawForwardModules(int offset, bool init) {
             if (forwardPointer == MODULE_FORWARD) {
                 IconTrans.label = modules[0];
                 IconTrans.x += (totalStep - curStep) * (30 / totalStep) + 40;
+                
                 if (curStep < totalStep / 2) {
                     pallTransRect(IconTrans);     // pall->rect
                 } else {
                     IconTrans.height = IconTrans.width = 30;
                     display.drawRoundRect(IconTrans.x, IconTrans.y,
                                         IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR); 
+                    display.drawFastVLine(IconTrans.x + IconTrans.width - 1, IconTrans.y + 2, IconTrans.height - 2, UNSELECTED_COLOR);                    
                     wordGrow(IconTrans);         // grow word-root
                 }
             }
@@ -220,6 +223,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                 IconTrans.height = IconTrans.width = 30;
                 display.drawRoundRect(IconTrans.x, IconTrans.y,
                                       IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR); 
+                display.drawFastVLine(IconTrans.x + IconTrans.width - 1, IconTrans.y + 2, IconTrans.height - 2, UNSELECTED_COLOR);
                 wordGrow(IconTrans);         // grow word-root
 
                 if (i == MODULE_FORWARD && curStep > totalStep - 2) {
@@ -244,7 +248,11 @@ void Menu::drawForwardModules(int offset, bool init) {
             IconTrans.x = tmp;
         }
         else {
-            if (next) IconTrans.x += 40;
+            if (next) {
+                IconTrans.x += 40;
+                IconTrans.icon = icons[forwardPointer + 2];
+                display.drawBitmap(IconTrans.x - 1, IconTrans.y + 3, IconTrans.icon, 24, 24, SELECTED_COLOR);
+            }
             drawUnseleModule(IconTrans);
         }
         IconTrans.x += 35;
@@ -287,6 +295,12 @@ void Menu::drawBackwardModules() {
             display.setCursor(60 - offsetX, 49 - offsetY);
             display.print(IconTrans.label);
 
+            IconTrans.icon = icons[backMartix[i]];
+        
+            display.drawRect(IconTrans.x + 3, IconTrans.y + 3, 24, 24, UNSELECTED_COLOR);
+            display.drawFastVLine(IconTrans.x + IconTrans.width - 1, IconTrans.y + 2, IconTrans.height - 2, UNSELECTED_COLOR);
+            display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, IconTrans.icon, 24, 24, SELECTED_COLOR);
+
             if (curStep == totalStep - 1) {
                 display.fillRoundRect(100 - offsetX, 50 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             } else {
@@ -316,16 +330,16 @@ void Menu::wordShrink(Module& icon) {
 void Menu::wordGrow(Module& icon) {
     int growOffset = curStep - wordStep;
 
-    int startX = icon.x + icon.width - 1;
+    int startX = icon.x + icon.width - 4;
     int startY = icon.y + icon.height - 1;
     
-    int endX1 = icon.x + icon.width + 8;
-    int endY1 = icon.y + icon.height - 10;
+    int endX1 = icon.x + icon.width + 6;
+    int endY1 = icon.y + icon.height - 11;
 
-    int currentEndX1 = startX + 18 / wordStep * growOffset;  // 9 * 2
-    int currentEndY1 = startY - 18 / wordStep * growOffset;
+    int currentEndX1 = startX + 20 / wordStep * growOffset;  // (END - START) * 2
+    int currentEndY1 = startY - 20 / wordStep * growOffset;
 
-    int currentEndX2 = endX1 + 50 / wordStep * (growOffset - wordStep * 3 / 7); 
+    int currentEndX2 = endX1 + 40 / wordStep * (growOffset - wordStep * 3 / 7); 
 
     //if (modules[forwardPointer + 1] == icon.label) {
         if (growOffset >= wordStep * 3 / 7) {
@@ -366,8 +380,8 @@ void Menu::pallTrans(Module& icon, int leftTopX, int rightTopX, int rightBottomX
                              RADIUS_PALL, 8, SELECTED_COLOR);
 
     // 4 - RIGHT-TOP -> RIGHT-BOTTOM
-    display.drawLine(rightTopX, icon.y + RADIUS_PALL,
-                             rightBottomX, icon.y + icon.height - RADIUS_PALL, SELECTED_COLOR); 
+    //display.drawLine(rightTopX, icon.y + RADIUS_PALL,
+    //                         rightBottomX, icon.y + icon.height - RADIUS_PALL, SELECTED_COLOR); 
 
     // 4 - RIGHT-BOTTOM -> LEFT-BOTTOM
     display.drawLine(rightBottomX - RADIUS_PALL, icon.y + icon.height,
