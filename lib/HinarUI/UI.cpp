@@ -24,34 +24,52 @@ void Menu::loop() {
     currentTime = millis();
 
     if (!isAnimating) {
-        int keyUpState = digitalRead(KEY_ENTER);
+        int keyEnterState = digitalRead(KEY_ENTER);
         int keyRightState = digitalRead(KEY_RIGHT);
+        int keyBackState = digitalRead(KEY_BACK);
 
-        if (keyUpState == LOW && isbackward) {
-            if (UpPT == 0) {
-                UpPT = currentTime;
-            } else if ((currentTime - UpPT) > Threshold) {
-                // long
-                flowSpeed = FLOWSPEED_FAST_PLUS;
-                isAnimating = true;
-                renderBackward();
-                UpPT = 0;
-            }
-        } else if (UpPT > 0) {
-            if ((currentTime - UpPT) <= Threshold) {
-                // short
-                flowSpeed = FLOWSPEED_NORMAL;
-                isAnimating = true;
-                renderBackward();
-            }
-            UpPT = 0;
+        if (keyBackState == LOW && isBackward && forwardPointer == MODULE_FORWARD) {
+            display.fillRect(90, 36, 31, 6, UNSELECTED_COLOR);
+            display.display();
+            isBackward = false;
+            isUP = false;          
         }
 
+        if (!isBackward) {
+            isUP = false;
+        }
+
+        if (isBackward) {
+            if (keyEnterState == LOW && !isUP && forwardPointer == MODULE_FORWARD) {
+                isUP = true;
+                display.fillRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                display.display(); 
+            }
+
+            if (isUP) {   
+                if (keyRightState == LOW) {
+                    if (RightPT == 0) {
+                        RightPT = currentTime;
+                    } else if ((currentTime - RightPT) > Threshold) {
+                        flowSpeed = FLOWSPEED_FAST_PLUS;
+                        isAnimating = true;
+                        renderBackward();
+                        RightPT = 0;
+                    }
+                } else if (RightPT > 0) {
+                    if ((currentTime - RightPT) <= Threshold) {
+                        flowSpeed = FLOWSPEED_NORMAL;
+                        isAnimating = true;
+                        renderBackward();
+                    }
+                    RightPT = 0;
+                }
+            }
+        }
         if (keyRightState == LOW) {
             if (RightPT == 0) {
                 RightPT = currentTime;
             } else if ((currentTime - RightPT) > Threshold) {
-                // long
                 flowSpeed = FLOWSPEED_FAST_PLUS;
                 isAnimating = true;
                 renderForward();
@@ -59,12 +77,15 @@ void Menu::loop() {
             }
         } else if (RightPT > 0) {
             if ((currentTime - RightPT) <= Threshold) {
-                // short
                 flowSpeed = FLOWSPEED_NORMAL;
                 isAnimating = true;
                 renderForward();
             }
             RightPT = 0;
+        }
+
+        if (keyEnterState == LOW && !isBackward) {
+            isBackward = true;
         }
     }
 }
@@ -117,7 +138,7 @@ void Menu::drawSeleModule(Module& icon) {
                      icon.x + icon.width + 25, icon.y + icon.height - 10, SELECTED_COLOR);
 
     // 2 - NAME
-    display.setCursor(icon.x + icon.width + 8, icon.y + 10);
+    display.setCursor(icon.x + icon.width + 8, icon.y + 9);
     display.print(icon.label);
 }
 
@@ -228,11 +249,11 @@ void Menu::drawForwardModules(int offset, bool init) {
                 wordGrow(IconTrans);         // grow word-root
 
                 if (i == MODULE_FORWARD && curStep > totalStep - 2) {
-                    display.fillRoundRect(90, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                    display.drawRoundRect(89, 34, 33, 8, RADIUS_PALL, SELECTED_COLOR);
 
                     if (curStep == totalStep - 1) {
                         delay(30);
-                        display.setCursor(57, 52);
+                        display.setCursor(56, 53);
                         display.print(modules[MODULE_FORWARD+1]);
 
                         display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
@@ -242,7 +263,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                         backMartix[i] = backMartix[i - 1] + 1;
                     }
                     backMartix[MODULE_BACKWARD] = MODULE_FORWARD;
-                    isbackward = true;
+                    isBackward = true;
                 }
             }
             next = true;
@@ -303,9 +324,9 @@ void Menu::drawBackwardModules() {
             display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, IconTrans.icon, 24, 24, SELECTED_COLOR);
 
             if (curStep == totalStep - 1) {
-                display.fillRoundRect(100 - offsetX, 51 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                display.fillRoundRect(100 - offsetX, 50 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             } else {
-                display.drawRoundRect(100 - offsetX, 51 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                display.drawRoundRect(100 - offsetX, 50 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             }
         }
 
@@ -324,7 +345,7 @@ void Menu::drawBackwardModules() {
 void Menu::wordShrink(Module& icon) {
     float shrinkOffset = 45.0 / wordStep;
 
-    display.fillRect(icon.x + 30 + shrinkOffset * (wordStep - curStep), icon.y + 10, 
+    display.fillRect(icon.x + 30 + shrinkOffset * (wordStep - curStep), icon.y + 9, 
                      shrinkOffset * curStep, 20, UNSELECTED_COLOR);
 }
 
@@ -352,7 +373,7 @@ void Menu::wordGrow(Module& icon) {
         }
 
         if (curStep > totalStep - 4) {
-            display.setCursor(icon.x + icon.width + 10, icon.y + 10); 
+            display.setCursor(icon.x + icon.width + 10, icon.y + 9); 
             display.setTextColor(SELECTED_COLOR);
             display.print(icon.label);
         }
@@ -418,11 +439,11 @@ void Menu::renderForward() {
         curStep++;
         delay(flowSpeed);
     }
-
+    
     if (forwardPointer == MODULE_FORWARD) {
         forwardPointer = 0;
         backMartix[0] = MODULE_FORWARD;
-        isbackward = false;
+        isBackward = false;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true, true);
         isAnimating = false;
