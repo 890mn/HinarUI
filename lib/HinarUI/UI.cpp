@@ -201,7 +201,6 @@ void Menu::drawForwardModules(int offset, bool init) {
                 IconTrans.x += (totalStep - curStep) * (30 / totalStep) + 40;
                 
                 if (curStep < totalStep / 2) {
-                    IconTrans.width = 20;
                     pallTransRect(IconTrans);     // pall->rect
                 } else {
                     IconTrans.height = IconTrans.width = 30;
@@ -396,6 +395,7 @@ void Menu::pallTrans(Module& icon, int leftTopX, int rightTopX, int rightBottomX
 
 void Menu::pallTransRect(Module& icon) {
     int transOffset = (curStep - wordStep) * (10 / wordStep); 
+    icon.height -= 1;
 
     pallTrans(icon, icon.x - transOffset, icon.x + icon.width,
               icon.x + icon.width + transOffset, icon.x);
