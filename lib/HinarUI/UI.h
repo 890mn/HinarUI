@@ -23,10 +23,10 @@
 #define FLOWSPEED_SLOW      35
 
 // Module Setting
-#define MODULE_MAX          5
+#define MODULE_MAX          6
 #define MODULE_OFFSET       45
 #define MODULE_DIRECTION    -1
-#define MODULE_FORWARD      2
+#define MODULE_FORWARD      3
 #define MODULE_BACKWARD     MODULE_MAX - MODULE_FORWARD
 
 #define RADIUS_PALL         2
@@ -46,11 +46,11 @@ public:
 
 private:
     String PAGE_NAME           = "FORWARD";
-    String modules[MODULE_MAX] = {"LIGHT", "TIME", "ENVIR",
-                                  "INFO", "GITHUB"};
+    String modules[MODULE_MAX] = {"LIGHT", "TIME", "DHT11",
+                                  "CORE", "GITHUB", "ABOUT"};
     
     unsigned char* icons[MODULE_MAX] = {bitmap_diode, bitmap_clock, bitmap_data, 
-                                           bitmap_cube, bitmap_github};
+                                        bitmap_chip, bitmap_github, bitmap_cube};
 
     int backMartix[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
 

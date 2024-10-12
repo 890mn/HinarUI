@@ -265,10 +265,10 @@ void Menu::drawBackwardModules() {
     display.drawRoundRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR);
 
     // 1 - ROOT
-    display.drawLine(IconTrans.x + IconTrans.width - 1 , IconTrans.y + IconTrans.height - 1,
-                     IconTrans.x + IconTrans.width + 8 , IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
-    display.drawLine(IconTrans.x + IconTrans.width + 8 , IconTrans.y + IconTrans.height - 10,
-                     IconTrans.x + IconTrans.width + 28, IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
+    display.drawLine(IconTrans.x + IconTrans.width - 4 , IconTrans.y + IconTrans.height - 1,
+                     IconTrans.x + IconTrans.width + 5 , IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
+    display.drawLine(IconTrans.x + IconTrans.width + 5 , IconTrans.y + IconTrans.height - 10,
+                     IconTrans.x + IconTrans.width + 25, IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
     
     for (int i = 0; i < MODULE_BACKWARD; ++i) {
         IconTrans.label = modules[backMartix[i]];
@@ -278,7 +278,7 @@ void Menu::drawBackwardModules() {
             int offsetX = curStep;
             int offsetY = 4 * pow(curStep, 0.5);
 
-            display.setCursor(49 + offsetX, 34 - offsetY);
+            display.setCursor(49 + offsetX, 35 - offsetY);
             display.print(IconTrans.label);
 
             if (curStep < totalStep / 4) {
@@ -293,19 +293,19 @@ void Menu::drawBackwardModules() {
             int offsetX = curStep;
             int offsetY = 0.125 * pow(curStep, 2);
 
-            display.setCursor(60 - offsetX, 49 - offsetY);
+            display.setCursor(60 - offsetX, 51 - offsetY);
             display.print(IconTrans.label);
 
             IconTrans.icon = icons[backMartix[i]];
         
             display.drawRect(IconTrans.x + 3, IconTrans.y + 3, 24, 24, UNSELECTED_COLOR);
-            display.drawFastVLine(IconTrans.x + IconTrans.width - 1, IconTrans.y + 2, IconTrans.height - 2, UNSELECTED_COLOR);
+            display.drawFastVLine(IconTrans.x + IconTrans.width - 1, IconTrans.y + 2, IconTrans.height - 6, UNSELECTED_COLOR);
             display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, IconTrans.icon, 24, 24, SELECTED_COLOR);
 
             if (curStep == totalStep - 1) {
-                display.fillRoundRect(100 - offsetX, 50 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                display.fillRoundRect(100 - offsetX, 51 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             } else {
-                display.drawRoundRect(100 - offsetX, 50 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                display.drawRoundRect(100 - offsetX, 51 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             }
         }
 
@@ -316,7 +316,7 @@ void Menu::drawBackwardModules() {
 
             display.setCursor(72 - offsetX, 65 - offsetY);
             display.print(IconTrans.label);
-            display.drawRoundRect(110 - offsetX, 65 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+            display.drawRoundRect(110 - offsetX, 66 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
         }
     }
 }
