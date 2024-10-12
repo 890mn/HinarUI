@@ -226,7 +226,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                 } else {
                     IconTrans.height = IconTrans.width = 30;
                     display.drawRoundRect(IconTrans.x, IconTrans.y,
-                                        IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR); 
+                                          IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR); 
                     display.drawFastVLine(IconTrans.x + IconTrans.width - 1, IconTrans.y + 2, IconTrans.height - 2, UNSELECTED_COLOR);                    
                     wordGrow(IconTrans);         // grow word-root
                 }
@@ -249,7 +249,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                 wordGrow(IconTrans);         // grow word-root
 
                 if (i == MODULE_FORWARD && curStep > totalStep - 2) {
-                    display.drawRoundRect(89, 34, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                    display.drawRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
 
                     if (curStep == totalStep - 1) {
                         delay(30);
