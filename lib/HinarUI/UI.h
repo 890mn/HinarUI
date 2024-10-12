@@ -47,7 +47,7 @@ public:
 private:
     String PAGE_NAME           = "FORWARD";
     String modules[MODULE_MAX] = {"LIGHT", "TIME", "DHT11",
-                                  "CORE", "GITHUB", "ABOUT"};
+                                  "UICORE", "GITHUB", "ABOUT"};
     
     unsigned char* icons[MODULE_MAX] = {bitmap_diode, bitmap_clock, bitmap_data, 
                                         bitmap_chip, bitmap_github, bitmap_cube};
