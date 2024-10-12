@@ -63,7 +63,8 @@ private:
     int    flowSpeed           = FLOWSPEED_NORMAL;
 
     bool   isAnimating         = false;
-    bool   isbackward          = false;
+    bool   isBackward          = false;
+    bool   isUP                = false;
 
     int    currentTime         = 0;
     int    UpPT                = 0;
