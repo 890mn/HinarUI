@@ -28,11 +28,11 @@ void Menu::loop() {
         int keyRightState = digitalRead(KEY_RIGHT);
         int keyBackState = digitalRead(KEY_BACK);
 
-        if (keyBackState == LOW && isBackward) {
+        if (keyBackState == LOW && isBackward && forwardPointer == MODULE_FORWARD) {
             display.fillRect(90, 36, 31, 6, UNSELECTED_COLOR);
             display.display();
             isBackward = false;
-            isUP = false;
+            isUP = false;          
         }
 
         if (!isBackward) {
@@ -40,13 +40,13 @@ void Menu::loop() {
         }
 
         if (isBackward) {
-            if (keyEnterState == LOW && !isUP) {
+            if (keyEnterState == LOW && !isUP && forwardPointer == MODULE_FORWARD) {
                 isUP = true;
+                display.fillRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                display.display(); 
             }
 
-            if (isUP) {
-                display.fillRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-                display.display();
+            if (isUP) {   
                 if (keyRightState == LOW) {
                     if (RightPT == 0) {
                         RightPT = currentTime;
@@ -84,7 +84,7 @@ void Menu::loop() {
             RightPT = 0;
         }
 
-        if (keyEnterState == LOW) {
+        if (keyEnterState == LOW && !isBackward) {
             isBackward = true;
         }
     }
