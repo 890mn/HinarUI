@@ -1,7 +1,5 @@
 #include "UI.h"
 
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-
 void Menu::create() {
     Serial.begin(115200);
 
@@ -11,7 +9,7 @@ void Menu::create() {
     }
 
     pinMode(KEY_ENTER, INPUT_PULLUP);
-    pinMode(KEY_RIGHT, INPUT_PULLUP);
+    pinMode(KEY_CYCLE, INPUT_PULLUP);
     pinMode(KEY_BACK , INPUT_PULLUP);
 
     display.setTextSize(1);
@@ -25,29 +23,61 @@ void Menu::loop() {
 
     if (!isAnimating) {
         int keyEnterState = digitalRead(KEY_ENTER);
-        int keyRightState = digitalRead(KEY_RIGHT);
-        int keyBackState = digitalRead(KEY_BACK);
+        int keyCycleState = digitalRead(KEY_CYCLE);
+        int keyBackState  = digitalRead(KEY_BACK);
 
-        if (keyBackState == LOW && isBackward && forwardPointer == MODULE_FORWARD) {
-            display.fillRect(90, 36, 31, 6, UNSELECTED_COLOR);
-            display.display();
-            isBackward = false;
-            isUP = false;          
-        }
+        switch (currentState) {
+            case IDLE:
+                // IDLE -> BACKWARD
+                if (keyEnterState == LOW && !isUP && forwardPointer == MODULE_FORWARD) {
+                    isBackward = true;
+                    display.fillRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                    display.display();
+                    currentState = BACKWARD;
+                }
 
-        if (!isBackward) {
-            isUP = false;
-        }
+                // IDLE -> FORWARD
+                else if (keyCycleState == LOW) {
 
-        if (isBackward) {
-            if (keyEnterState == LOW && !isUP && forwardPointer == MODULE_FORWARD) {
-                isUP = true;
-                display.fillRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-                display.display(); 
-            }
+                    currentState = FORWARD;
+                }
 
-            if (isUP) {   
-                if (keyRightState == LOW) {
+                // IDLE -> MODULE
+                else if (keyEnterState == LOW) {
+
+                    currentState = MODULE;
+                }
+                break;
+
+            case FORWARD:
+                // IDLE -> FORWARD -> IDLE
+                if (RightPT == 0) {
+                    RightPT = currentTime;
+                } else if ((currentTime - RightPT) > Threshold) {
+                    flowSpeed = FLOWSPEED_FAST_PLUS;
+                    isAnimating = true;
+                    renderForward();
+                    RightPT = 0;
+                } else if ((currentTime - RightPT) <= Threshold) {
+                    flowSpeed = FLOWSPEED_NORMAL;
+                    isAnimating = true;
+                    renderForward();
+                    RightPT = 0;
+                }
+                currentState = IDLE; 
+                break;
+
+            case BACKWARD:
+                // BACKWARD -> BACKWARD_SELECTED
+                if (keyEnterState == LOW) {
+                    isUP = true;
+                    currentState = BACKWARD_SELECTED;
+                }
+                break;
+
+            case BACKWARD_SELECTED:
+                // BACKWARD_SELECTED -> BACKWARD_SELECTED
+                if (keyCycleState == LOW) {
                     if (RightPT == 0) {
                         RightPT = currentTime;
                     } else if ((currentTime - RightPT) > Threshold) {
@@ -55,37 +85,33 @@ void Menu::loop() {
                         isAnimating = true;
                         renderBackward();
                         RightPT = 0;
-                    }
-                } else if (RightPT > 0) {
-                    if ((currentTime - RightPT) <= Threshold) {
+                    } else if ((currentTime - RightPT) <= Threshold) {
                         flowSpeed = FLOWSPEED_NORMAL;
                         isAnimating = true;
                         renderBackward();
+                        RightPT = 0;
                     }
+                } else if (RightPT > 0) {
                     RightPT = 0;
                 }
-            }
-        }
-        if (keyRightState == LOW) {
-            if (RightPT == 0) {
-                RightPT = currentTime;
-            } else if ((currentTime - RightPT) > Threshold) {
-                flowSpeed = FLOWSPEED_FAST_PLUS;
-                isAnimating = true;
-                renderForward();
-                RightPT = 0;
-            }
-        } else if (RightPT > 0) {
-            if ((currentTime - RightPT) <= Threshold) {
-                flowSpeed = FLOWSPEED_NORMAL;
-                isAnimating = true;
-                renderForward();
-            }
-            RightPT = 0;
-        }
+                
+                // BACKWARD_SELECTED -> IDLE
+                else if (keyBackState == LOW && isBackward) {
+                    display.fillRect(90, 36, 31, 6, UNSELECTED_COLOR);
+                    display.display();
+                    isBackward = false;
+                    isUP = false;     
+                    currentState = IDLE;     
+                }
+                break;
+            
+            case MODULE:
+                // MODULE -> IDLE
+                if (keyBackState == LOW) {
 
-        if (keyEnterState == LOW && !isBackward) {
-            isBackward = true;
+                    currentState = IDLE;
+                }
+                break;
         }
     }
 }
@@ -186,7 +212,7 @@ void Menu::drawForwardModules(int offset, bool init) {
 
     if (init) {
         for (int i = 0; i < MODULE_MAX; ++i) {
-            IconTrans.label = modules[i];
+            IconTrans.label = labels[i];
             if (i == 0) {
                 drawSeleModule(IconTrans);
                 display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_diode, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
@@ -201,7 +227,7 @@ void Menu::drawForwardModules(int offset, bool init) {
     }
 
     for (int i = 0; i <= MODULE_FORWARD; ++i) {
-        IconTrans.label = modules[i];
+        IconTrans.label = labels[i];
         IconTrans.icon = icons[i];
 
         // MainModule
@@ -218,7 +244,7 @@ void Menu::drawForwardModules(int offset, bool init) {
             }
 
             if (forwardPointer == MODULE_FORWARD) {
-                IconTrans.label = modules[0];
+                IconTrans.label = labels[0];
                 IconTrans.x += (totalStep - curStep) * (30 / totalStep) + 40;
                 
                 if (curStep < totalStep / 2) {
@@ -254,7 +280,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                     if (curStep == totalStep - 1) {
                         delay(30);
                         display.setCursor(56, 53);
-                        display.print(modules[MODULE_FORWARD+1]);
+                        display.print(labels[MODULE_FORWARD+1]);
 
                         display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
                     }   
@@ -282,7 +308,7 @@ void Menu::drawForwardModules(int offset, bool init) {
 }
 
 void Menu::drawBackwardModules() {
-    IconTrans = {.x = 10, .y = 25, .width = 30, .height = 30, .label = modules[MODULE_FORWARD-1]};  
+    IconTrans = {.x = 10, .y = 25, .width = 30, .height = 30, .label = labels[MODULE_FORWARD-1]};  
     display.drawRoundRect(IconTrans.x, IconTrans.y, IconTrans.width, IconTrans.height, RADIUS_RECT, SELECTED_COLOR);
 
     // 1 - ROOT
@@ -292,7 +318,7 @@ void Menu::drawBackwardModules() {
                      IconTrans.x + IconTrans.width + 25, IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
     
     for (int i = 0; i < MODULE_BACKWARD; ++i) {
-        IconTrans.label = modules[backMartix[i]];
+        IconTrans.label = labels[backMartix[i]];
         
         // MIDDLE -> UP
         if (i == 0) {  
