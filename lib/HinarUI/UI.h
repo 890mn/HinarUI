@@ -45,8 +45,8 @@ private:
 
     int    currentTime         = 0;
     int    UpPT                = 0;
-    int    RightPT             = 0;
-    int    Threshold           = 400;
+    int    CyclePress          = 0;
+    int    Threshold           = 500;
     struct Module {
         int x;
         int y;
@@ -62,6 +62,7 @@ private:
     enum MenuState {
         IDLE,                // Base     Status
         FORWARD,             // Forward  Cycle
+        FORWARD_HOLD,
         BACKWARD,            // Backward Status
         BACKWARD_SELECTED,   // Backward Cycle
         MODULE               // Module   Status

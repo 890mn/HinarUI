@@ -29,7 +29,7 @@ void Menu::loop() {
         switch (currentState) {
             case IDLE:
                 // IDLE -> BACKWARD
-                if (keyEnterState == LOW && !isUP && forwardPointer == MODULE_FORWARD) {
+                if (keyEnterState == LOW && forwardPointer == MODULE_FORWARD) {
                     isBackward = true;
                     display.fillRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
                     display.display();
@@ -50,21 +50,41 @@ void Menu::loop() {
                 break;
 
             case FORWARD:
-                // IDLE -> FORWARD -> IDLE
-                if (RightPT == 0) {
-                    RightPT = currentTime;
-                } else if ((currentTime - RightPT) > Threshold) {
+                if (keyCycleState == LOW) {
+                    if (CyclePress == 0) {
+                        CyclePress = currentTime; // 记录按下时间
+                    }
+                    // 长按
+                    else if ((currentTime - CyclePress) > Threshold) {
+                        flowSpeed = FLOWSPEED_FAST_PLUS; // 快速流动
+                        isAnimating = true;
+                        renderForward();
+                    }
+                    // 短按
+                    else if ((currentTime - CyclePress) <= Threshold) {
+                        flowSpeed = FLOWSPEED_NORMAL; // 正常速度
+                        isAnimating = true;
+                        renderForward();
+                    }
+                } 
+                // 松开按键后重置
+                else if (keyCycleState == HIGH && CyclePress > 0) {
+                    CyclePress = 0;
+                    currentState = IDLE; // 重置为初始状态
+                }
+                break;
+
+            case FORWARD_HOLD:
+                // 持续检测按键是否松开
+                if (keyCycleState == HIGH) {
+                    CyclePress = 0;
+                    currentState = FORWARD;  // 按键松开后返回 IDLE
+                } else {
+                    // 持续按下时维持加速
                     flowSpeed = FLOWSPEED_FAST_PLUS;
                     isAnimating = true;
                     renderForward();
-                    RightPT = 0;
-                } else if ((currentTime - RightPT) <= Threshold) {
-                    flowSpeed = FLOWSPEED_NORMAL;
-                    isAnimating = true;
-                    renderForward();
-                    RightPT = 0;
                 }
-                currentState = IDLE; 
                 break;
 
             case BACKWARD:
@@ -78,25 +98,30 @@ void Menu::loop() {
             case BACKWARD_SELECTED:
                 // BACKWARD_SELECTED -> BACKWARD_SELECTED
                 if (keyCycleState == LOW) {
-                    if (RightPT == 0) {
-                        RightPT = currentTime;
-                    } else if ((currentTime - RightPT) > Threshold) {
-                        flowSpeed = FLOWSPEED_FAST_PLUS;
-                        isAnimating = true;
-                        renderBackward();
-                        RightPT = 0;
-                    } else if ((currentTime - RightPT) <= Threshold) {
-                        flowSpeed = FLOWSPEED_NORMAL;
-                        isAnimating = true;
-                        renderBackward();
-                        RightPT = 0;
+                    if (CyclePress == 0) {
+                        CyclePress = currentTime; // 记录按下时间
                     }
-                } else if (RightPT > 0) {
-                    RightPT = 0;
+                    // 长按加速
+                    else if ((currentTime - CyclePress) > Threshold) {
+                        flowSpeed = FLOWSPEED_FAST_PLUS; // 快速流动
+                        isAnimating = true;
+                        renderBackward();
+                    }
+                    // 短按正常速度
+                    else if ((currentTime - CyclePress) <= Threshold) {
+                        flowSpeed = FLOWSPEED_NORMAL; // 正常速度
+                        isAnimating = true;
+                        renderBackward();
+                    }
                 }
-                
+                // 按键松开后重置
+                else if (keyCycleState == HIGH && CyclePress > 0) {
+                    CyclePress = 0;  // 释放按键后重置 CyclePress
+                    currentState = BACKWARD_SELECTED;  // 重置为初始状态或根据需要设置下一个状态
+                }
+
                 // BACKWARD_SELECTED -> IDLE
-                else if (keyBackState == LOW && isBackward) {
+                if (keyBackState == LOW) {
                     display.fillRect(90, 36, 31, 6, UNSELECTED_COLOR);
                     display.display();
                     isBackward = false;
