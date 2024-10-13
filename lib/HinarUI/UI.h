@@ -11,8 +11,8 @@
 
 // Render FlowSpeed
 #define FLOWSPEED_FAST_PLUS 5
-#define FLOWSPEED_FAST      25
-#define FLOWSPEED_NORMAL    30
+#define FLOWSPEED_FAST      20
+#define FLOWSPEED_NORMAL    25
 #define FLOWSPEED_SLOW      35
 
 #define KEY_ENTER           18
@@ -44,7 +44,6 @@ private:
     bool   isUP                = false;
 
     int    currentTime         = 0;
-    int    UpPT                = 0;
     int    CyclePress          = 0;
     int    Threshold           = 500;
     struct Module {
@@ -62,13 +61,13 @@ private:
     enum MenuState {
         IDLE,                // Base     Status
         FORWARD,             // Forward  Cycle
-        FORWARD_HOLD,
         BACKWARD,            // Backward Status
         BACKWARD_SELECTED,   // Backward Cycle
         MODULE               // Module   Status
     };
     MenuState currentState = IDLE;
 
+    void renderDynamic(int keyCycleState, bool isForward);
     void renderForward();
     void renderBackward();
 

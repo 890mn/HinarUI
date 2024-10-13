@@ -50,41 +50,8 @@ void Menu::loop() {
                 break;
 
             case FORWARD:
-                if (keyCycleState == LOW) {
-                    if (CyclePress == 0) {
-                        CyclePress = currentTime; // 记录按下时间
-                    }
-                    // 长按
-                    else if ((currentTime - CyclePress) > Threshold) {
-                        flowSpeed = FLOWSPEED_FAST_PLUS; // 快速流动
-                        isAnimating = true;
-                        renderForward();
-                    }
-                    // 短按
-                    else if ((currentTime - CyclePress) <= Threshold) {
-                        flowSpeed = FLOWSPEED_NORMAL; // 正常速度
-                        isAnimating = true;
-                        renderForward();
-                    }
-                } 
-                // 松开按键后重置
-                else if (keyCycleState == HIGH && CyclePress > 0) {
-                    CyclePress = 0;
-                    currentState = IDLE; // 重置为初始状态
-                }
-                break;
-
-            case FORWARD_HOLD:
-                // 持续检测按键是否松开
-                if (keyCycleState == HIGH) {
-                    CyclePress = 0;
-                    currentState = FORWARD;  // 按键松开后返回 IDLE
-                } else {
-                    // 持续按下时维持加速
-                    flowSpeed = FLOWSPEED_FAST_PLUS;
-                    isAnimating = true;
-                    renderForward();
-                }
+                // FORWARD -> FORWARD
+                renderDynamic(keyCycleState, true);
                 break;
 
             case BACKWARD:
@@ -97,28 +64,7 @@ void Menu::loop() {
 
             case BACKWARD_SELECTED:
                 // BACKWARD_SELECTED -> BACKWARD_SELECTED
-                if (keyCycleState == LOW) {
-                    if (CyclePress == 0) {
-                        CyclePress = currentTime; // 记录按下时间
-                    }
-                    // 长按加速
-                    else if ((currentTime - CyclePress) > Threshold) {
-                        flowSpeed = FLOWSPEED_FAST_PLUS; // 快速流动
-                        isAnimating = true;
-                        renderBackward();
-                    }
-                    // 短按正常速度
-                    else if ((currentTime - CyclePress) <= Threshold) {
-                        flowSpeed = FLOWSPEED_NORMAL; // 正常速度
-                        isAnimating = true;
-                        renderBackward();
-                    }
-                }
-                // 按键松开后重置
-                else if (keyCycleState == HIGH && CyclePress > 0) {
-                    CyclePress = 0;  // 释放按键后重置 CyclePress
-                    currentState = BACKWARD_SELECTED;  // 重置为初始状态或根据需要设置下一个状态
-                }
+                renderDynamic(keyCycleState, false);
 
                 // BACKWARD_SELECTED -> IDLE
                 if (keyBackState == LOW) {
@@ -479,6 +425,28 @@ void Menu::rectTransPall(Module& icon) {
 
     pallTrans(icon, icon.x, icon.x + 30 - 10.0 * progress,
               icon.x + 25 - 15.0 * progress, icon.x - 10.0 * progress);
+}
+
+void Menu::renderDynamic(int keyCycleState, bool isForward) {
+    if (keyCycleState == LOW) {
+        if (CyclePress == 0) { // BEGIN
+            CyclePress = currentTime;
+        }
+        else {
+            flowSpeed = ((currentTime - CyclePress) > Threshold) 
+                        ? FLOWSPEED_FAST_PLUS  // Long Press
+                        : FLOWSPEED_NORMAL;   // Short Press
+            isAnimating = true;
+            if (isForward) renderForward();
+            else           renderBackward();
+        }
+    } 
+    // Stop Press
+    else if (keyCycleState == HIGH && CyclePress > 0) {
+        CyclePress = 0;
+        if (isForward) currentState = IDLE; // FORWARD -> IDLE
+        else           currentState = BACKWARD_SELECTED;
+    }
 }
 
 void Menu::renderForward() {
