@@ -58,6 +58,9 @@
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
     "random": "cpp",
-    "cmath": "cpp"
+    "cmath": "cpp",
+    "module.h": "c",
+    "ui.h": "c",
+    "adafruit_ssd1306.h": "c"
   }
 }

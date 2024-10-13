@@ -2,40 +2,22 @@
 #define __UI_H
 
 #include "resource/icon.h"
+#include "resource/oled.h"
 
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-
-// OLED Setting
-#define SCREEN_WIDTH        128
-#define SCREEN_HEIGHT       64
-#define SELECTED_COLOR      SSD1306_WHITE
-#define UNSELECTED_COLOR    SSD1306_BLACK
+#include "module/module.h"
 
 // Iteration Depth
 #define STEP_COUNT          12 
 
 // Render FlowSpeed
 #define FLOWSPEED_FAST_PLUS 5
-#define FLOWSPEED_FAST      25
-#define FLOWSPEED_NORMAL    30
+#define FLOWSPEED_FAST      20
+#define FLOWSPEED_NORMAL    25
 #define FLOWSPEED_SLOW      35
 
-// Module Setting
-#define MODULE_MAX          6
-#define MODULE_OFFSET       45
-#define MODULE_DIRECTION    -1
-#define MODULE_FORWARD      3
-#define MODULE_BACKWARD     MODULE_MAX - MODULE_FORWARD
-
-#define RADIUS_PALL         2
-#define RADIUS_RECT         5
-
 #define KEY_ENTER           18
-#define KEY_RIGHT           27
+#define KEY_CYCLE           27
 #define KEY_BACK            19
-
 
 // TopBar Setting
 #define UI_NAME             "HinarUI"
@@ -46,11 +28,6 @@ public:
 
 private:
     String PAGE_NAME           = "FORWARD";
-    String modules[MODULE_MAX] = {"LIGHT", "TIME", "DHT11",
-                                  "UICORE", "GITHUB", "ABOUT"};
-    
-    unsigned char* icons[MODULE_MAX] = {bitmap_diode, bitmap_clock, bitmap_data, 
-                                        bitmap_chip, bitmap_github, bitmap_cube};
 
     int backMartix[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
 
@@ -67,9 +44,8 @@ private:
     bool   isUP                = false;
 
     int    currentTime         = 0;
-    int    UpPT                = 0;
-    int    RightPT             = 0;
-    int    Threshold           = 400;
+    int    CyclePress          = 0;
+    int    Threshold           = 500;
     struct Module {
         int x;
         int y;
@@ -77,10 +53,21 @@ private:
         int height;
         String label;
         unsigned char* icon;
+        //void (*entry)();
     };
     Module Icon      = {.x = 10, .y = 25, .width = 20, .height = 30, .label = "INIT"};
     Module IconTrans = {         .y = 25, .width = 20, .height = 30, .label = "INIT"};
 
+    enum MenuState {
+        IDLE,                // Base     Status
+        FORWARD,             // Forward  Cycle
+        BACKWARD,            // Backward Status
+        BACKWARD_SELECTED,   // Backward Cycle
+        MODULE               // Module   Status
+    };
+    MenuState currentState = IDLE;
+
+    void renderDynamic(int keyCycleState, bool isForward);
     void renderForward();
     void renderBackward();
 
