@@ -31,13 +31,13 @@ public:
     void drawFrame();
 
 private:
-    String PAGE_NAME           = "FORWARD";
+    String PAGE_NAME = "FORWARD";
 
     int backMartix[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
     int backMackup[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
 
-    unsigned char* iconBaset   = icons[MODULE_FORWARD];
-    String         labelBaset  = labels[MODULE_FORWARD];
+    String tmpLabel = labels[MODULE_FORWARD];
+    unsigned char* tmpIcons = icons[MODULE_FORWARD];
 
     String labels[MODULE_MAX] = {"LIGHT", "TIME", "DHT11",
                                  "UICORE", "GITHUB", "ABOUT"};
