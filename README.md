@@ -4,9 +4,6 @@ Original OLED UI Designed
 
 ## Current Status
 
-- Icon on | 2024.10.12
-- base on | 2024.10.9
-
-## Example
-
-current based on ESP32 + 0.96' OLED 128/64 
+- 2024.10.14 | Status Machine Rebuild
+- 2024.10.12 | Icon on
+- 2024.10.09 | base on
