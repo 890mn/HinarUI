@@ -18,11 +18,10 @@
 #define KEY_BACK            19
 #define KEY_CYCLE           27
 
-// TopBar Setting
-#define UI_NAME             "HinarUI"
+static String PAGE_NAME = "FORWARD";
+static String UI_NAME   = "HinarUI";
 
 typedef void (*entry)();
-
 class Menu {
 public:
     void create();
@@ -31,8 +30,6 @@ public:
     void drawFrame();
 
 private:
-    String PAGE_NAME = "FORWARD";
-
     int backMartix[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
     int backMackup[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
 

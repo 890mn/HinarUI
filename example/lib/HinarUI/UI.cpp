@@ -99,10 +99,11 @@ void Menu::loop() {
                         delay(3);
                     }
                     backwardLoad();
+                    PAGE_NAME = "BACKWARD";
+                    UI_NAME   = "HinarUI";
 
                     curStep = totalStep - 1;
                     draw(1, false, false);
-                    curStep = 0;
 
                     backwardTrans();
                     currentState = BACKWARD_SELECTED;
@@ -110,9 +111,12 @@ void Menu::loop() {
 
                 // MODULE -> IDLE
                 if (keyBackState == LOW && forwardPointer != MODULE_FORWARD) {
+                    --forwardPointer;
 
-                    //renderForward();
+                    curStep = totalStep - 1;
+                    draw(1, false, true);
 
+                    ++forwardPointer;
                     currentState = IDLE;
                 }
                 break;
@@ -146,13 +150,13 @@ void Menu::drawFrame() {
 }
 
 void Menu::drawTopBar() {
-    display.setCursor(4, 4);
+    display.setCursor(4, 5);
     display.print(PAGE_NAME);
 
     int16_t x1, y1;
     uint16_t w, h;
     display.getTextBounds(UI_NAME, 0, 0, &x1, &y1, &w, &h);
-    display.setCursor(SCREEN_WIDTH - w - 4, 4);
+    display.setCursor(SCREEN_WIDTH - w - 4, 5);
     display.print(UI_NAME);
 }
 
@@ -587,11 +591,22 @@ void module_UICORE() {
 
 void module_github() {
     display.clearDisplay();
+    PAGE_NAME = "TEST RELEASE";
+    UI_NAME = "V0.1";
+
     menu.drawTopBar();
     menu.drawFrame();
 
-    display.setCursor(1, 20);
-    display.print("GITHUB");
+    display.setTextSize(2);
+    display.setCursor(8, 25);
+    display.print("HinarUI");
+
+    display.drawBitmap(98, 23, bitmap_github, 24, 24, SELECTED_COLOR);
+    display.setCursor(10, 48);
+
+    display.setTextSize(1);
+    display.print("@890mn ORIGINAL");
+    
     display.display();
 }
 
