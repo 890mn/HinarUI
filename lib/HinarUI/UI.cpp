@@ -473,8 +473,8 @@ void Menu::renderForward() {
     PAGE_NAME = forwardPointer == MODULE_FORWARD - 1 ? "BACKWARD" : "FORWARD";
 
     if (forwardPointer == MODULE_FORWARD) {
-        labels[3] = labels[backMartix[0]];
-        icons[3] = icons[backMartix[0]];
+        labels[MODULE_FORWARD] = labels[backMartix[0]];
+        icons[MODULE_FORWARD] = icons[backMartix[0]];
     }
 
     while (curStep < totalStep) {
@@ -486,8 +486,8 @@ void Menu::renderForward() {
     if (forwardPointer == MODULE_FORWARD) {
         forwardPointer = 0;
         backMartix[0] = MODULE_FORWARD;
-        labels[3] = labelBaset;
-        icons[3] = iconBaset;
+        labels[MODULE_FORWARD] = labelBaset;
+        icons[MODULE_FORWARD] = iconBaset;
         isBackward = false;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true, true);

@@ -47,8 +47,8 @@ private:
     int    CyclePress          = 0;
     int    Threshold           = 500;
 
-    unsigned char* iconBaset   = icons[3];
-    String         labelBaset  = labels[3];
+    unsigned char* iconBaset   = icons[MODULE_FORWARD];
+    String         labelBaset  = labels[MODULE_FORWARD];
     struct Module {
         int x;
         int y;
