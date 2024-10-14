@@ -10,7 +10,7 @@ Original OLED UI Designed
 
 ## Project Structure
 
-```
+```plaintext
 HinarUI
 ├─ module
 │   ├─ module.h
