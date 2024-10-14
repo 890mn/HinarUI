@@ -1,5 +1,6 @@
 #include "UI.h"
 
+Menu menu;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void Menu::create() {
@@ -95,11 +96,20 @@ void Menu::loop() {
                         keyBackState = digitalRead(KEY_BACK);
                         delay(3);
                     }
+                    //backwardLoad();
+
+                    //curStep = totalStep - 1;
+                    //draw(1, false, false);
+                    //curStep = 0;
+
+                    //backwardTrans();
                     currentState = BACKWARD_SELECTED;
                 }
 
                 // MODULE -> IDLE
                 if (keyBackState == LOW && forwardPointer != MODULE_FORWARD) {
+
+                    //renderForward();
 
                     currentState = IDLE;
                 }
@@ -474,10 +484,10 @@ void Menu::renderForward() {
     curStep = 0;
     PAGE_NAME = forwardPointer == MODULE_FORWARD - 1 ? "BACKWARD" : "FORWARD";
 
-    if (forwardPointer == MODULE_FORWARD) {
-        labels[MODULE_FORWARD] = labels[backMartix[0]];
-        icons[MODULE_FORWARD] = icons[backMartix[0]];
-    }
+    //if (forwardPointer == MODULE_FORWARD) {
+    //    labels[MODULE_FORWARD] = labels[backMartix[0]];
+    //    icons[MODULE_FORWARD] = icons[backMartix[0]];
+    //}
 
     while (curStep < totalStep) {
         draw(-45 / totalStep, false, true);
@@ -486,10 +496,10 @@ void Menu::renderForward() {
     }
     
     if (forwardPointer == MODULE_FORWARD) {
-        forwardPointer = 0;
+        forwardPointer = 0; 
         backMartix[0] = MODULE_FORWARD;
-        labels[MODULE_FORWARD] = labelBaset;
-        icons[MODULE_FORWARD] = iconBaset;
+        //labels[MODULE_FORWARD] = labelBaset;
+        //icons[MODULE_FORWARD] = iconBaset;
         isBackward = false;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true, true);
@@ -502,6 +512,7 @@ void Menu::renderForward() {
 
 void Menu::renderBackward() {
     curStep = 0;
+    //backwardSave();
 
     while (curStep < totalStep) {
         draw(1, false, false);
@@ -518,8 +529,31 @@ void Menu::renderBackward() {
     } else {
         backMartix[MODULE_BACKWARD] = backMartix[MODULE_BACKWARD - 1] + 1;
     }
-
     isAnimating = false;
+}
+
+void Menu::backwardTrans() {
+    for (int i = 1; i < MODULE_BACKWARD + 1; ++i) {
+        backMartix[i - 1] = backMartix[i];
+    }
+
+    if (backMartix[MODULE_BACKWARD - 1] == MODULE_MAX - 1) {
+        backMartix[MODULE_BACKWARD] = MODULE_BACKWARD;
+    } else {
+        backMartix[MODULE_BACKWARD] = backMartix[MODULE_BACKWARD - 1] + 1;
+    }
+}
+
+void Menu::backwardSave() {
+    for (int i = 0; i < MODULE_BACKWARD + 1; i++) {
+        backMackup[i] = backMartix[i];
+    }
+}
+
+void Menu::backwardLoad() {
+    for (int i = 0; i < MODULE_BACKWARD + 1; i++) {
+        backMartix[i] = backMackup[i];
+    }
 }
 
 float Menu::easeInOut(float t) {
@@ -528,4 +562,40 @@ float Menu::easeInOut(float t) {
     } else {
         return -1 + (4 - 2 * t) * t;
     }
+}
+
+void module_LIGHT() {
+    display.clearDisplay();
+    menu.drawTopBar();
+    menu.drawFrame();
+
+    display.setCursor(1, 20);
+    display.print("LIGHT");
+    display.display();
+}
+
+void module_TIME() {
+
+}
+
+void module_DHT11() {
+
+}
+
+void module_UICORE() {
+
+}
+
+void module_github() {
+    display.clearDisplay();
+    menu.drawTopBar();
+    menu.drawFrame();
+
+    display.setCursor(1, 20);
+    display.print("GITHUB");
+    display.display();
+}
+
+void module_ABOUT() {
+
 }
