@@ -56,7 +56,6 @@ private:
         int height;
         String label;
         unsigned char* icon;
-        //void (*entry)();
     };
     Module Icon      = {.x = 10, .y = 25, .width = 20, .height = 30, .label = "INIT"};
     Module IconTrans = {         .y = 25, .width = 20, .height = 30, .label = "INIT"};
