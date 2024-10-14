@@ -46,6 +46,9 @@ private:
     int    currentTime         = 0;
     int    CyclePress          = 0;
     int    Threshold           = 500;
+
+    unsigned char* iconBaset   = icons[MODULE_FORWARD];
+    String         labelBaset  = labels[MODULE_FORWARD];
     struct Module {
         int x;
         int y;
