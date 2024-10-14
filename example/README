@@ -1,0 +1,11 @@
+# Sample Intro
+
+Based on
+
+- VSCode + platformIO
+
+- ESP32 [CP2102]
+
+- 0.96' OLED I2C 128x64 with BLUE/YELLOW Double Color AT [TX2/RX2]
+
+- Simplest button AT [GPIO 18/19/27]

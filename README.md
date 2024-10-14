@@ -4,9 +4,27 @@ Original OLED UI Designed
 
 ## Current Status
 
-- Icon on | 2024.10.12
-- base on | 2024.10.9
+- 2024.10.14 | Status Machine Rebuild
+- 2024.10.12 | Icon on
+- 2024.10.09 | base on
 
-## Example
+## Project Structure
 
-current based on ESP32 + 0.96' OLED 128/64 
+```plaintext
+HinarUI
+├─ module
+│   ├─ module.h
+│   └─ module.cpp
+├─ resource
+│   ├─ icon.h
+│   └─ font.h
+├─ example
+│   ├─ .pio
+│   ├─ include
+│   ├─ lib
+│   ├─ src
+│   └─ test
+├─ UI.h
+├─ UI.cpp
+└─ README.md
+```
