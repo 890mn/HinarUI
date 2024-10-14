@@ -58,6 +58,10 @@ void Menu::loop() {
                 // BACKWARD -> BACKWARD_SELECTED
                 if (keyEnterState == LOW) {
                     isUP = true;
+                    while (keyEnterState == LOW) {
+                        keyEnterState = digitalRead(KEY_ENTER);
+                        delay(3);
+                    }
                     currentState = BACKWARD_SELECTED;
                 }
                 break;
@@ -74,11 +78,26 @@ void Menu::loop() {
                     isUP = false;     
                     currentState = IDLE;     
                 }
+
+                // BACKWARD_SELECTED -> MODULE
+                if (keyEnterState == LOW) {
+
+                    currentState = MODULE;
+                }
                 break;
             
             case MODULE:
+                // MODULE -> BACKWARD_SELECTED
+                if (keyBackState == LOW && forwardPointer == MODULE_FORWARD) {
+                    while (keyBackState == LOW) {
+                        keyBackState = digitalRead(KEY_BACK);
+                        delay(3);
+                    }
+                    currentState = BACKWARD_SELECTED;
+                }
+
                 // MODULE -> IDLE
-                if (keyBackState == LOW) {
+                if (keyBackState == LOW && forwardPointer != MODULE_FORWARD) {
 
                     currentState = IDLE;
                 }
@@ -182,7 +201,7 @@ void Menu::drawForwardModules(int offset, bool init) {
     bool next = false;
 
     if (init) {
-        for (int i = 0; i < MODULE_MAX; ++i) {
+        for (int i = 0; i < MODULE_FORWARD; ++i) {
             IconTrans.label = labels[i];
             if (i == 0) {
                 drawSeleModule(IconTrans);
@@ -453,6 +472,11 @@ void Menu::renderForward() {
     curStep = 0;
     PAGE_NAME = forwardPointer == MODULE_FORWARD - 1 ? "BACKWARD" : "FORWARD";
 
+    if (forwardPointer == MODULE_FORWARD) {
+        labels[3] = labels[backMartix[0]];
+        icons[3] = icons[backMartix[0]];
+    }
+
     while (curStep < totalStep) {
         draw(-45 / totalStep, false, true);
         curStep++;
@@ -462,6 +486,8 @@ void Menu::renderForward() {
     if (forwardPointer == MODULE_FORWARD) {
         forwardPointer = 0;
         backMartix[0] = MODULE_FORWARD;
+        labels[3] = labelBaset;
+        icons[3] = iconBaset;
         isBackward = false;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true, true);
