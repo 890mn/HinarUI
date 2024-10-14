@@ -46,7 +46,7 @@ void Menu::loop() {
 
                 // IDLE -> MODULE
                 else if (keyEnterState == LOW) {
-
+                    modules[forwardPointer]();
                     currentState = MODULE;
                 }
                 break;
@@ -83,7 +83,7 @@ void Menu::loop() {
 
                 // BACKWARD_SELECTED -> MODULE
                 if (keyEnterState == LOW) {
-
+                    modules[backMartix[0]]();
                     currentState = MODULE;
                 }
                 break;
