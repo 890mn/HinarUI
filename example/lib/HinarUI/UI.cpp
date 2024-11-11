@@ -98,7 +98,8 @@ void Menu::loop() {
                         keyBackState = digitalRead(KEY_BACK);
                         delay(3);
                     }
-                    backwardLoad();
+                    if (backMartix[0] != MODULE_FORWARD) backwardLoad();
+
                     PAGE_NAME = "BACKWARD";
                     UI_NAME   = "HinarUI";
 
@@ -548,13 +549,13 @@ void Menu::backwardTrans() {
 }
 
 void Menu::backwardSave() {
-    for (int i = 0; i < MODULE_BACKWARD + 1; i++) {
+    for (int i = 0; i < MODULE_BACKWARD + 1; ++i) {
         backMackup[i] = backMartix[i];
     }
 }
 
 void Menu::backwardLoad() {
-    for (int i = 0; i < MODULE_BACKWARD + 1; i++) {
+    for (int i = 0; i < MODULE_BACKWARD + 1; ++i) {
         backMartix[i] = backMackup[i];
     }
 }
@@ -586,7 +587,22 @@ void module_DHT11() {
 }
 
 void module_UICORE() {
+    display.clearDisplay();
+    PAGE_NAME = "UI-CORE";
+    UI_NAME = "WROOM-32";
 
+    menu.drawTopBar();
+    menu.drawFrame();
+
+    display.setTextSize(2);
+    display.setCursor(8, 25);
+    display.print("ESP-32");
+
+    display.setTextSize(1);
+    display.setCursor(10, 48);
+    display.print("40MHz / 520KB SRAM");
+    
+    display.display();
 }
 
 void module_github() {
