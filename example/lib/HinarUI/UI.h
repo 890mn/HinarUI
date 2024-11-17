@@ -30,9 +30,6 @@ public:
     void drawFrame();
 
 private:
-    int backMartix[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
-    int backMackup[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
-
     String tmpLabel = labels[MODULE_FORWARD];
     unsigned char* tmpIcons = icons[MODULE_FORWARD];
 
@@ -51,6 +48,7 @@ private:
 
     int    forwardPointer      = 0;
     int    backwardPointer     = MODULE_FORWARD;
+    int    i_back              = backwardPointer;
     int    flowSpeed           = FLOWSPEED_NORMAL;
 
     bool   isAnimating         = false;
