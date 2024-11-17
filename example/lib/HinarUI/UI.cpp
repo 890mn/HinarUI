@@ -1,5 +1,6 @@
 #include "UI.h"
 
+Menu menu;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void Menu::create() {
@@ -13,6 +14,8 @@ void Menu::create() {
     pinMode(KEY_ENTER, INPUT_PULLUP);
     pinMode(KEY_CYCLE, INPUT_PULLUP);
     pinMode(KEY_BACK , INPUT_PULLUP);
+
+    Menu();
 
     display.setTextSize(1);
     display.setTextColor(SELECTED_COLOR);
@@ -46,7 +49,7 @@ void Menu::loop() {
 
                 // IDLE -> MODULE
                 else if (keyEnterState == LOW) {
-
+                    modules[forwardPointer]();
                     currentState = MODULE;
                 }
                 break;
@@ -83,7 +86,7 @@ void Menu::loop() {
 
                 // BACKWARD_SELECTED -> MODULE
                 if (keyEnterState == LOW) {
-
+                    modules[i_back]();
                     currentState = MODULE;
                 }
                 break;
@@ -95,12 +98,26 @@ void Menu::loop() {
                         keyBackState = digitalRead(KEY_BACK);
                         delay(3);
                     }
+
+                    PAGE_NAME = "BACKWARD";
+                    UI_NAME   = "HinarUI";
+                    --i_back;
+
+                    curStep = totalStep - 1;
+                    draw(1, false, false);
+
+                    ++i_back;
                     currentState = BACKWARD_SELECTED;
                 }
 
                 // MODULE -> IDLE
                 if (keyBackState == LOW && forwardPointer != MODULE_FORWARD) {
+                    --forwardPointer;
 
+                    curStep = totalStep - 1;
+                    draw(1, false, true);
+
+                    ++forwardPointer;
                     currentState = IDLE;
                 }
                 break;
@@ -134,13 +151,13 @@ void Menu::drawFrame() {
 }
 
 void Menu::drawTopBar() {
-    display.setCursor(4, 4);
+    display.setCursor(4, 5);
     display.print(PAGE_NAME);
 
     int16_t x1, y1;
     uint16_t w, h;
     display.getTextBounds(UI_NAME, 0, 0, &x1, &y1, &w, &h);
-    display.setCursor(SCREEN_WIDTH - w - 4, 4);
+    display.setCursor(SCREEN_WIDTH - w - 4, 5);
     display.print(UI_NAME);
 }
 
@@ -271,16 +288,17 @@ void Menu::drawForwardModules(int offset, bool init) {
 
                     if (curStep == totalStep - 1) {
                         delay(30);
-                        display.setCursor(56, 53);
-                        display.print(labels[MODULE_FORWARD+1]);
 
-                        display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-                    }   
-                
-                    for (int i = 1; i < MODULE_BACKWARD; ++i) {
-                        backMartix[i] = backMartix[i - 1] + 1;
-                    }
-                    backMartix[MODULE_BACKWARD] = MODULE_FORWARD;
+                        //UP
+                        display.setCursor(60, 21);
+                        display.print(labels[MODULE_FORWARD - 1]);
+                        display.drawRoundRect(100, 21, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+
+                        //DOWN
+                        display.setCursor(61, 50);
+                        display.print(labels[MODULE_FORWARD + 1]);
+                        display.drawRoundRect(99, 51, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                    }              
                     isBackward = true;
                 }
             }
@@ -309,11 +327,12 @@ void Menu::drawBackwardModules() {
     display.drawLine(IconTrans.x + IconTrans.width + 5 , IconTrans.y + IconTrans.height - 10,
                      IconTrans.x + IconTrans.width + 25, IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
     
-    for (int i = 0; i < MODULE_BACKWARD; ++i) {
-        IconTrans.label = labels[backMartix[i]];
+    int num = i_back;
+    for (int cnt = 0; cnt < 3; ++cnt) {
+        IconTrans.label = labels[num];
         
         // MIDDLE -> UP
-        if (i == 0) {  
+        if (cnt == 0) {  
             int offsetX = curStep;
             int offsetY = 4 * pow(curStep, 0.5);
 
@@ -325,17 +344,30 @@ void Menu::drawBackwardModules() {
             } else {
                 display.drawRoundRect(89 + offsetX, 35 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             }
+/*
+            if (curStep == totalStep - 1) {
+                Serial.print("\nsetCursor\n");
+                Serial.print(49 + offsetX); // 60
+                Serial.print("\n");
+                Serial.print(35 - offsetY); // 22
+
+                Serial.print("\ndisplay.drawRoundRect\n");
+                Serial.print(89 + offsetX); // 100
+                Serial.print("\n");
+                Serial.print(35 - offsetY); // 22
+            }
+*/
         }
 
         // LOW -> MIDDLE
-        else if (i == 1) { 
+        else if (cnt == 1) { 
             int offsetX = curStep;
             int offsetY = 0.125 * pow(curStep, 2);
 
             display.setCursor(60 - offsetX, 51 - offsetY);
             display.print(IconTrans.label);
 
-            IconTrans.icon = icons[backMartix[i]];
+            IconTrans.icon = icons[num];
         
             display.drawRect(IconTrans.x + 3, IconTrans.y + 3, 24, 24, UNSELECTED_COLOR);
             display.drawFastVLine(IconTrans.x + IconTrans.width - 1, IconTrans.y + 2, IconTrans.height - 6, UNSELECTED_COLOR);
@@ -346,17 +378,45 @@ void Menu::drawBackwardModules() {
             } else {
                 display.drawRoundRect(100 - offsetX, 50 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             }
+/*
+            if (curStep == totalStep - 1) {
+                Serial.print("\nsetCursor\n"); 
+                Serial.print(60 - offsetX); // 49
+                Serial.print("\n");
+                Serial.print(51 - offsetY); // 36
+
+                Serial.print("\ndisplay.drawRoundRect\n");
+                Serial.print(100 - offsetX); // 89
+                Serial.print("\n");
+                Serial.print(50 - offsetY); // 35
+            }
+*/            
         }
 
         // OUT -> LOW
-        else if (i == 2) { 
+        else if (cnt == 2) { 
             int offsetX = curStep;
             int offsetY = 0.125 * pow(curStep, 2);
 
             display.setCursor(72 - offsetX, 65 - offsetY);
             display.print(IconTrans.label);
             display.drawRoundRect(110 - offsetX, 66 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+/*
+            if (curStep == totalStep - 1) {
+                Serial.print("\nsetCursor\n");
+                Serial.print(72 - offsetX); // 61
+                Serial.print("\n");
+                Serial.print(65 - offsetY); // 50
+
+                Serial.print("\ndisplay.drawRoundRect\n");
+                Serial.print(110 - offsetX); // 99
+                Serial.print("\n");
+                Serial.print(66 - offsetY); // 51
+            }
+*/
         }
+        ++num;
+        if (num == MODULE_MAX) num = backwardPointer;
     }
 }
 
@@ -474,9 +534,13 @@ void Menu::renderForward() {
     curStep = 0;
     PAGE_NAME = forwardPointer == MODULE_FORWARD - 1 ? "BACKWARD" : "FORWARD";
 
+    // Save last Backward
     if (forwardPointer == MODULE_FORWARD) {
-        labels[MODULE_FORWARD] = labels[backMartix[0]];
-        icons[MODULE_FORWARD] = icons[backMartix[0]];
+        tmpLabel = labels[MODULE_FORWARD];
+        tmpIcons = icons[MODULE_FORWARD]; // change Shallow copy to Deep Copy
+
+        labels[MODULE_FORWARD] = labels[i_back];
+        icons[MODULE_FORWARD] = icons[i_back];
     }
 
     while (curStep < totalStep) {
@@ -486,10 +550,12 @@ void Menu::renderForward() {
     }
     
     if (forwardPointer == MODULE_FORWARD) {
-        forwardPointer = 0;
-        backMartix[0] = MODULE_FORWARD;
-        labels[MODULE_FORWARD] = labelBaset;
-        icons[MODULE_FORWARD] = iconBaset;
+        forwardPointer = 0; 
+        i_back = backwardPointer;
+
+        labels[MODULE_FORWARD] = tmpLabel;
+        icons[MODULE_FORWARD] = tmpIcons;
+        
         isBackward = false;
         Icon = {.x = 10, .y = 25, .width = 20, .height = 30};                                                                                                                                   
         draw(0, true, true);
@@ -503,22 +569,14 @@ void Menu::renderForward() {
 void Menu::renderBackward() {
     curStep = 0;
 
-    while (curStep < totalStep) {
+    while (curStep < totalStep) {  
         draw(1, false, false);
         curStep++;
         delay(flowSpeed);
     }
 
-    for (int i = 1; i < MODULE_BACKWARD + 1; ++i) {
-        backMartix[i - 1] = backMartix[i];
-    }
-
-    if (backMartix[MODULE_BACKWARD - 1] == MODULE_MAX - 1) {
-        backMartix[MODULE_BACKWARD] = MODULE_BACKWARD;
-    } else {
-        backMartix[MODULE_BACKWARD] = backMartix[MODULE_BACKWARD - 1] + 1;
-    }
-
+    if (i_back == MODULE_MAX - 1) i_back = backwardPointer;
+    else ++i_back;
     isAnimating = false;
 }
 
@@ -528,4 +586,66 @@ float Menu::easeInOut(float t) {
     } else {
         return -1 + (4 - 2 * t) * t;
     }
+}
+
+void module_LIGHT() {
+    display.clearDisplay();
+    menu.drawTopBar();
+    menu.drawFrame();
+
+    display.setCursor(1, 20);
+    display.print("LIGHT");
+    display.display();
+}
+
+void module_TIME() {
+
+}
+
+void module_DHT11() {
+
+}
+
+void module_UICORE() {
+    display.clearDisplay();
+    PAGE_NAME = "UI-CORE";
+    UI_NAME = "WROOM-32";
+
+    menu.drawTopBar();
+    menu.drawFrame();
+
+    display.setTextSize(2);
+    display.setCursor(8, 25);
+    display.print("ESP-32");
+
+    display.setTextSize(1);
+    display.setCursor(10, 48);
+    display.print("40MHz / 520KB SRAM");
+    
+    display.display();
+}
+
+void module_github() {
+    display.clearDisplay();
+    PAGE_NAME = "TEST RELEASE";
+    UI_NAME = "V0.1";
+
+    menu.drawTopBar();
+    menu.drawFrame();
+
+    display.setTextSize(2);
+    display.setCursor(8, 25);
+    display.print("HinarUI");
+
+    display.drawBitmap(98, 23, bitmap_github, 24, 24, SELECTED_COLOR);
+    display.setCursor(10, 48);
+
+    display.setTextSize(1);
+    display.print("@890mn ORIGINAL");
+    
+    display.display();
+}
+
+void module_ABOUT() {
+
 }
