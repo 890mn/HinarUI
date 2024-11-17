@@ -284,8 +284,6 @@ void Menu::drawForwardModules(int offset, bool init) {
                 wordGrow(IconTrans);         // grow word-root
 
                 if (i == MODULE_FORWARD && curStep > totalStep - 2) {
-
-                    
                     display.drawRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
 
                     if (curStep == totalStep - 1) {
@@ -294,13 +292,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                         display.print(labels[MODULE_FORWARD+1]);
 
                         display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
-                    }   
-                
-                    for (int i = 1; i < MODULE_BACKWARD; ++i) {
-                        backMartix[i] = backMartix[i - 1] + 1;
-                    }
-                    backMartix[MODULE_BACKWARD] = MODULE_FORWARD;
-                    
+                    }              
                     isBackward = true;
                 }
             }
@@ -541,30 +533,6 @@ void Menu::renderBackward() {
     if (i_back == MODULE_MAX - 1) i_back = backwardPointer;
     else ++i_back;
     isAnimating = false;
-}
-
-void Menu::backwardTrans() {
-    for (int i = 1; i < MODULE_BACKWARD + 1; ++i) {
-        backMartix[i - 1] = backMartix[i];
-    }
-
-    if (backMartix[MODULE_BACKWARD - 1] == MODULE_MAX - 1) {
-        backMartix[MODULE_BACKWARD] = MODULE_BACKWARD;
-    } else {
-        backMartix[MODULE_BACKWARD] = backMartix[MODULE_BACKWARD - 1] + 1;
-    }
-}
-
-void Menu::backwardSave() {
-    for (int i = 0; i < MODULE_BACKWARD + 1; ++i) {
-        backMackup[i] = backMartix[i];
-    }
-}
-
-void Menu::backwardLoad() {
-    for (int i = 0; i < MODULE_BACKWARD + 1; ++i) {
-        backMartix[i] = backMackup[i];
-    }
 }
 
 float Menu::easeInOut(float t) {
