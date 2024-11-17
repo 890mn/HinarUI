@@ -86,7 +86,7 @@ void Menu::loop() {
 
                 // BACKWARD_SELECTED -> MODULE
                 if (keyEnterState == LOW) {
-                    modules[backMartix[0]]();
+                    modules[i_back]();
                     currentState = MODULE;
                 }
                 break;
@@ -98,15 +98,15 @@ void Menu::loop() {
                         keyBackState = digitalRead(KEY_BACK);
                         delay(3);
                     }
-                    if (backMartix[0] != MODULE_FORWARD) backwardLoad();
 
                     PAGE_NAME = "BACKWARD";
                     UI_NAME   = "HinarUI";
+                    --i_back;
 
                     curStep = totalStep - 1;
                     draw(1, false, false);
 
-                    backwardTrans();
+                    ++i_back;
                     currentState = BACKWARD_SELECTED;
                 }
 
@@ -284,6 +284,8 @@ void Menu::drawForwardModules(int offset, bool init) {
                 wordGrow(IconTrans);         // grow word-root
 
                 if (i == MODULE_FORWARD && curStep > totalStep - 2) {
+
+                    
                     display.drawRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
 
                     if (curStep == totalStep - 1) {
@@ -298,6 +300,7 @@ void Menu::drawForwardModules(int offset, bool init) {
                         backMartix[i] = backMartix[i - 1] + 1;
                     }
                     backMartix[MODULE_BACKWARD] = MODULE_FORWARD;
+                    
                     isBackward = true;
                 }
             }
@@ -326,11 +329,12 @@ void Menu::drawBackwardModules() {
     display.drawLine(IconTrans.x + IconTrans.width + 5 , IconTrans.y + IconTrans.height - 10,
                      IconTrans.x + IconTrans.width + 25, IconTrans.y + IconTrans.height - 10, SELECTED_COLOR);
     
-    for (int i = 0; i < MODULE_BACKWARD; ++i) {
-        IconTrans.label = labels[backMartix[i]];
+    int num = i_back;
+    for (int cnt = 0; cnt < 3; ++cnt) {
+        IconTrans.label = labels[num];
         
         // MIDDLE -> UP
-        if (i == 0) {  
+        if (cnt == 0) {  
             int offsetX = curStep;
             int offsetY = 4 * pow(curStep, 0.5);
 
@@ -345,14 +349,14 @@ void Menu::drawBackwardModules() {
         }
 
         // LOW -> MIDDLE
-        else if (i == 1) { 
+        else if (cnt == 1) { 
             int offsetX = curStep;
             int offsetY = 0.125 * pow(curStep, 2);
 
             display.setCursor(60 - offsetX, 51 - offsetY);
             display.print(IconTrans.label);
 
-            IconTrans.icon = icons[backMartix[i]];
+            IconTrans.icon = icons[num];
         
             display.drawRect(IconTrans.x + 3, IconTrans.y + 3, 24, 24, UNSELECTED_COLOR);
             display.drawFastVLine(IconTrans.x + IconTrans.width - 1, IconTrans.y + 2, IconTrans.height - 6, UNSELECTED_COLOR);
@@ -366,7 +370,7 @@ void Menu::drawBackwardModules() {
         }
 
         // OUT -> LOW
-        else if (i == 2) { 
+        else if (cnt == 2) { 
             int offsetX = curStep;
             int offsetY = 0.125 * pow(curStep, 2);
 
@@ -374,6 +378,8 @@ void Menu::drawBackwardModules() {
             display.print(IconTrans.label);
             display.drawRoundRect(110 - offsetX, 66 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
         }
+        ++num;
+        if (num == MODULE_MAX) num = backwardPointer;
     }
 }
 
@@ -491,12 +497,13 @@ void Menu::renderForward() {
     curStep = 0;
     PAGE_NAME = forwardPointer == MODULE_FORWARD - 1 ? "BACKWARD" : "FORWARD";
 
+    // Save last Backward
     if (forwardPointer == MODULE_FORWARD) {
         tmpLabel = labels[MODULE_FORWARD];
         tmpIcons = icons[MODULE_FORWARD]; // change Shallow copy to Deep Copy
 
-        labels[MODULE_FORWARD] = labels[backMartix[0]];
-        icons[MODULE_FORWARD] = icons[backMartix[0]];
+        labels[MODULE_FORWARD] = labels[i_back];
+        icons[MODULE_FORWARD] = icons[i_back];
     }
 
     while (curStep < totalStep) {
@@ -507,7 +514,7 @@ void Menu::renderForward() {
     
     if (forwardPointer == MODULE_FORWARD) {
         forwardPointer = 0; 
-        backMartix[0] = MODULE_FORWARD;
+        i_back = backwardPointer;
 
         labels[MODULE_FORWARD] = tmpLabel;
         icons[MODULE_FORWARD] = tmpIcons;
@@ -524,15 +531,15 @@ void Menu::renderForward() {
 
 void Menu::renderBackward() {
     curStep = 0;
-    backwardSave();
 
-    while (curStep < totalStep) {
+    while (curStep < totalStep) {  
         draw(1, false, false);
         curStep++;
         delay(flowSpeed);
     }
 
-    backwardTrans();
+    if (i_back == MODULE_MAX - 1) i_back = backwardPointer;
+    else ++i_back;
     isAnimating = false;
 }
 

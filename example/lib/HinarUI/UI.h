@@ -51,6 +51,7 @@ private:
 
     int    forwardPointer      = 0;
     int    backwardPointer     = MODULE_FORWARD;
+    int    i_back              = backwardPointer;
     int    flowSpeed           = FLOWSPEED_NORMAL;
 
     bool   isAnimating         = false;
