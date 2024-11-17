@@ -288,10 +288,16 @@ void Menu::drawForwardModules(int offset, bool init) {
 
                     if (curStep == totalStep - 1) {
                         delay(30);
-                        display.setCursor(56, 53);
-                        display.print(labels[MODULE_FORWARD+1]);
 
-                        display.drawRoundRect(96, 52, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+                        //UP
+                        display.setCursor(60, 21);
+                        display.print(labels[MODULE_FORWARD - 1]);
+                        display.drawRoundRect(100, 21, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+
+                        //DOWN
+                        display.setCursor(61, 50);
+                        display.print(labels[MODULE_FORWARD + 1]);
+                        display.drawRoundRect(99, 51, 33, 8, RADIUS_PALL, SELECTED_COLOR);
                     }              
                     isBackward = true;
                 }
@@ -338,6 +344,19 @@ void Menu::drawBackwardModules() {
             } else {
                 display.drawRoundRect(89 + offsetX, 35 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             }
+/*
+            if (curStep == totalStep - 1) {
+                Serial.print("\nsetCursor\n");
+                Serial.print(49 + offsetX); // 60
+                Serial.print("\n");
+                Serial.print(35 - offsetY); // 22
+
+                Serial.print("\ndisplay.drawRoundRect\n");
+                Serial.print(89 + offsetX); // 100
+                Serial.print("\n");
+                Serial.print(35 - offsetY); // 22
+            }
+*/
         }
 
         // LOW -> MIDDLE
@@ -359,6 +378,19 @@ void Menu::drawBackwardModules() {
             } else {
                 display.drawRoundRect(100 - offsetX, 50 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
             }
+/*
+            if (curStep == totalStep - 1) {
+                Serial.print("\nsetCursor\n"); 
+                Serial.print(60 - offsetX); // 49
+                Serial.print("\n");
+                Serial.print(51 - offsetY); // 36
+
+                Serial.print("\ndisplay.drawRoundRect\n");
+                Serial.print(100 - offsetX); // 89
+                Serial.print("\n");
+                Serial.print(50 - offsetY); // 35
+            }
+*/            
         }
 
         // OUT -> LOW
@@ -369,6 +401,19 @@ void Menu::drawBackwardModules() {
             display.setCursor(72 - offsetX, 65 - offsetY);
             display.print(IconTrans.label);
             display.drawRoundRect(110 - offsetX, 66 - offsetY, 33, 8, RADIUS_PALL, SELECTED_COLOR);
+/*
+            if (curStep == totalStep - 1) {
+                Serial.print("\nsetCursor\n");
+                Serial.print(72 - offsetX); // 61
+                Serial.print("\n");
+                Serial.print(65 - offsetY); // 50
+
+                Serial.print("\ndisplay.drawRoundRect\n");
+                Serial.print(110 - offsetX); // 99
+                Serial.print("\n");
+                Serial.print(66 - offsetY); // 51
+            }
+*/
         }
         ++num;
         if (num == MODULE_MAX) num = backwardPointer;
