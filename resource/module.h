@@ -1,8 +1,9 @@
 #ifndef __MODULE_H
 #define __MODULE_H
 
-#include "resource/oled.h"
-#include "resource/icon.h"
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include "nvs.h"
 
 #define MODULE_MAX          6
 #define MODULE_OFFSET       45
@@ -13,9 +14,14 @@
 #define RADIUS_PALL         2
 #define RADIUS_RECT         5
 
-extern String labels[MODULE_MAX];
-extern unsigned char* icons[MODULE_MAX];
-
+void module_LIGHT();
+void module_TIME();
+void module_DHT11();
+void module_UICORE();
 void module_github();
+void module_ABOUT();
+
+void RTC_Setup();
+uint32_t RTC_Time();
 
 #endif

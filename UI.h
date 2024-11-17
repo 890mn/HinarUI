@@ -3,8 +3,7 @@
 
 #include "resource/icon.h"
 #include "resource/oled.h"
-
-#include "module/module.h"
+#include "resource/module.h"
 
 // Iteration Depth
 #define STEP_COUNT          12 
@@ -16,20 +15,33 @@
 #define FLOWSPEED_SLOW      35
 
 #define KEY_ENTER           18
-#define KEY_CYCLE           27
 #define KEY_BACK            19
+#define KEY_CYCLE           27
 
-// TopBar Setting
-#define UI_NAME             "HinarUI"
+static String PAGE_NAME = "FORWARD";
+static String UI_NAME   = "HinarUI";
+
+typedef void (*entry)();
 class Menu {
 public:
     void create();
     void loop();
+    void drawTopBar();
+    void drawFrame();
+    String getFlowSpeed();
 
 private:
-    String PAGE_NAME           = "FORWARD";
+    String tmpLabel = labels[MODULE_FORWARD];
+    unsigned char* tmpIcons = icons[MODULE_FORWARD];
 
-    int backMartix[MODULE_BACKWARD + 1] = {MODULE_FORWARD};
+    String labels[MODULE_MAX] = {"LIGHT", "TIME", "DHT11",
+                                 "UICORE", "GITHUB", "ABOUT"};
+    
+    unsigned char* icons[MODULE_MAX] = {bitmap_diode, bitmap_clock, bitmap_data, 
+                                        bitmap_chip, bitmap_github, bitmap_cube};
+
+    entry modules[MODULE_MAX] = {module_LIGHT, module_TIME, module_DHT11,
+                                 module_UICORE, module_github, module_ABOUT};
 
     int    curStep             = 0;
     int    wordStep            = STEP_COUNT / 2;
@@ -37,6 +49,7 @@ private:
 
     int    forwardPointer      = 0;
     int    backwardPointer     = MODULE_FORWARD;
+    int    i_back              = backwardPointer;
     int    flowSpeed           = FLOWSPEED_NORMAL;
 
     bool   isAnimating         = false;
@@ -46,9 +59,6 @@ private:
     int    currentTime         = 0;
     int    CyclePress          = 0;
     int    Threshold           = 500;
-
-    unsigned char* iconBaset   = icons[MODULE_FORWARD];
-    String         labelBaset  = labels[MODULE_FORWARD];
     struct Module {
         int x;
         int y;
@@ -74,11 +84,9 @@ private:
     void renderBackward();
 
     void draw(int offset, bool init, bool isForward);
-    void drawTopBar();
-    void drawFrame();
-
     void drawSeleModule(Module& icon);
     void drawUnseleModule(Module& icon);
+    
     void drawForwardModules(int offset, bool init);
     void drawBackwardModules();
 
@@ -89,7 +97,12 @@ private:
     void pallTransRect(Module& icon);
     void rectTransPall(Module& icon);
 
-    float easeInOut(float t);    
+    void backwardTrans();
+    void backwardSave();
+    void backwardLoad();
+
+    float easeInOut(float t);   
 };
+extern Menu menu;
 
 #endif
