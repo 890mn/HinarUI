@@ -10,6 +10,4 @@
 #define SELECTED_COLOR      SSD1306_WHITE
 #define UNSELECTED_COLOR    SSD1306_BLACK
 
-extern Adafruit_SSD1306 display;
-
 #endif

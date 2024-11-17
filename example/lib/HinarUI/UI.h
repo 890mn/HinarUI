@@ -28,6 +28,7 @@ public:
     void loop();
     void drawTopBar();
     void drawFrame();
+    String getFlowSpeed();
 
 private:
     String tmpLabel = labels[MODULE_FORWARD];
@@ -100,7 +101,7 @@ private:
     void backwardSave();
     void backwardLoad();
 
-    float easeInOut(float t);    
+    float easeInOut(float t);   
 };
 extern Menu menu;
 
