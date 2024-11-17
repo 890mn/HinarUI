@@ -4,6 +4,7 @@ Menu menu;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void Menu::create() {
+    RTC_Setup();
     Serial.begin(115200);
 
     if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
@@ -588,6 +589,16 @@ float Menu::easeInOut(float t) {
     }
 }
 
+String Menu::getFlowSpeed() {
+    switch (flowSpeed) {
+        case FLOWSPEED_FAST : return "FAST";
+        case FLOWSPEED_FAST_PLUS : return "FAST_PLUS";
+        case FLOWSPEED_NORMAL : return "NORMAL";
+        case FLOWSPEED_SLOW : return "SLOW";
+    }
+    return "ERROR";
+}
+
 void module_LIGHT() {
     display.clearDisplay();
     menu.drawTopBar();
@@ -647,5 +658,31 @@ void module_github() {
 }
 
 void module_ABOUT() {
+    display.clearDisplay();
+    PAGE_NAME = "SETTING";
 
+    menu.drawTopBar();
+    menu.drawFrame();
+
+    display.setTextSize(1);
+    display.setCursor(3, 20);
+    display.print("FLOW SPEED");
+    display.setCursor(70, 20);
+    display.print(menu.getFlowSpeed());
+
+    display.setCursor(3, 30);
+    display.print("BOOT TIME");
+
+    while (true) {
+        uint32_t Boot = RTC_Time();
+
+        display.fillRect(70, 30, 50, 8, BLACK);
+        display.setCursor(70, 30);
+        display.print(Boot);
+        display.setCursor(100, 30);
+        display.print("Sec");
+
+        display.display();
+        if (digitalRead(KEY_BACK) == LOW) break;
+    }
 }
