@@ -1,4 +1,5 @@
 #include "UI.h"
+#include "resource/module.h"
 
 RTC_DATA_ATTR uint64_t rtc_time_start = 0;
 

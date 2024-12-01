@@ -16,8 +16,6 @@ void Menu::create() {
     pinMode(KEY_CYCLE, INPUT_PULLUP);
     pinMode(KEY_BACK , INPUT_PULLUP);
 
-    Menu();
-
     display.setTextSize(1);
     display.setTextColor(SELECTED_COLOR);
     display.setCursor(0, 0);

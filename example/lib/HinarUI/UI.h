@@ -14,9 +14,11 @@
 #define FLOWSPEED_NORMAL    25
 #define FLOWSPEED_SLOW      35
 
+#if ESP32
 #define KEY_ENTER           18
 #define KEY_BACK            19
 #define KEY_CYCLE           27
+#endif
 
 static String PAGE_NAME = "FORWARD";
 static String UI_NAME   = "HinarUI";
