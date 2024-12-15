@@ -14,11 +14,9 @@
 #define FLOWSPEED_NORMAL    25
 #define FLOWSPEED_SLOW      35
 
-#if ESP32
-#define KEY_ENTER           18
-#define KEY_BACK            19
-#define KEY_CYCLE           27
-#endif
+#define KEY_ENTER           32
+#define KEY_BACK            33
+#define KEY_CYCLE           34
 
 static String PAGE_NAME = "FORWARD";
 static String UI_NAME   = "HinarUI";
@@ -98,10 +96,6 @@ private:
     void pallTrans(Module& icon, int leftTopX, int rightTopX, int rightBottomX, int leftBottomX);
     void pallTransRect(Module& icon);
     void rectTransPall(Module& icon);
-
-    void backwardTrans();
-    void backwardSave();
-    void backwardLoad();
 
     float easeInOut(float t);   
 };
