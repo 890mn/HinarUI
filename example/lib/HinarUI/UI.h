@@ -15,8 +15,8 @@
 #define FLOWSPEED_SLOW      35
 
 #define KEY_ENTER           32
-#define KEY_BACK            33
-#define KEY_CYCLE           34
+#define KEY_BACK            34 
+#define KEY_CYCLE           33
 
 static String PAGE_NAME = "FORWARD";
 static String UI_NAME   = "HinarUI";
@@ -78,6 +78,7 @@ private:
         MODULE               // Module   Status
     };
     MenuState currentState = IDLE;
+    String stateToString(MenuState state);
 
     void renderDynamic(int keyCycleState, bool isForward);
     void renderForward();

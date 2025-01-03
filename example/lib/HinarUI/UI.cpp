@@ -6,6 +6,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 void Menu::create() {
     RTC_Setup();
     Serial.begin(115200);
+    Wire.begin(21, 22);
 
     if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
         Serial.println(F("SSD1306 allocation failed"));
@@ -23,6 +24,12 @@ void Menu::create() {
 }
 
 void Menu::loop() {
+    static int prevKeyEnterState = HIGH;
+    static int prevKeyCycleState = HIGH;
+    static int prevKeyBackState  = HIGH;
+
+    static MenuState previousState = IDLE;
+
     currentTime = millis();
 
     if (!isAnimating) {
@@ -30,36 +37,48 @@ void Menu::loop() {
         int keyCycleState = digitalRead(KEY_CYCLE);
         int keyBackState  = digitalRead(KEY_BACK);
 
+        if (keyEnterState != prevKeyEnterState) {
+            Serial.print("Enter Status Changed: ");
+            Serial.println(keyEnterState);
+            prevKeyEnterState = keyEnterState;
+        }
+        if (keyCycleState != prevKeyCycleState) {
+            Serial.print("Cycle Status Changed: ");
+            Serial.println(keyCycleState);
+            prevKeyCycleState = keyCycleState;
+        }
+        if (keyBackState != prevKeyBackState) {
+            Serial.print("Back Status Changed: ");
+            Serial.println(keyBackState);
+            prevKeyBackState = keyBackState;
+        }
+
+        if (currentState != previousState) {
+            Serial.print("State Changed to: ");
+            Serial.println(stateToString(currentState));
+            previousState = currentState;
+        }
+
         switch (currentState) {
             case IDLE:
-                // IDLE -> BACKWARD
                 if (keyEnterState == LOW && forwardPointer == MODULE_FORWARD) {
                     isBackward = true;
                     display.fillRoundRect(89, 35, 33, 8, RADIUS_PALL, SELECTED_COLOR);
                     display.display();
                     currentState = BACKWARD;
-                }
-
-                // IDLE -> FORWARD
-                else if (keyCycleState == LOW) {
-
+                } else if (keyCycleState == LOW) {
                     currentState = FORWARD;
-                }
-
-                // IDLE -> MODULE
-                else if (keyEnterState == LOW) {
+                } else if (keyEnterState == LOW) {
                     modules[forwardPointer]();
                     currentState = MODULE;
                 }
                 break;
 
             case FORWARD:
-                // FORWARD -> FORWARD
                 renderDynamic(keyCycleState, true);
                 break;
 
             case BACKWARD:
-                // BACKWARD -> BACKWARD_SELECTED
                 if (keyEnterState == LOW) {
                     isUP = true;
                     while (keyEnterState == LOW) {
@@ -71,33 +90,25 @@ void Menu::loop() {
                 break;
 
             case BACKWARD_SELECTED:
-                // BACKWARD_SELECTED -> BACKWARD_SELECTED
                 renderDynamic(keyCycleState, false);
-
-                // BACKWARD_SELECTED -> IDLE
                 if (keyBackState == LOW) {
                     display.fillRect(90, 36, 31, 6, UNSELECTED_COLOR);
                     display.display();
                     isBackward = false;
                     isUP = false;     
                     currentState = IDLE;     
-                }
-
-                // BACKWARD_SELECTED -> MODULE
-                if (keyEnterState == LOW) {
+                } else if (keyEnterState == LOW) {
                     modules[i_back]();
                     currentState = MODULE;
                 }
                 break;
-            
+
             case MODULE:
-                // MODULE -> BACKWARD_SELECTED
                 if (keyBackState == LOW && forwardPointer == MODULE_FORWARD) {
                     while (keyBackState == LOW) {
                         keyBackState = digitalRead(KEY_BACK);
                         delay(3);
                     }
-
                     PAGE_NAME = "BACKWARD";
                     UI_NAME   = "HinarUI";
                     --i_back;
@@ -107,10 +118,7 @@ void Menu::loop() {
 
                     ++i_back;
                     currentState = BACKWARD_SELECTED;
-                }
-
-                // MODULE -> IDLE
-                if (keyBackState == LOW && forwardPointer != MODULE_FORWARD) {
+                } else if (keyBackState == LOW && forwardPointer != MODULE_FORWARD) {
                     --forwardPointer;
 
                     curStep = totalStep - 1;
@@ -711,5 +719,16 @@ void module_ABOUT() {
 
         display.display();
         if (digitalRead(KEY_BACK) == LOW) break;
+    }
+}
+
+String Menu::stateToString(MenuState state) {
+    switch (state) {
+        case IDLE:               return "IDLE";
+        case FORWARD:            return "FORWARD";
+        case BACKWARD:           return "BACKWARD";
+        case BACKWARD_SELECTED:  return "BACKWARD_SELECTED";
+        case MODULE:             return "MODULE";
+        default:                 return "UNKNOWN";
     }
 }
