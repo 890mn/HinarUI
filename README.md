@@ -32,4 +32,4 @@ HinarUI
 
 Maybe it'll create in a few days
 
-Current best way is to open the [EXAMPLE](/example/README) to recognize.
+Current best way is to open the [EXAMPLE](/example/README.md) to recognize.
