@@ -21,6 +21,9 @@
 #define SELECTED_COLOR      SSD1306_WHITE
 #define UNSELECTED_COLOR    SSD1306_BLACK
 
+static String PAGE_NAME = "FORWARD";
+static String UI_NAME   = "HinarUI";
+
 bool OLED_Setup();
 bool RTC_Setup();
 bool KEY_Setup();

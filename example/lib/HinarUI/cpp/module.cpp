@@ -50,29 +50,23 @@ void module_DHT11() {
 
 void module_UICORE() {
     display.clearDisplay();
-    PAGE_NAME = "UI-CORE";
-    UI_NAME = "WROOM-32";
-
-    menu.drawTopBar();
+    menu.drawTopBar("UI-CORE", "WROVER-E");
     menu.drawFrame();
 
     display.setTextSize(2);
     display.setCursor(8, 25);
-    display.print("ESP-32");
+    display.print("ESP32");
 
     display.setTextSize(1);
-    display.setCursor(10, 48);
-    display.print("40MHz / 520KB SRAM");
+    display.setCursor(8, 48);
+    display.print("4MB Flash 8MB PSRAM");
     
     display.display();
 }
 
 void module_github() {
     display.clearDisplay();
-    PAGE_NAME = "TEST RELEASE";
-    UI_NAME = "V0.1";
-
-    menu.drawTopBar();
+    menu.drawTopBar("Board RELEASE", "V0.1");
     menu.drawFrame();
 
     display.setTextSize(2);
@@ -90,9 +84,7 @@ void module_github() {
 
 void module_ABOUT() {
     display.clearDisplay();
-    PAGE_NAME = "SETTING";
-
-    menu.drawTopBar();
+    menu.drawTopBar("SETTING");
     menu.drawFrame();
 
     display.setTextSize(1);

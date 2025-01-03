@@ -20,7 +20,6 @@ void Menu::loop() {
     static int prevKeyBackState  = HIGH;
 
     static MenuState previousState = IDLE;
-
     currentTime = millis();
 
     if (!isAnimating) {
@@ -148,15 +147,15 @@ void Menu::drawFrame() {
     display.drawLine(105, 63, 127, 63, SELECTED_COLOR); // BOTTOM 2-2
 }
 
-void Menu::drawTopBar() {
+void Menu::drawTopBar(String page, String ui) {
     display.setCursor(4, 5);
-    display.print(PAGE_NAME);
+    display.print(page);
 
     int16_t x1, y1;
     uint16_t w, h;
-    display.getTextBounds(UI_NAME, 0, 0, &x1, &y1, &w, &h);
+    display.getTextBounds(ui, 0, 0, &x1, &y1, &w, &h);
     display.setCursor(SCREEN_WIDTH - w - 4, 5);
-    display.print(UI_NAME);
+    display.print(ui);
 }
 
 void Menu::drawSeleModule(Module& icon) {

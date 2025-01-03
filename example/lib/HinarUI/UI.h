@@ -14,15 +14,12 @@
 #define FLOWSPEED_NORMAL    25
 #define FLOWSPEED_SLOW      35
 
-static String PAGE_NAME = "FORWARD";
-static String UI_NAME   = "HinarUI";
-
 typedef void (*entry)();
 class Menu {
 public:
     void create();
     void loop();
-    void drawTopBar();
+    void drawTopBar(String page = PAGE_NAME, String ui = UI_NAME);
     void drawFrame();
 
     String getFlowSpeed();
