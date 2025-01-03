@@ -1,25 +1,16 @@
 #include "UI.h"
 
+// 1 - Create Menu
 Menu menu;
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
+// 2 - Basic External calls
 void Menu::create() {
-    RTC_Setup();
     Serial.begin(115200);
-    Wire.begin(21, 22);
+    if(!RTC_Setup()) return;
+    if(!KEY_Setup()) return;
+    if(!OLED_Setup()) return;
 
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-        Serial.println(F("SSD1306 allocation failed"));
-        while (1);
-    }
-
-    pinMode(KEY_ENTER, INPUT_PULLUP);
-    pinMode(KEY_CYCLE, INPUT_PULLUP);
-    pinMode(KEY_BACK , INPUT_PULLUP);
-
-    display.setTextSize(1);
-    display.setTextColor(SELECTED_COLOR);
-    display.setCursor(0, 0);
+    Serial.println(F("-- Inital Success == [ Hardware ]"));
     draw(0, true, true);
 }
 
@@ -39,23 +30,23 @@ void Menu::loop() {
 
         if (keyEnterState != prevKeyEnterState) {
             Serial.print("Enter Status Changed: ");
-            Serial.println(keyEnterState);
+            Serial.println(keyEnterState == 0 ? "Pressed" : "Exited");
             prevKeyEnterState = keyEnterState;
         }
         if (keyCycleState != prevKeyCycleState) {
             Serial.print("Cycle Status Changed: ");
-            Serial.println(keyCycleState);
+            Serial.println(keyCycleState == 0 ? "Pressed" : "Exited");
             prevKeyCycleState = keyCycleState;
         }
         if (keyBackState != prevKeyBackState) {
             Serial.print("Back Status Changed: ");
-            Serial.println(keyBackState);
+            Serial.println(keyBackState == 0 ? "Pressed" : "Exited");
             prevKeyBackState = keyBackState;
         }
 
         if (currentState != previousState) {
             Serial.print("State Changed to: ");
-            Serial.println(stateToString(currentState));
+            Serial.println(stateToString());
             previousState = currentState;
         }
 
@@ -605,130 +596,13 @@ String Menu::getFlowSpeed() {
     return "ERROR";
 }
 
-void module_LIGHT() {
-    display.clearDisplay();
-    menu.drawTopBar();
-    menu.drawFrame();
-
-    display.setCursor(1, 20);
-    display.setTextSize(2);
-    display.print("LIGHT");
-    display.display();
-    display.setTextSize(1);
-}
-
-void module_TIME() {
-    // Wait for DS3231
-    while (true) {
-        display.clearDisplay();
-        menu.drawTopBar();
-        menu.drawFrame();
-        uint32_t total_seconds = RTC_Time();
-    
-        uint32_t hours = total_seconds / 3600;
-        uint32_t minutes = (total_seconds % 3600) / 60;
-        uint32_t seconds = total_seconds % 60;
-
-        display.fillRect(17, 30, 100, 8, BLACK);
-        display.setCursor(17, 30);
-        display.setTextSize(2);
-        display.printf("%02d:%02d:%02d", hours, minutes, seconds);
-
-        display.display();
-        display.setTextSize(1);
-        if (digitalRead(KEY_BACK) == LOW) break;
-    }
-}
-
-void module_DHT11() {
-    display.clearDisplay();
-    menu.drawTopBar();
-    menu.drawFrame();
-
-    display.setCursor(1, 20);
-    display.setTextSize(2);
-    display.print("DHT11");
-    display.display();
-    display.setTextSize(1);
-}
-
-void module_UICORE() {
-    display.clearDisplay();
-    PAGE_NAME = "UI-CORE";
-    UI_NAME = "WROOM-32";
-
-    menu.drawTopBar();
-    menu.drawFrame();
-
-    display.setTextSize(2);
-    display.setCursor(8, 25);
-    display.print("ESP-32");
-
-    display.setTextSize(1);
-    display.setCursor(10, 48);
-    display.print("40MHz / 520KB SRAM");
-    
-    display.display();
-}
-
-void module_github() {
-    display.clearDisplay();
-    PAGE_NAME = "TEST RELEASE";
-    UI_NAME = "V0.1";
-
-    menu.drawTopBar();
-    menu.drawFrame();
-
-    display.setTextSize(2);
-    display.setCursor(8, 25);
-    display.print("HinarUI");
-
-    display.drawBitmap(98, 23, bitmap_github, 24, 24, SELECTED_COLOR);
-    display.setCursor(10, 48);
-
-    display.setTextSize(1);
-    display.print("@890mn ORIGINAL");
-    
-    display.display();
-}
-
-void module_ABOUT() {
-    display.clearDisplay();
-    PAGE_NAME = "SETTING";
-
-    menu.drawTopBar();
-    menu.drawFrame();
-
-    display.setTextSize(1);
-    display.setCursor(3, 20);
-    display.print("FLOW SPEED");
-    display.setCursor(70, 20);
-    display.print(menu.getFlowSpeed());
-
-    display.setCursor(3, 30);
-    display.print("BOOT TIME");
-
-    while (true) {
-        uint32_t Boot = RTC_Time();
-
-        display.fillRect(70, 30, 50, 8, BLACK);
-        display.setCursor(70, 30);
-        display.print(Boot);
-        display.setCursor(100, 30);
-        display.print("Sec");
-
-        display.display();
-        if (digitalRead(KEY_BACK) == LOW) break;
-    }
-}
-
-String Menu::stateToString(MenuState state) {
-    switch (state) {
+String Menu::stateToString() {
+    switch (currentState) {
         case IDLE:               return "IDLE";
         case FORWARD:            return "FORWARD";
         case BACKWARD:           return "BACKWARD";
         case BACKWARD_SELECTED:  return "BACKWARD_SELECTED";
         case MODULE:             return "MODULE";
-        default:                 return "UNKNOWN";
     }
+    return "ERROR";
 }

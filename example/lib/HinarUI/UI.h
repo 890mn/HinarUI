@@ -2,7 +2,7 @@
 #define __UI_H
 
 #include "resource/icon.h"
-#include "resource/oled.h"
+#include "resource/asset.h"
 #include "resource/module.h"
 
 // Iteration Depth
@@ -14,10 +14,6 @@
 #define FLOWSPEED_NORMAL    25
 #define FLOWSPEED_SLOW      35
 
-#define KEY_ENTER           32
-#define KEY_BACK            34 
-#define KEY_CYCLE           33
-
 static String PAGE_NAME = "FORWARD";
 static String UI_NAME   = "HinarUI";
 
@@ -28,6 +24,7 @@ public:
     void loop();
     void drawTopBar();
     void drawFrame();
+
     String getFlowSpeed();
 
 private:
@@ -78,7 +75,7 @@ private:
         MODULE               // Module   Status
     };
     MenuState currentState = IDLE;
-    String stateToString(MenuState state);
+    String stateToString();
 
     void renderDynamic(int keyCycleState, bool isForward);
     void renderForward();
@@ -98,8 +95,10 @@ private:
     void pallTransRect(Module& icon);
     void rectTransPall(Module& icon);
 
-    float easeInOut(float t);   
+    float easeInOut(float t);
 };
+
 extern Menu menu;
+extern Adafruit_SSD1306 display;
 
 #endif
