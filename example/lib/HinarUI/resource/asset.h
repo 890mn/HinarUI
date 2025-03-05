@@ -4,12 +4,12 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-
+ 
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "nvs.h"
 
-#define OLED_SDA            21  
+#define OLED_SDA            21
 #define OLED_SCL            22
 
 #define KEY_ENTER           32

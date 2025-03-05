@@ -2,11 +2,10 @@
 
 // 1 - Create Menu
 Menu menu;
-
 // 2 - Basic External calls
 void Menu::create() {
     Serial.begin(115200);
-    if(!RTC_Setup()) return;
+    //if(!RTC_Setup()) return;
     if(!KEY_Setup()) return;
     if(!OLED_Setup()) return;
 

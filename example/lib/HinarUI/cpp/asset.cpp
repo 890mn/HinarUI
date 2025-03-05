@@ -6,7 +6,7 @@ RTC_DATA_ATTR uint64_t rtc_time_start = 0;
 bool OLED_Setup() {
     Wire.begin(OLED_SDA, OLED_SCL);
 
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    if (!display.begin(SSD1306_SWITCHCAPVCC)) {
         Serial.println(F("-! Inital Failed == [ SSD1306 OLED ]"));
         return false;
     }
