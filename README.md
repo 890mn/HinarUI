@@ -4,7 +4,7 @@ Original OLED UI Design based on Embedded Platform, current exam on PlatformIO +
 
 基于嵌入式平台的原创 OLED UI 设计，目前使用 PlatformIO + ESP32-WROVER-E 进行测试，长远计划是适应各种比例的嵌入式屏幕(maybe?)
 
-![cover](HinarUI.jpg)
+![cover](pic/cover-2.jpg)
 
 By the way, all of it just try something i wanna to do...why not LVGL or other solution? Only because im excited about creating something by my own :)
 
@@ -44,7 +44,8 @@ HinarUI
 
 ## Usage
 
-![cover](HinarUI-2.jpg)
+Optional: Supporting design board at [oshwhub](https://oshwhub.com/link_joestar/)  
+![cover](pic/cover.jpg)
 
 *One way is to open the [EXAMPLE](/example/README.md) to understand.*
 
