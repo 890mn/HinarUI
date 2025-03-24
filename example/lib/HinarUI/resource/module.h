@@ -12,7 +12,7 @@
 
 void module_LIGHT();
 void module_TIME();
-void module_DHT11();
+void module_SHT30();
 void module_UICORE();
 void module_github();
 void module_ABOUT();
