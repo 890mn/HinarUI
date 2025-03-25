@@ -5,8 +5,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_SHT31.h>
-
-#include <Fonts/FreeSans9pt7b.h>
  
 #include "esp_system.h"
 #include "nvs_flash.h"
@@ -31,6 +29,17 @@
 #define SELECTED_COLOR      SSD1306_WHITE
 #define UNSELECTED_COLOR    SSD1306_BLACK
 
+#include "fonts/Arame_Regular5pt7b.h"
+#include "fonts/Arame_Regular6pt7b.h"
+#include "fonts/Arame_Regular8pt7b.h"
+#include "fonts/Arame_Regular10pt7b.h"
+
+#define SET_FONT_USMALL  display.setFont(&Arame_Regular5pt7b);
+#define SET_FONT_SMALL   display.setFont(&Arame_Regular6pt7b);
+#define SET_FONT_MEDIUM  display.setFont(&Arame_Regular8pt7b);
+#define SET_FONT_LARGE   display.setFont(&Arame_Regular10pt7b);
+#define SET_FONT_DEFAULT display.setFont();
+
 static String PAGE_NAME = "FORWARD";
 static String UI_NAME   = "HinarUI";
 
@@ -39,9 +48,6 @@ bool RTC_Setup();
 bool KEY_Setup();
 bool SHT30_Setup();
 
-void drawScaledPixel(int x, int y, float scale);
-void drawScaledChar(char c, int x, int y, float scale);
-void drawScaledText(const char* text, int x, int y, float scale);
 uint32_t RTC_Time();
 
 #endif

@@ -36,109 +36,81 @@ void module_TIME() {
     }
 }
 
-void drawScaledText(const char* text, int x, int y, float scale) {
-  int16_t x1, y1;
-  uint16_t w, h;
-  display.getTextBounds(text, x, y, &x1, &y1, &w, &h);
-
-  // 创建位图缓冲区
-  uint8_t* buffer = (uint8_t*)calloc(w * h, sizeof(uint8_t));
-  if (!buffer) return;
-
-  // 在缓冲区绘制原始文字
-  Adafruit_SSD1306 bufferDisplay(w, h, &Wire, -1);
-  bufferDisplay.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  bufferDisplay.clearDisplay();
-  bufferDisplay.setFont(&FreeSans9pt7b);
-  bufferDisplay.setTextColor(SSD1306_WHITE);
-  bufferDisplay.setCursor(0, h / 2);
-  bufferDisplay.print(text);
-  bufferDisplay.display();
-
-  // 提取缓冲区数据
-  for (int i = 0; i < h; i++) {
-    for (int j = 0; j < w; j++) {
-      buffer[i * w + j] = bufferDisplay.getPixel(j, i);
-    }
-  }
-
-  // 使用双线性插值缩放
-  int scaledW = w * scale;
-  int scaledH = h * scale;
-  for (int i = 0; i < scaledH; i++) {
-    for (int j = 0; j < scaledW; j++) {
-      int srcX = j / scale;
-      int srcY = i / scale;
-      uint8_t pixel = buffer[srcY * w + srcX];
-      display.drawPixel(x + j, y + i, pixel);
-    }
-  }
-
-  free(buffer);
-}
-
 void module_SHT30() {
     display.clearDisplay();
     menu.drawTopBar();
     menu.drawFrame();
-    display.setFont(&FreeSans9pt7b);
+
+    SET_FONT_MEDIUM;
     float t = SHT.readTemperature();
     float h = SHT.readHumidity();
 
-    display.setCursor(1, 20);
+    display.setCursor(1, 30);
     if (! isnan(t)) {  // check if 'is not a number'
         char* temper = (char*)malloc(20);
         sprintf(temper, "Temper: %.2f", t);
-        //drawScaledText(temper, 1, 20, 1.5);
         display.print(temper); 
     } else { 
-        drawScaledText("Temper Failed", 1, 20, 2);
+        display.print("Temper: NaN");
     }
     
-    display.setCursor(1, 40);
+    display.setCursor(1, 45);
     if (! isnan(h)) {  // check if 'is not a number'
         char* humi = (char*)malloc(20);
         sprintf(humi, "Humi: %.2f", h);
-        //drawScaledText(humi, 1, 40, 1.5);
         display.print(humi);
     } else { 
-        drawScaledText("Humi Failed", 1, 40, 1.5);
+        display.print("Humi: NaN");
     }
 
     display.display();
+    SET_FONT_DEFAULT;
 }
 
 void module_UICORE() {
     display.clearDisplay();
-    menu.drawTopBar("UI-CORE", "WROVER-E");
+    menu.drawTopBar("UI-CORE", "1of2");
     menu.drawFrame();
 
-    display.setTextSize(2);
-    display.setCursor(8, 25);
+    SET_FONT_LARGE;
+    display.setCursor(17, 35);
     display.print("ESP32");
 
+    SET_FONT_USMALL;
+    display.setCursor(52, 45);
+    display.print("ESPRESSIF");
+
+    display.setCursor(52, 55);
+    display.print("WROVER");
     display.setTextSize(1);
-    display.setCursor(8, 48);
-    display.print("4MB Flash 8MB PSRAM");
-    
+/*
+    SET_FONT_USMALL;
+    display.setTextSize(1);
+    display.setCursor(8, 53);
+    display.print("7/24.8% RAM/Flash");
+*/
+    SET_FONT_DEFAULT;
+    display.drawLine(75, 58, 95, 58, SELECTED_COLOR);
+    display.drawLine(95, 58, 105, 63, SELECTED_COLOR);
     display.display();
 }
 
 void module_github() {
     display.clearDisplay();
-    menu.drawTopBar("Board RELEASE", "V0.1");
+    menu.drawTopBar("RELEASE", "Ver0.2");
     menu.drawFrame();
 
     display.setTextSize(2);
-    display.setCursor(8, 25);
+    display.setCursor(8, 26);
     display.print("HinarUI");
 
-    display.drawBitmap(98, 23, bitmap_github, 24, 24, SELECTED_COLOR);
-    display.setCursor(10, 48);
-
+    display.drawBitmap(98, 26, bitmap_github, 24, 24, SELECTED_COLOR);
     display.setTextSize(1);
+    SET_FONT_USMALL;
+    display.setCursor(8, 53);   
     display.print("@890mn ORIGINAL");
     
+    SET_FONT_DEFAULT;
     display.display();
 }
 

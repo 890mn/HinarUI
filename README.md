@@ -12,6 +12,7 @@ By the way, all of it just try something i wanna to do...why not LVGL or other s
 
 It seems to be a little slow because everyday get so busy :(
 
+- 2025.03.25 | Complete TESTVer.0.2 and PCB(Scale with 1:1)
 - 2025.01.02 | Draw PCB (imperfect so not here)
 - 2024.11.17 | Module init
 - 2024.10.14 | Status Machine Rebuild
@@ -24,18 +25,21 @@ Clone this project down will include these part, the Library "HinarUI" and an Ex
 
 ```plaintext
 HinarUI
-├─ example | Based on PlatformIO
+├─ example
 │   ├─ .pio
 │   ├─ include
 │   ├─ lib ― HinarUI
 │   ├─ src
 │   └─ test
-│
-├─ resource | Header file
+├─ resource
 │   ├─ asset.h
 │   ├─ icon.h
-│   └─ font.h
-├─ cpp | component
+│   └─ module.h
+├─ fonts
+│   ├─ Arame_Regular[5:10pt]7b.h
+│   ├─ Cubano7pt7b.h
+│   └─ optional.md
+├─ cpp
 │   ├─ asset.cpp
 │   └─ module.cpp
 ├─ UI.h
@@ -44,39 +48,43 @@ HinarUI
 
 ## Usage
 
-Optional: Supporting design board at [oshwhub](https://oshwhub.com/link_joestar/)  
+Optional: Supporting design board at [oshwhub](https://oshwhub.com/link_joestar/hinarui-open-source-embedded-sel)  
+
 ![cover](pic/cover.jpg)
 
 *One way is to open the [EXAMPLE](/example/README.md) to understand.*
 
 About how to adapt this project on your board, here gives some tips:
 
-1. open `resource/asset.h` and modify these GPIO by your own
+- open `resource/asset.h` and modify these GPIO by your own
 
     ```cpp
-    // OLED Setting
-    #define OLED_SDA            21  
+    #define OLED_SDA            21
     #define OLED_SCL            22
 
-    // KEY Setting
+    #define SHT30_SDA           18
+    #define SHT30_SCL           19
+
     #define KEY_ENTER           32
-    #define KEY_BACK            34 
+    #define KEY_BACK            35 
     #define KEY_CYCLE           33
+
+    #define KEY_BACKUP          15
     ```
 
-2. open `cpp/asset.cpp` and modify the I2C address if not Default
+- open `resource/asset.h` and modify the OLED / SHT30 I2C address if not Default
 
     ```cpp
     // Default
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3C)
+    #define OLED_ADDR           0x3C
+    #define SHT30_ADDR          0x44
     
     // Another Possible
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3D)
-
-    // Detail see: Adafruit SSD1306
+    #define OLED_ADDR           0x3D
+    #define SHT30_ADDR          0x45
     ```
 
-3. It can normally run at this time of everything alright.
+- It can normally run at this time of everything alright.
 
 ## Postscript
 

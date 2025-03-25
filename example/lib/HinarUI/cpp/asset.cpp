@@ -7,7 +7,7 @@ Adafruit_SHT31 SHT = Adafruit_SHT31(&Wire1);
 RTC_DATA_ATTR uint64_t rtc_time_start = 0;
 
 bool OLED_Setup() {
-    Wire.begin(OLED_SDA, OLED_SCL, 400000);
+    Wire.begin(OLED_SDA, OLED_SCL, 10000);
 
     if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
         Serial.println(F("-! Inital Failed == [ SSD1306 OLED ]"));
@@ -16,6 +16,7 @@ bool OLED_Setup() {
     display.setTextSize(1);
     display.setTextColor(SELECTED_COLOR);
     display.setCursor(0, 0);
+    SET_FONT_DEFAULT;
 
     Serial.println(F("-- Inital Success == [ OLED ]"));
     return true;

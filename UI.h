@@ -28,13 +28,13 @@ private:
     String tmpLabel = labels[MODULE_FORWARD];
     unsigned char* tmpIcons = icons[MODULE_FORWARD];
 
-    String labels[MODULE_MAX] = {"LIGHT", "TIME", "DHT11",
+    String labels[MODULE_MAX] = {"LIGHT", "TIME", "SHT30",
                                  "UICORE", "GITHUB", "ABOUT"};
     
     unsigned char* icons[MODULE_MAX] = {bitmap_diode, bitmap_clock, bitmap_data, 
                                         bitmap_chip, bitmap_github, bitmap_cube};
 
-    entry modules[MODULE_MAX] = {module_LIGHT, module_TIME, module_DHT11,
+    entry modules[MODULE_MAX] = {module_LIGHT, module_TIME, module_SHT30,
                                  module_UICORE, module_github, module_ABOUT};
 
     int    curStep             = 0;
@@ -95,7 +95,35 @@ private:
     float easeInOut(float t);
 };
 
+// 帧率计数器类
+class FPSCounter {
+private:
+    unsigned long lastTime = 0;
+    unsigned int frameCount = 0;
+    float fps = 0;
+
+public:
+    void update() {
+        frameCount++;
+        
+        // 每过1秒计算一次帧率
+        if (millis() - lastTime >= 1000) {
+            fps = frameCount / ((millis() - lastTime) / 1000.0);
+            Serial.printf("FPS: %.2f\n", fps);
+            
+            // 重置计数器和时间
+            frameCount = 0;
+            lastTime = millis();
+        }
+    }
+
+    float getFPS() {
+        return fps;
+    }
+};
+
 extern Menu menu;
 extern Adafruit_SSD1306 display;
+extern Adafruit_SHT31 SHT;
 
 #endif

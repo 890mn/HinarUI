@@ -2,6 +2,8 @@
 
 // 1 - Create Menu
 Menu menu;
+FPSCounter fpsCounter;
+
 // 2 - Basic External calls
 void Menu::create() {
     Serial.begin(115200);
@@ -9,8 +11,6 @@ void Menu::create() {
     if(!KEY_Setup()) return;
     if(!OLED_Setup()) return;
     if(!SHT30_Setup()) return;
-
-    //Wire1.begin(18, 19);
 
     Serial.println(F("-- Inital Success == [ Hardware ]"));
     draw(0, true, true);
@@ -134,6 +134,7 @@ void Menu::draw(int offset, bool init, bool isForward) {
     }
     drawFrame();
     display.display();
+    fpsCounter.update();
 }
 
 void Menu::drawFrame() {
