@@ -97,20 +97,19 @@ void module_UICORE() {
 
 void module_github() {
     display.clearDisplay();
-    menu.drawTopBar("RELEASE", "Ver0.2");
+    menu.drawTopBar("VER_RELEASE", "0.2");
     menu.drawFrame();
 
     display.setTextSize(2);
-    display.setCursor(8, 26);
+    display.setCursor(8, 25);
     display.print("HinarUI");
 
-    display.drawBitmap(98, 26, bitmap_github, 24, 24, SELECTED_COLOR);
+    display.drawBitmap(98, 23, bitmap_github, 24, 24, SELECTED_COLOR);
+    display.setCursor(10, 48);
+
     display.setTextSize(1);
-    SET_FONT_USMALL;
-    display.setCursor(8, 53);   
     display.print("@890mn ORIGINAL");
     
-    SET_FONT_DEFAULT;
     display.display();
 }
 
