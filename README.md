@@ -7,7 +7,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/890mn/HinarUI?labelColor=%2339354A&color=%239BB9B4)
 ![Static Badge](https://img.shields.io/github/v/release/890mn/HinarUI?color=%23263C53)
 
-Original OLED UI Design based on Embedded Platform, current exam on PlatformIO + ESP32-WROVER-E, aim to fit on various proportion of Embedded screen.
+Original OLED UI Design based on Embedded Platform, current exam on PlatformIO + ESP32-WROVER-E, aim to fit on various proportion of Embedded screen
 
 基于嵌入式平台的原创 OLED UI 设计，目前使用 PlatformIO + ESP32-WROVER-E 进行测试，长远计划是适应各种比例的嵌入式屏幕(maybe?)
 
@@ -17,7 +17,8 @@ By the way, all of it just try something i wanna to do...why not LVGL or other s
 
 It seems to be a little slow because everyday get so busy :(
 
-- 2025.03.25 | Complete TESTVer.0.2 and PCB(Scale with 1:1)
+- 2025.05.06 | Create Shell of the board (V2)
+- 2025.03.25 | Complete TESTVer.0.2 and PCB (Scale with 1:1)
 - 2025.01.02 | Draw PCB (imperfect so not here)
 - 2024.11.17 | Module init
 - 2024.10.14 | Status Machine Rebuild
@@ -28,8 +29,15 @@ It seems to be a little slow because everyday get so busy :(
 
 Clone this project down will include these part, the Library "HinarUI" and an Example  
 
+Also include the PCB and Shell
 ```plaintext
 HinarUI
+├─ PCB
+│   ├─ BOM
+│   └─ Gerber
+├─ Shell
+│   ├─ Box.3mf
+│   └─ Top.3mf
 ├─ example
 │   ├─ .pio
 │   ├─ include
@@ -55,7 +63,7 @@ HinarUI
 
 Optional: Supporting design board at [oshwhub](https://oshwhub.com/link_joestar/hinarui-open-source-embedded-sel)  
 
-![cover](pic/cover.jpg)
+![cover](pic/Board.jpg)
 
 *One way is to open the [EXAMPLE](/example/README.md) to understand.*
 
@@ -89,7 +97,7 @@ About how to adapt this project on your board, here gives some tips:
     #define SHT30_ADDR          0x45
     ```
 
-- It can normally run at this time of everything alright.
+- It can normally run at this time of everything alright
 
 ## Postscript
 
