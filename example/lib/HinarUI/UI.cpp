@@ -10,7 +10,7 @@ void Menu::create() {
     if(!RTC_Setup()) return;
     if(!KEY_Setup()) return;
     if(!OLED_Setup()) return;
-    //if(!SHT30_Setup()) return;
+    if(!SHT30_Setup()) return;
 
     Serial.println(F("-- Inital Success == [ Hardware ]"));
     draw(0, true, true);
