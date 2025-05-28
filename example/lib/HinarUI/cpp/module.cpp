@@ -1,6 +1,8 @@
 #include "UI.h"
 #include "resource/module.h"
 
+struct tm timeinfo;
+
 void module_LIGHT() {
     display.clearDisplay();
     menu.drawTopBar();
@@ -19,11 +21,10 @@ void module_TIME() {
         display.clearDisplay();
         menu.drawTopBar();
         menu.drawFrame();
-        uint32_t total_seconds = RTC_Time();
     
-        uint32_t hours = total_seconds / 3600;
-        uint32_t minutes = (total_seconds % 3600) / 60;
-        uint32_t seconds = total_seconds % 60;
+        uint32_t hours = getLocalTime(&timeinfo) ? timeinfo.tm_hour : 00;
+        uint32_t minutes = getLocalTime(&timeinfo) ? timeinfo.tm_min : 00;
+        uint32_t seconds = getLocalTime(&timeinfo) ? timeinfo.tm_sec : 00;
 
         display.fillRect(17, 30, 100, 8, BLACK);
         display.setCursor(17, 30);
@@ -123,20 +124,5 @@ void module_ABOUT() {
     display.print("FLOW SPEED");
     display.setCursor(70, 20);
     display.print(menu.getFlowSpeed());
-
-    display.setCursor(3, 30);
-    display.print("BOOT TIME");
-
-    while (true) {
-        uint32_t Boot = RTC_Time();
-
-        display.fillRect(70, 30, 50, 8, BLACK);
-        display.setCursor(70, 30);
-        display.print(Boot);
-        display.setCursor(100, 30);
-        display.print("Sec");
-
-        display.display();
-        if (digitalRead(KEY_BACK) == LOW) break;
-    }
+    display.display();
 }

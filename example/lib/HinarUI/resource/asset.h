@@ -5,10 +5,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_SHT31.h>
- 
-#include "esp_system.h"
-#include "nvs_flash.h"
-#include "nvs.h"
+#include <AutoConnect.h>
+#include <WiFi.h>
+#include <WebServer.h>
 
 #define OLED_SDA            21
 #define OLED_SCL            22
@@ -21,8 +20,7 @@
 #define KEY_ENTER           32
 #define KEY_BACK            35 
 #define KEY_CYCLE           33
-
-#define KEY_BACKUP          15
+#define KEY_OFF             15
 
 #define SCREEN_WIDTH        128
 #define SCREEN_HEIGHT       64
@@ -44,9 +42,9 @@ static String PAGE_NAME = "FORWARD";
 static String UI_NAME   = "HinarUI";
 
 bool OLED_Setup();
-bool RTC_Setup();
 bool KEY_Setup();
 bool SHT30_Setup();
+bool WIFI_Setup();
 
 uint32_t RTC_Time();
 
