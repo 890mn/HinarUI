@@ -5,9 +5,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_SHT31.h>
-#include <AutoConnect.h>
-#include <WiFi.h>
-#include <WebServer.h>
+//#include <AutoConnect.h>
+//#include <WiFi.h>
+//#include <WebServer.h>
 
 #define OLED_SDA            21
 #define OLED_SCL            22
@@ -44,8 +44,5 @@ static String UI_NAME   = "HinarUI";
 bool OLED_Setup();
 bool KEY_Setup();
 bool SHT30_Setup();
-bool WIFI_Setup();
-
-uint32_t RTC_Time();
 
 #endif

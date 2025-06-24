@@ -125,6 +125,6 @@ public:
 extern Menu menu;
 extern Adafruit_SSD1306 display;
 extern Adafruit_SHT31 SHT;
-extern WebServer Server;
-extern AutoConnect Portal;
+//extern WebServer Server;
+//extern AutoConnect Portal;
 #endif

@@ -17,6 +17,7 @@ void module_LIGHT() {
 
 void module_TIME() {
     // Wait for DS3231
+    return;
     while (true) {
         display.clearDisplay();
         menu.drawTopBar();

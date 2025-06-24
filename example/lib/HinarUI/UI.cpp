@@ -10,7 +10,7 @@ void Menu::create() {
     if(!KEY_Setup()) return;
     if(!OLED_Setup()) return;
     if(!SHT30_Setup()) return;
-    if(!WIFI_Setup()) return;
+    //if(!WIFI_Setup()) return;
 
     Serial.println(F("-- Inital Success == [ Hardware ]"));
     draw(0, true, true);
@@ -20,15 +20,17 @@ void Menu::loop() {
     static int prevKeyEnterState = HIGH;
     static int prevKeyCycleState = HIGH;
     static int prevKeyBackState  = HIGH;
+    static int prevKeyOffState  = HIGH;
 
     static MenuState previousState = IDLE;
     currentTime = millis();
-    Portal.handleClient();
+    //Portal.handleClient();
 
     if (!isAnimating) {
         int keyEnterState = digitalRead(KEY_ENTER);
         int keyCycleState = digitalRead(KEY_CYCLE);
         int keyBackState  = digitalRead(KEY_BACK);
+        int keyOffState  = digitalRead(KEY_OFF);
 
         if (keyEnterState != prevKeyEnterState) {
             Serial.print("Enter Status Changed: ");
@@ -45,7 +47,11 @@ void Menu::loop() {
             Serial.println(keyBackState == 0 ? "Pressed" : "Exited");
             prevKeyBackState = keyBackState;
         }
-
+        if (keyOffState != prevKeyOffState) {
+            Serial.print("Off Status Changed: ");
+            Serial.println(keyOffState == 0 ? "Pressed" : "Exited");
+            prevKeyOffState = keyOffState;
+        }
         if (currentState != previousState) {
             Serial.print("State Changed to: ");
             Serial.println(stateToString());
