@@ -95,36 +95,7 @@ private:
     float easeInOut(float t);
 };
 
-// 帧率计数器类
-class FPSCounter {
-private:
-    unsigned long lastTime = 0;
-    unsigned int frameCount = 0;
-    float fps = 0;
-
-public:
-    void update() {
-        frameCount++;
-        
-        // 每过1秒计算一次帧率
-        if (millis() - lastTime >= 1000) {
-            fps = frameCount / ((millis() - lastTime) / 1000.0);
-            Serial.printf("FPS: %.2f\n", fps);
-            
-            // 重置计数器和时间
-            frameCount = 0;
-            lastTime = millis();
-        }
-    }
-
-    float getFPS() {
-        return fps;
-    }
-};
-
 extern Menu menu;
 extern Adafruit_SSD1306 display;
 extern Adafruit_SHT31 SHT;
-//extern WebServer Server;
-//extern AutoConnect Portal;
 #endif

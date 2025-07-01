@@ -2,7 +2,6 @@
 
 // 1 - Create Menu
 Menu menu;
-FPSCounter fpsCounter;
 
 // 2 - Basic External calls
 void Menu::create() {
@@ -10,7 +9,6 @@ void Menu::create() {
     if(!KEY_Setup()) return;
     if(!OLED_Setup()) return;
     if(!SHT30_Setup()) return;
-    //if(!WIFI_Setup()) return;
 
     Serial.println(F("-- Inital Success == [ Hardware ]"));
     draw(0, true, true);
@@ -24,7 +22,6 @@ void Menu::loop() {
 
     static MenuState previousState = IDLE;
     currentTime = millis();
-    //Portal.handleClient();
 
     if (!isAnimating) {
         int keyEnterState = digitalRead(KEY_ENTER);
@@ -71,7 +68,7 @@ void Menu::loop() {
                     modules[forwardPointer]();
                     currentState = MODULE;
                 }
-                break;
+                break; 
 
             case FORWARD:
                 renderDynamic(keyCycleState, true);
@@ -141,7 +138,6 @@ void Menu::draw(int offset, bool init, bool isForward) {
     }
     drawFrame();
     display.display();
-    fpsCounter.update();
 }
 
 void Menu::drawFrame() {

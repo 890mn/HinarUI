@@ -1,12 +1,7 @@
 #include "resource/asset.h"
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-
 Adafruit_SHT31 SHT = Adafruit_SHT31(&Wire1);
-
-//WebServer Server;
-//AutoConnect Portal(Server);
-//AutoConnectConfig config;
 
 bool OLED_Setup() {
     Wire.begin(OLED_SDA, OLED_SCL);
@@ -48,31 +43,7 @@ bool KEY_Setup() {
     pinMode(KEY_BACK , INPUT_PULLUP);
     pinMode(KEY_OFF  , INPUT_PULLUP);
     pinMode(34  , INPUT_PULLDOWN);
-    pinMode(12  , INPUT_PULLDOWN);
-    pinMode(13  , INPUT_PULLDOWN);
 
     Serial.println(F("-- Inital Success == [ KEY ]"));
     return true;
 }
-
-/*
-bool WIFI_Setup() {
-    config.apid = "ESP-HinarUI";
-    config.psk = "12345678";
-    config.autoReconnect = true;
-    config.ota = AC_OTA_BUILTIN;
-    config.hostName = "ESP-WROVER-E-HinarUI";
-    config.retainPortal = true;  // ⭐ 关键！断网后也保留 portal 页面
-
-    Portal.config(config);
-
-    if (Portal.begin()) {
-        Serial.println("WiFi connected: " + WiFi.localIP().toString());
-        configTime(8 * 3600, 0, "ntp.aliyun.com", "pool.ntp.org");
-    } else {
-        Serial.println("WiFi setup failed!");
-        return false;
-    }
-    return true;
-}
-*/

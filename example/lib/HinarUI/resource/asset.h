@@ -5,9 +5,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_SHT31.h>
-//#include <AutoConnect.h>
-//#include <WiFi.h>
-//#include <WebServer.h>
 
 #define OLED_SDA            21
 #define OLED_SCL            22
