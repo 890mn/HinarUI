@@ -1,9 +1,7 @@
 #include "UI.h"
 #include "resource/module.h"
 
-struct tm timeinfo;
-
-void module_LIGHT() {
+void module_serial() {
     display.clearDisplay();
     menu.drawTopBar();
     menu.drawFrame();
@@ -15,27 +13,8 @@ void module_LIGHT() {
     display.setTextSize(1);
 }
 
-void module_TIME() {
-    // Wait for DS3231
-    return;
-    while (true) {
-        display.clearDisplay();
-        menu.drawTopBar();
-        menu.drawFrame();
-    
-        uint32_t hours = getLocalTime(&timeinfo) ? timeinfo.tm_hour : 00;
-        uint32_t minutes = getLocalTime(&timeinfo) ? timeinfo.tm_min : 00;
-        uint32_t seconds = getLocalTime(&timeinfo) ? timeinfo.tm_sec : 00;
+void module_battery() {
 
-        display.fillRect(17, 30, 100, 8, BLACK);
-        display.setCursor(17, 30);
-        display.setTextSize(2);
-        display.printf("%02d:%02d:%02d", hours, minutes, seconds);
-
-        display.display();
-        display.setTextSize(1);
-        if (digitalRead(KEY_BACK) == LOW) break;
-    }
 }
 
 void module_SHT30() {

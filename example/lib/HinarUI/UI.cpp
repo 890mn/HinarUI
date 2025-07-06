@@ -227,11 +227,11 @@ void Menu::drawForwardModules(int offset, bool init) {
             IconTrans.label = labels[i];
             if (i == 0) {
                 drawSeleModule(IconTrans);
-                display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_diode, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+                display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, icons[0], 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
                 IconTrans.x += 85;
             } else {
                 drawUnseleModule(IconTrans);
-                display.drawBitmap(IconTrans.x, IconTrans.y + 3, bitmap_clock, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+                display.drawBitmap(IconTrans.x, IconTrans.y + 3, icons[1], 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
                 IconTrans.x += 50;
             }
         }

@@ -28,13 +28,13 @@ private:
     String tmpLabel = labels[MODULE_FORWARD];
     unsigned char* tmpIcons = icons[MODULE_FORWARD];
 
-    String labels[MODULE_MAX] = {"LIGHT", "TIME", "SHT30",
+    String labels[MODULE_MAX] = {"SERIAL", "VBAT", "SHT30",
                                  "UICORE", "GITHUB", "ABOUT"};
     
-    unsigned char* icons[MODULE_MAX] = {bitmap_diode, bitmap_clock, bitmap_data, 
-                                        bitmap_chip, bitmap_github, bitmap_cube};
+    unsigned char* icons[MODULE_MAX] = {bitmap_serial, bitmap_battery, bitmap_sht, 
+                                        bitmap_chip, bitmap_github, bitmap_about};
 
-    entry modules[MODULE_MAX] = {module_LIGHT, module_TIME, module_SHT30,
+    entry modules[MODULE_MAX] = {module_serial, module_battery, module_SHT30,
                                  module_UICORE, module_github, module_ABOUT};
 
     int    curStep             = 0;

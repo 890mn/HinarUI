@@ -10,8 +10,8 @@
 #define RADIUS_PALL         2
 #define RADIUS_RECT         5
 
-void module_LIGHT();
-void module_TIME();
+void module_serial();
+void module_battery();
 void module_SHT30();
 void module_UICORE();
 void module_github();
