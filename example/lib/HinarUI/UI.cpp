@@ -136,6 +136,18 @@ void Menu::loop() {
                     ++forwardPointer;
                     currentState = IDLE;
                 }
+                // 如果在 MODULE 状态下检测翻页
+                if (keyCycleState == LOW) {
+                    while (keyCycleState == LOW) {
+                        keyCycleState = digitalRead(KEY_CYCLE);
+                        delay(3);
+                    }
+                    Serial.println(i_back);
+                    Serial.println(module_UICORE_page);
+                    if (i_back == backwardPointer) {
+                        module_UICORE_page = (module_UICORE_page + 1) % module_UICORE_totalPages;
+                    }
+                }
                 break;
         }
     }

@@ -21,6 +21,7 @@ public:
     void loop();
     void drawTopBar(String page = PAGE_NAME, String ui = UI_NAME);
     void drawFrame();
+    int getIback() { return i_back; }
 
     String getFlowSpeed();
 

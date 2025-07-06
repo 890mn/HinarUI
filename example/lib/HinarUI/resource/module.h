@@ -17,4 +17,6 @@ void module_UICORE();
 void module_github();
 void module_ABOUT();
 
+extern int module_UICORE_page;
+extern const int module_UICORE_totalPages;
 #endif

@@ -1,5 +1,9 @@
 #include "UI.h"
+#include "resource/asset.h"
 #include "resource/module.h"
+
+int module_UICORE_page = 0;
+const int module_UICORE_totalPages = 2;
 
 void module_serial() {
     display.clearDisplay();
@@ -57,29 +61,37 @@ void module_SHT30() {
 
 void module_UICORE() {
     display.clearDisplay();
-    menu.drawTopBar("UI-CORE", "1of2");
+    Serial.println("UI-CORE module loaded");
+    char buf[16];
+    sprintf(buf, "%dof%d", module_UICORE_page + 1, module_UICORE_totalPages);
+    menu.drawTopBar("UICore", buf);
     menu.drawFrame();
+    switch (module_UICORE_page) {
+        case 0:
+            SET_FONT_LARGE;
+            display.setCursor(17, 35);
+            display.print("ESP32");
 
-    SET_FONT_LARGE;
-    display.setCursor(17, 35);
-    display.print("ESP32");
+            SET_FONT_USMALL;
+            display.setCursor(52, 45);
+            display.print("ESPRESSIF");
 
-    SET_FONT_USMALL;
-    display.setCursor(52, 45);
-    display.print("ESPRESSIF");
+            display.setCursor(52, 55);
+            display.print("WROVER");
 
-    display.setCursor(52, 55);
-    display.print("WROVER");
-    display.setTextSize(1);
-/*
-    SET_FONT_USMALL;
-    display.setTextSize(1);
-    display.setCursor(8, 53);
-    display.print("7/24.8% RAM/Flash");
-*/
+            display.drawLine(75, 58, 95, 58, SELECTED_COLOR);
+            display.drawLine(95, 58, 105, 63, SELECTED_COLOR);
+            break;
+        case 1:
+            display.setCursor(5, 23);
+            display.print("VSCode/PlatformIO");
+            display.setCursor(5, 37);
+            display.print("SSD1306/Adafruit_GFX");
+            display.setCursor(5, 51);
+            display.print("Adafruit_SHT31");
+            break;
+    }
     SET_FONT_DEFAULT;
-    display.drawLine(75, 58, 95, 58, SELECTED_COLOR);
-    display.drawLine(95, 58, 105, 63, SELECTED_COLOR);
     display.display();
 }
 
