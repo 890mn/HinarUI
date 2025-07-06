@@ -22,30 +22,37 @@ void module_SHT30() {
     menu.drawTopBar();
     menu.drawFrame();
 
-    SET_FONT_MEDIUM;
     float t = SHT.readTemperature();
     float h = SHT.readHumidity();
 
-    display.setCursor(1, 30);
-    if (! isnan(t)) {  // check if 'is not a number'
-        char* temper = (char*)malloc(20);
-        sprintf(temper, "Temper: %.2f", t);
-        display.print(temper); 
-    } else { 
-        display.print("Temper: NaN");
-    }
+    display.drawBitmap(3, 25, bitmap_temper, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+    display.drawBitmap(65, 25, bitmap_humi, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
     
-    display.setCursor(1, 45);
-    if (! isnan(h)) {  // check if 'is not a number'
-        char* humi = (char*)malloc(20);
-        sprintf(humi, "Humi: %.2f", h);
-        display.print(humi);
-    } else { 
-        display.print("Humi: NaN");
+    display.fillRect(32, 25, 30, 24, BLACK);
+    display.fillRect(93, 25, 30, 24, BLACK);
+
+    display.setCursor(32, 29);
+    if (!isnan(t)) {
+        display.printf("%.2f", t);
+    } else {
+        display.print("NaN");
     }
+    display.setCursor(32, 39);
+    display.printf("C");
+
+    display.setCursor(93, 29);
+    if (!isnan(h)) {
+        display.printf("%.2f", h);
+    } else {
+        display.print("NaN");
+    }
+    display.setCursor(93, 39);
+    display.printf("%%");
+
+    display.setCursor(52, 57);
+    display.printf("SHT30");
 
     display.display();
-    SET_FONT_DEFAULT;
 }
 
 void module_UICORE() {

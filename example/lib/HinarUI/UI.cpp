@@ -100,6 +100,15 @@ void Menu::loop() {
                 break;
 
             case MODULE:
+                static unsigned long lastUpdateTime = 0;
+                unsigned long now = millis();
+                if (now - lastUpdateTime >= 1000) {
+                    lastUpdateTime = now;
+                    if (forwardPointer != MODULE_FORWARD)
+                        modules[forwardPointer]();
+                    else
+                        modules[i_back]();
+                }
                 if (keyBackState == LOW && forwardPointer == MODULE_FORWARD) {
                     while (keyBackState == LOW) {
                         keyBackState = digitalRead(KEY_BACK);
@@ -115,6 +124,10 @@ void Menu::loop() {
                     ++i_back;
                     currentState = BACKWARD_SELECTED;
                 } else if (keyBackState == LOW && forwardPointer != MODULE_FORWARD) {
+                    while (keyBackState == LOW) {
+                        keyBackState = digitalRead(KEY_BACK);
+                        delay(3);
+                    }
                     --forwardPointer;
 
                     curStep = totalStep - 1;
