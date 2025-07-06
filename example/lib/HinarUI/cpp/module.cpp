@@ -1,24 +1,80 @@
 #include "UI.h"
 #include "resource/asset.h"
 #include "resource/module.h"
+#include <deque>
+
+#define VBAT_PIN 34
+#define VREF 3.3
+#define VOLTAGE_DIVIDER_RATIO 2.0
 
 int module_UICORE_page = 0;
 const int module_UICORE_totalPages = 2;
 
+std::deque<String> comLogs;
+const size_t MAX_LOG_LINES = 5;
+
+float readBatteryVoltage() {
+    int raw = analogRead(VBAT_PIN);
+    float voltage = raw * VREF / 4095.0 * VOLTAGE_DIVIDER_RATIO + 0.25;
+    return voltage;
+}
+
+int calcBatteryPercent(float voltage) {
+    if (voltage >= 4.2) return 100;
+    if (voltage <= 3.0) return 0;
+    return (int)((voltage - 3.0) / (4.2 - 3.0) * 100);
+}
+
 void module_serial() {
     display.clearDisplay();
-    menu.drawTopBar();
+    menu.drawTopBar("COM-MON", "LOG");
     menu.drawFrame();
+    SET_FONT_USMALL;
 
-    display.setCursor(1, 20);
-    display.setTextSize(2);
-    display.print("LIGHT");
+    while (Serial1.available()) {
+        String line = Serial1.readStringUntil('\n');
+        line.trim();
+        if (line.length() > 0) {
+            if (comLogs.size() >= MAX_LOG_LINES) {
+                comLogs.pop_front();
+            }
+            comLogs.push_back(line);
+        }
+    }
+
+    for (size_t i = 0; i < comLogs.size(); ++i) {
+        display.setCursor(3, 22 + i * 10);
+        display.print(comLogs[i]);
+    }
+
     display.display();
-    display.setTextSize(1);
+    SET_FONT_DEFAULT;
 }
 
 void module_battery() {
+    display.clearDisplay();
+    menu.drawTopBar("BATTERY", "STATUS");
+    menu.drawFrame();
+    SET_FONT_MEDIUM;
 
+    float voltage = readBatteryVoltage();
+    int percent = calcBatteryPercent(voltage);
+
+    int x = 10, y = 30, width = 40, height = 20;
+    display.drawRect(x, y, width, height, WHITE);
+    display.fillRect(x + width, y + height / 4, 4, height / 2, WHITE);
+
+    int fillWidth = (width - 2) * percent / 100;
+    display.fillRect(x + 1, y + 1, fillWidth, height - 2, percent < 20 ? WHITE : SELECTED_COLOR);
+
+    display.setCursor(60, 35);
+    display.printf("%.2fV", voltage);
+
+    display.setCursor(60, 50);
+    display.printf("%d%%", percent);
+
+    display.display();
+    SET_FONT_DEFAULT;
 }
 
 void module_SHT30() {

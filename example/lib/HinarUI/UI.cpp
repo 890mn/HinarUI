@@ -9,7 +9,8 @@ void Menu::create() {
     if(!KEY_Setup()) return;
     if(!OLED_Setup()) return;
     if(!SHT30_Setup()) return;
-
+    
+    Serial1.begin(115200, SERIAL_8N1, COM_RX_PIN, COM_TX_PIN);
     Serial.println(F("-- Inital Success == [ Hardware ]"));
     draw(0, true, true);
 }

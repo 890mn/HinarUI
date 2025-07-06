@@ -6,6 +6,9 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_SHT31.h>
 
+#define COM_RX_PIN          25
+#define COM_TX_PIN          26
+
 #define OLED_SDA            21
 #define OLED_SCL            22
 #define OLED_ADDR           0x3C
