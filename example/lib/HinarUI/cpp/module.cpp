@@ -123,5 +123,21 @@ void module_ABOUT() {
     display.print("FLOW SPEED");
     display.setCursor(70, 20);
     display.print(menu.getFlowSpeed());
+
+    display.setCursor(3, 30);
+    display.print("STEP_COUNT");
+    display.setCursor(70, 30);
+    display.print(STEP_COUNT);
+
+    display.setCursor(3, 40);
+    display.print("OLED  I2C");
+    display.setCursor(70, 40);
+    display.printf("0x%02X", OLED_ADDR);
+
+    display.setCursor(3, 50);
+    display.print("SHT30 I2C");
+    display.setCursor(70, 50);
+    display.printf("0x%02X", SHT30_ADDR);
+
     display.display();
 }
