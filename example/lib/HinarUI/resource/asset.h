@@ -8,6 +8,8 @@
 
 #define COM_RX_PIN          25
 #define COM_TX_PIN          26
+#define VBAT_PIN            34
+#define COM_BAUD_RATE       115200
 
 #define OLED_SDA            21
 #define OLED_SCL            22
@@ -44,5 +46,6 @@ static String UI_NAME   = "HinarUI";
 bool OLED_Setup();
 bool KEY_Setup();
 bool SHT30_Setup();
+bool ASSET_Setup();
 
 #endif

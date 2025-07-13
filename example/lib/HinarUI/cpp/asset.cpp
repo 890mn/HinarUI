@@ -42,8 +42,13 @@ bool KEY_Setup() {
     pinMode(KEY_CYCLE, INPUT_PULLUP);
     pinMode(KEY_BACK , INPUT_PULLUP);
     pinMode(KEY_OFF  , INPUT_PULLUP);
-    pinMode(34  , INPUT_PULLDOWN);
-
     Serial.println(F("-- Inital Success == [ KEY ]"));
+    return true;
+}
+
+bool ASSET_Setup() {
+    pinMode(VBAT_PIN , INPUT_PULLDOWN);
+    Serial1.begin(COM_BAUD_RATE, SERIAL_8N1, COM_RX_PIN, COM_TX_PIN);
+    Serial.println(F("-- Inital Success == [ ASSET ]"));
     return true;
 }

@@ -3,10 +3,6 @@
 #include "resource/module.h"
 #include <deque>
 
-#define VBAT_PIN 34
-#define VREF 3.3
-#define VOLTAGE_DIVIDER_RATIO 2.0
-
 int module_UICORE_page = 0;
 const int module_UICORE_totalPages = 2;
 
@@ -15,14 +11,15 @@ const size_t MAX_LOG_LINES = 5;
 
 float readBatteryVoltage() {
     int raw = analogRead(VBAT_PIN);
-    float voltage = raw * VREF / 4095.0 * VOLTAGE_DIVIDER_RATIO + 0.25;
+    float voltage = raw * 3.3 / 4095.0 * 2.0 + 0.25;
     return voltage;
 }
 
 int calcBatteryPercent(float voltage) {
-    if (voltage >= 4.2) return 100;
-    if (voltage <= 3.0) return 0;
-    return (int)((voltage - 3.0) / (4.2 - 3.0) * 100);
+    float percent = 100.0 / (1 + exp(-20 * (voltage - 3.7)));
+    if (percent > 100) return 100;
+    if (percent < 0) return 0;
+    return (int)percent;
 }
 
 void module_serial() {
