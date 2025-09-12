@@ -61,6 +61,7 @@ HinarUI
 
 ## Usage
 
+Main Doc on my website: [Link2hinar](https://link2hinar.fun/p/hinarui/) |
 Optional: Supporting design board at [oshwhub](https://oshwhub.com/link_joestar/hinarui-open-source-embedded-sel)  
 
 ![cover](pic/Board.jpg)
