@@ -8,7 +8,7 @@
 
 #define COM_RX_PIN          25
 #define COM_TX_PIN          26
-#define VBAT_PIN            34
+#define VBAT_PIN            36
 #define COM_BAUD_RATE       115200
 
 #define OLED_SDA            21
