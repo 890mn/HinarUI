@@ -1,13 +1,10 @@
 #include "resource/asset.h"
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-
 Adafruit_SHT31 SHT = Adafruit_SHT31(&Wire1);
 
-RTC_DATA_ATTR uint64_t rtc_time_start = 0;
-
 bool OLED_Setup() {
-    Wire.begin(OLED_SDA, OLED_SCL, 10000);
+    Wire.begin(OLED_SDA, OLED_SCL);
 
     if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
         Serial.println(F("-! Inital Failed == [ SSD1306 OLED ]"));
@@ -25,7 +22,7 @@ bool OLED_Setup() {
 bool SHT30_Setup() {
     Wire1.begin(SHT30_SDA, SHT30_SCL);
 
-    if (!SHT.begin(0x44)) {
+    if (!SHT.begin(SHT30_ADDR)) {
         Serial.println(F("-! Inital Failed == [ SHT30 ]"));
         return false;
     }
@@ -40,27 +37,18 @@ bool SHT30_Setup() {
     return true;
 }
 
-bool RTC_Setup() {
-    if (nvs_flash_init() != ESP_OK) {
-        Serial.println(F("-! Inital Failed == [ NVS FLASH ]"));
-        return false;
-    }
-    rtc_time_start = esp_timer_get_time();
-
-    Serial.println(F("-- Inital Success == [ RTC ]"));
-    return true;
-}
-
 bool KEY_Setup() {
     pinMode(KEY_ENTER, INPUT_PULLUP);
     pinMode(KEY_CYCLE, INPUT_PULLUP);
     pinMode(KEY_BACK , INPUT_PULLUP);
-    //pinMode(KEY_BACKUP, INPUT_PULLUP);
-
+    pinMode(KEY_OFF  , INPUT_PULLUP);
     Serial.println(F("-- Inital Success == [ KEY ]"));
     return true;
 }
 
-uint32_t RTC_Time() {
-    return (esp_timer_get_time() - rtc_time_start) / 1000000;
+bool ASSET_Setup() {
+    pinMode(VBAT_PIN , INPUT_PULLDOWN);
+    Serial1.begin(COM_BAUD_RATE, SERIAL_8N1, COM_RX_PIN, COM_TX_PIN);
+    Serial.println(F("-- Inital Success == [ ASSET ]"));
+    return true;
 }

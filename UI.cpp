@@ -2,15 +2,14 @@
 
 // 1 - Create Menu
 Menu menu;
-FPSCounter fpsCounter;
 
 // 2 - Basic External calls
 void Menu::create() {
     Serial.begin(115200);
-    if(!RTC_Setup()) return;
     if(!KEY_Setup()) return;
     if(!OLED_Setup()) return;
     if(!SHT30_Setup()) return;
+    if(!ASSET_Setup()) return;
 
     Serial.println(F("-- Inital Success == [ Hardware ]"));
     draw(0, true, true);
@@ -20,6 +19,7 @@ void Menu::loop() {
     static int prevKeyEnterState = HIGH;
     static int prevKeyCycleState = HIGH;
     static int prevKeyBackState  = HIGH;
+    static int prevKeyOffState  = HIGH;
 
     static MenuState previousState = IDLE;
     currentTime = millis();
@@ -28,6 +28,7 @@ void Menu::loop() {
         int keyEnterState = digitalRead(KEY_ENTER);
         int keyCycleState = digitalRead(KEY_CYCLE);
         int keyBackState  = digitalRead(KEY_BACK);
+        int keyOffState  = digitalRead(KEY_OFF);
 
         if (keyEnterState != prevKeyEnterState) {
             Serial.print("Enter Status Changed: ");
@@ -44,7 +45,11 @@ void Menu::loop() {
             Serial.println(keyBackState == 0 ? "Pressed" : "Exited");
             prevKeyBackState = keyBackState;
         }
-
+        if (keyOffState != prevKeyOffState) {
+            Serial.print("Off Status Changed: ");
+            Serial.println(keyOffState == 0 ? "Pressed" : "Exited");
+            prevKeyOffState = keyOffState;
+        }
         if (currentState != previousState) {
             Serial.print("State Changed to: ");
             Serial.println(stateToString());
@@ -64,7 +69,7 @@ void Menu::loop() {
                     modules[forwardPointer]();
                     currentState = MODULE;
                 }
-                break;
+                break; 
 
             case FORWARD:
                 renderDynamic(keyCycleState, true);
@@ -96,6 +101,15 @@ void Menu::loop() {
                 break;
 
             case MODULE:
+                static unsigned long lastUpdateTime = 0;
+                unsigned long now = millis();
+                if (now - lastUpdateTime >= 1000) {
+                    lastUpdateTime = now;
+                    if (forwardPointer != MODULE_FORWARD)
+                        modules[forwardPointer]();
+                    else
+                        modules[i_back]();
+                }
                 if (keyBackState == LOW && forwardPointer == MODULE_FORWARD) {
                     while (keyBackState == LOW) {
                         keyBackState = digitalRead(KEY_BACK);
@@ -111,6 +125,10 @@ void Menu::loop() {
                     ++i_back;
                     currentState = BACKWARD_SELECTED;
                 } else if (keyBackState == LOW && forwardPointer != MODULE_FORWARD) {
+                    while (keyBackState == LOW) {
+                        keyBackState = digitalRead(KEY_BACK);
+                        delay(3);
+                    }
                     --forwardPointer;
 
                     curStep = totalStep - 1;
@@ -118,6 +136,17 @@ void Menu::loop() {
 
                     ++forwardPointer;
                     currentState = IDLE;
+                }
+                if (keyCycleState == LOW) {
+                    while (keyCycleState == LOW) {
+                        keyCycleState = digitalRead(KEY_CYCLE);
+                        delay(3);
+                    }
+                    Serial.println(i_back);
+                    Serial.println(module_UICORE_page);
+                    if (i_back == backwardPointer) {
+                        module_UICORE_page = (module_UICORE_page + 1) % module_UICORE_totalPages;
+                    }
                 }
                 break;
         }
@@ -134,7 +163,6 @@ void Menu::draw(int offset, bool init, bool isForward) {
     }
     drawFrame();
     display.display();
-    fpsCounter.update();
 }
 
 void Menu::drawFrame() {
@@ -224,11 +252,11 @@ void Menu::drawForwardModules(int offset, bool init) {
             IconTrans.label = labels[i];
             if (i == 0) {
                 drawSeleModule(IconTrans);
-                display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, bitmap_diode, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+                display.drawBitmap(IconTrans.x + 3, IconTrans.y + 3, icons[0], 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
                 IconTrans.x += 85;
             } else {
                 drawUnseleModule(IconTrans);
-                display.drawBitmap(IconTrans.x, IconTrans.y + 3, bitmap_clock, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+                display.drawBitmap(IconTrans.x, IconTrans.y + 3, icons[1], 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
                 IconTrans.x += 50;
             }
         }

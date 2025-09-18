@@ -7,7 +7,8 @@ int module_UICORE_page = 0;
 const int module_UICORE_totalPages = 2;
 
 std::deque<String> comLogs;
-const size_t MAX_LOG_LINES = 5;
+const size_t MAX_LOG_LINES = 4;
+int first_serial = 0;
 
 float readBatteryVoltage() {
     int raw = analogRead(VBAT_PIN);
@@ -24,11 +25,21 @@ int calcBatteryPercent(float voltage) {
 
 void module_serial() {
     display.clearDisplay();
-    menu.drawTopBar("COM-MON", "LOG");
+    char config[16];
+    sprintf(config, "TX%d/RX%d", COM_TX_PIN, COM_RX_PIN);
+    menu.drawTopBar(config, (String)COM_BAUD_RATE);
     menu.drawFrame();
+    if (first_serial == 0) {
+        comLogs.push_back("Wait for Data...");
+        ++first_serial;
+    }
     SET_FONT_USMALL;
 
     while (Serial1.available()) {
+        if (first_serial == 1) {
+            comLogs.clear();
+            ++first_serial;
+        }
         String line = Serial1.readStringUntil('\n');
         line.trim();
         if (line.length() > 0) {
@@ -40,7 +51,7 @@ void module_serial() {
     }
 
     for (size_t i = 0; i < comLogs.size(); ++i) {
-        display.setCursor(3, 22 + i * 10);
+        display.setCursor(3, 25 + i * 10);
         display.print(comLogs[i]);
     }
 
@@ -150,7 +161,7 @@ void module_UICORE() {
 
 void module_github() {
     display.clearDisplay();
-    menu.drawTopBar("VER_RELEASE", "0.2");
+    menu.drawTopBar("VER_RELEASE", "0.3");
     menu.drawFrame();
 
     display.setTextSize(2);
