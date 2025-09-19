@@ -1,11 +1,13 @@
-![head](pic/HinarUI_Cover.jpg)
-
 # HinarUI 
-![Bilibili](https://img.shields.io/badge/Bilibili-EE979F?link=https%3A%2F%2Fspace.bilibili.com%2F45409103)
-![oshwhub](https://img.shields.io/badge/%E7%AB%8B%E5%88%9B%E5%BC%80%E6%BA%90%E7%A4%BE%E5%8C%BA-4672F5?link=https%3A%2F%2Foshwhub.com%2Flink_joestar%2Fhinarui-open-source-embedded-sel)
+<img alt="Bilibili" src="https://img.shields.io/badge/Bilibili-EE979F?link=https%3A%2F%2Fspace.bilibili.com%2F45409103">
+<img alt="oshwhub" src="https://img.shields.io/badge/%E7%AB%8B%E5%88%9B%E5%BC%80%E6%BA%90%E7%A4%BE%E5%8C%BA-4672F5?link=https%3A%2F%2Foshwhub.com%2Flink_joestar%2Fhinarui-open-source-embedded-sel">
+<img alt="MakerWorld" src="https://img.shields.io/badge/MakerWorld-white?link=https%3A%2F%2Fmakerworld.com.cn%2Fzh%2Fmodels%2F1583584-hinarui-shell-v1">  
+
 ![GitHub Created At](https://img.shields.io/github/created-at/890mn/HinarUI?labelColor=%2339354A&color=%239BB9B4)
 ![GitHub last commit](https://img.shields.io/github/last-commit/890mn/HinarUI?labelColor=%2339354A&color=%239BB9B4)
 ![Static Badge](https://img.shields.io/github/v/release/890mn/HinarUI?color=%23263C53)
+
+![head](pic/HinarUI.jpg)
 
 Original OLED UI Design based on Embedded Platform, current exam on PlatformIO + ESP32-WROVER-E, aim to fit on various proportion of Embedded screen
 
@@ -17,6 +19,7 @@ By the way, all of it just try something i wanna to do...why not LVGL or other s
 
 It seems to be a little slow because everyday get so busy :(
 
+- 2025.09.19 | Add Li Ver of PCB/Shell (V3)
 - 2025.05.06 | Create Shell of the board (V2)
 - 2025.03.25 | Complete TESTVer.0.2 and PCB (Scale with 1:1)
 - 2025.01.02 | Draw PCB (imperfect so not here)
@@ -29,15 +32,8 @@ It seems to be a little slow because everyday get so busy :(
 
 Clone this project down will include these part, the Library "HinarUI" and an Example  
 
-Also include the PCB and Shell
 ```plaintext
 HinarUI
-├─ PCB
-│   ├─ BOM
-│   └─ Gerber
-├─ Shell
-│   ├─ Box.3mf
-│   └─ Top.3mf
 ├─ example
 │   ├─ .pio
 │   ├─ include
@@ -51,7 +47,7 @@ HinarUI
 ├─ fonts
 │   ├─ Arame_Regular[5:10pt]7b.h
 │   ├─ Cubano7pt7b.h
-│   └─ optional.md
+│   └─ optional.md  // Add custom font see this
 ├─ cpp
 │   ├─ asset.cpp
 │   └─ module.cpp
@@ -62,9 +58,10 @@ HinarUI
 ## Usage
 
 Main Doc on my website: [Link2hinar](https://link2hinar.fun/p/hinarui/) |
-Optional: Supporting design board at [oshwhub](https://oshwhub.com/link_joestar/hinarui-open-source-embedded-sel)  
+Supporting design PCB at [oshwhub](https://oshwhub.com/link_joestar/hinarui-open-source-embedded-sel) |
+Shell at [Makerworld](https://makerworld.com.cn/zh/models/1583584-hinarui-shell-v1)
 
-![cover](pic/Board.jpg)
+![cover](pic/HinarUI_Cover.jpg)
 
 *One way is to open the [EXAMPLE](/example/README.md) to understand.*
 
