@@ -1,17 +1,11 @@
-#include "UI.h"
+#include "HinarUI_Core.h"
 
 // 1 - Create Menu
 Menu menu;
 
 // 2 - Basic External calls
 void Menu::create() {
-    Serial.begin(115200);
-    if(!KEY_Setup()) return;
-    if(!OLED_Setup()) return;
-    if(!SHT30_Setup()) return;
-    if(!ASSET_Setup()) return;
-
-    Serial.println(F("-- Inital Success == [ Hardware ]"));
+    if(!board_init()) return;
     draw(0, true, true);
 }
 

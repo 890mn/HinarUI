@@ -1,9 +1,8 @@
-#ifndef __UI_H
-#define __UI_H
+#ifndef HINARUI_CORE_H
+#define HINARUI_CORE_H
 
-#include "resource/icon.h"
-#include "resource/asset.h"
-#include "resource/module.h"
+#include "icon.h"
+#include "Profile.h"
 
 // Iteration Depth
 #define STEP_COUNT          12 
@@ -13,6 +12,25 @@
 #define FLOWSPEED_FAST      20
 #define FLOWSPEED_NORMAL    25
 #define FLOWSPEED_SLOW      35
+
+#define MODULE_MAX          6
+#define MODULE_OFFSET       45
+#define MODULE_DIRECTION    -1
+#define MODULE_FORWARD      3
+#define MODULE_BACKWARD     MODULE_MAX - MODULE_FORWARD
+
+#define RADIUS_PALL         2
+#define RADIUS_RECT         5
+
+void module_serial();
+void module_battery();
+void module_SHT30();
+void module_UICORE();
+void module_github();
+void module_ABOUT();
+
+static String PAGE_NAME = "FORWARD";
+static String UI_NAME   = "HinarUI";
 
 typedef void (*entry)();
 class Menu {
@@ -95,8 +113,6 @@ private:
 
     float easeInOut(float t);
 };
-
 extern Menu menu;
-extern Adafruit_SSD1306 display;
-extern Adafruit_SHT31 SHT;
+
 #endif
