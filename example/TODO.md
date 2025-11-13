@@ -7,7 +7,7 @@
 * [x] 新建统一入口 `board_profile.h`，通过编译宏 `-D BOARD=ESP32_DEVKIT` 选择
 * [ ] `resource/asset.h` 保留**UI 资源声明**与常量（不再混入 GPIO/I²C）
 * [ ] 文档：README 增补“如何切换板型”的 3 步
-* 验收：切换两种板文件编译通过，示例可运行（不改业务代码）。([GitHub][1])
+* 验收：切换两种板文件编译通过，示例可运行
 
 ## 2 UI 内核拆分（Core）
 
@@ -72,3 +72,5 @@
 * [ ] README 新增：板型切换、事件/状态机示意、tokens 说明
 * [ ] 在 README “Usage” 中保留现有“改 `resource/asset.h`”提示，同时链接到板型方式（两种都可行，推荐新法）([GitHub][1])
 * [ ] 增加一张“页面/事件/渲染”关系图（`pic/architecture.svg`）
+
+**TRANS ING NAME NOT FILL**

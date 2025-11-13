@@ -2,8 +2,6 @@
 #include "Profile.h"
 
 bool ESP_WROVER_KIT_Board_Init(void) {
-    Serial.begin(115200);
-    
 #if defined(MODULE_OLED)
     Serial.println(F("[INFO] SUPPORT OLED Module"));
     if (!ESP_WROVER_KIT_OLED_Setup()) {

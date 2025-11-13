@@ -27,6 +27,7 @@
 #endif
 
 static bool board_init(void) {
+    Serial.begin(115200);
 #if defined(BOARD_ESP_WROVER_KIT)
     Serial.println(F("[INFO] Using ESP_WROVER_KIT Board"));
     return ESP_WROVER_KIT_Board_Init();

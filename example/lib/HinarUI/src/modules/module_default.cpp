@@ -72,7 +72,7 @@ void module_ABOUT() {
     display.setCursor(3, 30);
     display.print("STEP_COUNT");
     display.setCursor(70, 30);
-    display.print(STEP_COUNT);
+    display.print(menu.getStepCount());
 
     display.setCursor(3, 40);
     display.print("OLED  I2C");
