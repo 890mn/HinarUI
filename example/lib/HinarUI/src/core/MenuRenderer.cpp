@@ -306,7 +306,7 @@ void MenuRenderer::drawBackwardModules() {
 }
 
 void MenuRenderer::wordShrink(ModuleVisual& icon) {
-    int shrinkOffset = 4;
+    float shrinkOffset = 45.0 / menu_.wordStep;
     display.fillRect(icon.x + 30 + shrinkOffset * (menu_.wordStep - menu_.curStep), icon.y + 9,
                      shrinkOffset * menu_.curStep, 20, UNSELECTED_COLOR);
 }
