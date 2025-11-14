@@ -1,10 +1,13 @@
 #include "Profile.h"
 #include "HinarUI_Core.h"
 
+#include "HinarUI/core/FrameBufferManager.h"
+
 int module_UICORE_page = 0;
 const int module_UICORE_totalPages = 2;
 
 void module_UICORE() {
+    frameBuffer.beginFrame();
     display.clearDisplay();
     Serial.println("UI-CORE module loaded");
     char buf[16];
@@ -37,10 +40,11 @@ void module_UICORE() {
             break;
     }
     SET_FONT_DEFAULT;
-    display.display();
+    frameBuffer.endFrame();
 }
 
 void module_github() {
+    frameBuffer.beginFrame();
     display.clearDisplay();
     menu.drawTopBar("VER_REFACTOR", "0.4");
     menu.drawFrame();
@@ -55,10 +59,11 @@ void module_github() {
     display.setTextSize(1);
     display.print("@890mn ORIGINAL");
     
-    display.display();
+    frameBuffer.endFrame();
 }
 
 void module_ABOUT() {
+    frameBuffer.beginFrame();
     display.clearDisplay();
     menu.drawTopBar("SETTING");
     menu.drawFrame();
@@ -84,5 +89,5 @@ void module_ABOUT() {
     display.setCursor(70, 50);
     display.printf("0x%02X", SHT30_ADDR);
 
-    display.display();
+    frameBuffer.endFrame();
 }

@@ -7,6 +7,7 @@ const size_t MAX_LOG_LINES = 4;
 int first_serial = 0;
 
 void module_serial() {
+    frameBuffer.beginFrame();
     display.clearDisplay();
     char config[16];
     sprintf(config, "TX%d/RX%d", COM_TX_PIN, COM_RX_PIN);
@@ -38,6 +39,6 @@ void module_serial() {
         display.print(comLogs[i]);
     }
 
-    display.display();
+    frameBuffer.endFrame();
     SET_FONT_DEFAULT;
 }

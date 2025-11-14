@@ -1,6 +1,7 @@
 #include "profile.h"
+#include "HinarUI/core/HinarUIDisplay.h"
 
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+HinarUIDisplay display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 bool OLED_Setup(void) {
 #if defined(BOARD_ESP_WROVER_KIT)

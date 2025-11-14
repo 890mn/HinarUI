@@ -15,7 +15,6 @@ void MenuRenderer::drawMenu(int offset, bool init, bool isForward) {
         drawBackwardModules();
     }
     drawFrame();
-    display.display();
 }
 
 void MenuRenderer::drawFrame() const {
@@ -391,4 +390,3 @@ void MenuRenderer::rectTransPall(ModuleVisual& icon) {
     pallTrans(icon, icon.x, icon.x + 30 - 10.0 * progress,
               icon.x + 25 - 15.0 * progress, icon.x - 10.0 * progress);
 }
-

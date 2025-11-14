@@ -1,7 +1,13 @@
 #include "profile.h"
 #include "HinarUI_Core.h"
 
+#include "HinarUI/core/FilteredValue.h"
+#include "HinarUI/core/FrameBufferManager.h"
+
 Adafruit_SHT31 SHT = Adafruit_SHT31(&Wire1);
+
+static FilteredValue tempFilter(0.2f, 0.05f);
+static FilteredValue humFilter(0.5f, 0.1f);
 
 bool SHT30_Setup(void) {
 #if defined(BOARD_ESP_WROVER_KIT)
@@ -13,16 +19,20 @@ bool SHT30_Setup(void) {
 }
 
 void module_SHT30() {
-    display.clearDisplay();
-    menu.drawTopBar();
-    menu.drawFrame();
+    bool forceFull = frameBuffer.needsFullRefreshHint();
+    frameBuffer.beginFrame();
 
-    float t = SHT.readTemperature();
-    float h = SHT.readHumidity();
+    if (forceFull) {
+        display.clearDisplay();
+        menu.drawTopBar();
+        menu.drawFrame();
+        display.drawBitmap(3, 25, bitmap_temper, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+        display.drawBitmap(65, 25, bitmap_humi, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
+    }
 
-    display.drawBitmap(3, 25, bitmap_temper, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
-    display.drawBitmap(65, 25, bitmap_humi, 24, 24, SELECTED_COLOR, UNSELECTED_COLOR);
-    
+    float t = tempFilter.update(SHT.readTemperature());
+    float h = humFilter.update(SHT.readHumidity());
+
     display.fillRect(32, 25, 30, 24, BLACK);
     display.fillRect(93, 25, 30, 24, BLACK);
 
@@ -33,7 +43,7 @@ void module_SHT30() {
         display.print("NaN");
     }
     display.setCursor(32, 39);
-    display.printf("C");
+    display.print("C");
 
     display.setCursor(93, 29);
     if (!isnan(h)) {
@@ -42,10 +52,7 @@ void module_SHT30() {
         display.print("NaN");
     }
     display.setCursor(93, 39);
-    display.printf("%%");
+    display.print("%");
 
-    display.setCursor(52, 57);
-    display.printf("SHT30");
-
-    display.display();
+    frameBuffer.endFrame();
 }

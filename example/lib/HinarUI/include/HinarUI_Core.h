@@ -3,7 +3,9 @@
 
 #include "Profile.h"
 #include "icon.h"
+#include "perf.h"
 
+#include "HinarUI/core/FrameBufferManager.h"
 #include "HinarUI/core/MenuAnimator.h"
 #include "HinarUI/core/MenuConfig.h"
 #include "HinarUI/core/MenuModuleRegistry.h"

@@ -15,6 +15,7 @@ int calcBatteryPercent(float voltage) {
 }
 
 void module_battery() {
+    frameBuffer.beginFrame();
     display.clearDisplay();
     menu.drawTopBar("BATTERY", "STATUS");
     menu.drawFrame();
@@ -36,6 +37,6 @@ void module_battery() {
     display.setCursor(60, 50);
     display.printf("%d%%", percent);
 
-    display.display();
+    frameBuffer.endFrame();
     SET_FONT_DEFAULT;
 }

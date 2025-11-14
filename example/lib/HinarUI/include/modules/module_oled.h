@@ -1,7 +1,7 @@
 #ifndef MODULE_OLED_H
 #define MODULE_OLED_H
 
-#include <Adafruit_SSD1306.h>
+#include "HinarUI/core/HinarUIDisplay.h"
 #include <Wire.h>
 
 #define SCREEN_WIDTH        128
@@ -9,7 +9,7 @@
 #define SELECTED_COLOR      SSD1306_WHITE
 #define UNSELECTED_COLOR    SSD1306_BLACK
 
-extern Adafruit_SSD1306 display;
+extern HinarUIDisplay display;
 
 bool OLED_Setup(void);
 
