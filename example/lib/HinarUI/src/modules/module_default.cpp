@@ -80,6 +80,16 @@ void module_ABOUT() {
     display.print(menu.getStepCount());
 
     display.setCursor(3, 40);
+    display.print("DEV MODE");
+    display.setCursor(70, 40);
+    display.print(menu.isDeveloperModeEnabled() ? "ON" : "OFF");
+
+    display.setCursor(3, 50);
+    display.print("FPS");
+    display.setCursor(70, 50);
+    display.print(perf.currentFps(), 1);
+
+    display.setCursor(3, 40);
     display.print("OLED  I2C");
     display.setCursor(70, 40);
     display.printf("0x%02X", OLED_ADDR);

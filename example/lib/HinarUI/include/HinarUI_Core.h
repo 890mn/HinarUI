@@ -27,6 +27,8 @@ public:
 
     String getFlowSpeed();
     int getStepCount() const { return config.stepCount; }
+    bool isDeveloperModeEnabled() const { return developerModeEnabled; }
+    void setDeveloperMode(bool enabled) { developerModeEnabled = enabled; }
 
 private:
     friend class MenuAnimator;
@@ -61,6 +63,7 @@ private:
     ModuleVisual IconTrans {0, 25, 20, 30, "INIT"};
 
     MenuState currentState = MenuState::Idle;
+    bool developerModeEnabled = true;
 
     String stateToString();
     void draw(int offset, bool init, bool isForward);

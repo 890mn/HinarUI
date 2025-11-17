@@ -183,7 +183,7 @@ void Menu::drawFrame() {
 }
 
 void Menu::drawTopBar(String page, String ui) {
-    renderer.drawTopBar(page, ui);
+    renderer.drawTopBar(page, developerModeEnabled ? perf.fpsLabel() : ui);
 }
 
 String Menu::getFlowSpeed() {

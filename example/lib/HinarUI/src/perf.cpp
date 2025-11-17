@@ -26,6 +26,8 @@ void PerfMonitor::loop() {
 
     if (hasFrame) {
         float fps = avgFrameMs > 0.0f ? (1000.0f / avgFrameMs) : 0.0f;
+        currentFps_ = fps;
+        fpsLabel_ = String(fps, 1) + "fps";
         Serial.print(F("[PERF] pixels="));
         Serial.print(lastPixels);
         Serial.print(F(" frame_ms="));

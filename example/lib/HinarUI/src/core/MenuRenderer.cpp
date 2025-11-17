@@ -8,7 +8,7 @@ MenuRenderer::MenuRenderer(Menu& owner) : menu_(owner) {}
 
 void MenuRenderer::drawMenu(int offset, bool init, bool isForward) {
     display.clearDisplay();
-    drawTopBar(PAGE_NAME, UI_NAME);
+    drawTopBar(PAGE_NAME, menu_.isDeveloperModeEnabled() ? perf.fpsLabel() : UI_NAME);
     if (isForward) {
         drawForwardModules(offset, init);
     } else {
