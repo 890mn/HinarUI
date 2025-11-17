@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "modules/module_oled.h"
+#include "perf.h"
 
 FrameBufferManager::FrameBufferManager(HinarUIDisplay& display)
     : display_(display) {
@@ -24,12 +25,13 @@ void FrameBufferManager::endFrame() {
     const size_t byteCount = width * pages;
 
     memcpy(frontBuffer_.data(), backBuffer, byteCount);
-    display_.display();
+    display_.commitFrame();
 
     lastPixelCount_ = width * height;
     lastFrameMs_ = millis() - frameStartMs_;
     coveragePercent_ = totalPixels_ ? (100.0f * lastPixelCount_) / totalPixels_ : 0.0f;
     fullRefreshRequested_ = false;
+    perf.onFrame(lastFrameMs_, lastPixelCount_, coveragePercent_);
 }
 
 void FrameBufferManager::forceFullRefresh() {
