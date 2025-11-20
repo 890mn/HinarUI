@@ -30,6 +30,7 @@ void Menu::loop() {
     static int prevKeyCycleState = HIGH;
     static int prevKeyBackState  = HIGH;
     static int prevKeyOffState   = HIGH;
+    static unsigned long lastIdleRefresh = 0;
 
     static MenuState previousState = MenuState::Idle;
     currentTime = millis();
@@ -68,7 +69,15 @@ void Menu::loop() {
 
         switch (currentState) {
             case MenuState::Idle:
-                frameBuffer.setTargetFps(10);
+                frameBuffer.setTargetFps(5);
+                if (millis() - lastIdleRefresh >= 100) {
+                    frameBuffer.beginFrame();
+                    display.fillRoundRect(80, 2, 46, 12, 0, UNSELECTED_COLOR);
+                    renderer.drawTopBar(PAGE_NAME, developerModeEnabled ? perf.fpsLabel() : UI_NAME);
+                    renderer.drawFrame();
+                    frameBuffer.endFrame();
+                    lastIdleRefresh = millis();
+                }
                 if (keyEnterState == LOW && forwardPointer == config.moduleForward) {
                     isBackward = true;
                     frameBuffer.beginFrame();
