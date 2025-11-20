@@ -27,7 +27,7 @@ void MenuRenderer::drawFrame() const {
     display.drawLine(0  , 40, 0  , 63, SELECTED_COLOR); // LEFT   2
     display.drawLine(127, 16, 127, 63, SELECTED_COLOR); // RIGHT  2
     display.drawLine(0  , 63, 30 , 63, SELECTED_COLOR); // BOTTOM 2-1
-    display.drawLine(105, 63, 127, 63, SELECTED_COLOR); // BOTTOM 2-2
+    display.drawLine(115, 63, 127, 63, SELECTED_COLOR); // BOTTOM 2-2
 }
 
 void MenuRenderer::drawTopBar(const String& page, const String& ui) {

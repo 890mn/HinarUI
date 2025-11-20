@@ -46,7 +46,7 @@ void module_UICORE() {
 void module_github() {
     frameBuffer.beginFrame();
     display.clearDisplay();
-    menu.drawTopBar("VER_REFACTOR", "0.4");
+    menu.drawTopBar("REFACTOR", "0.4");
     menu.drawFrame();
 
     display.setTextSize(2);
@@ -75,19 +75,9 @@ void module_ABOUT() {
     display.print(menu.getFlowSpeed());
 
     display.setCursor(3, 30);
-    display.print("STEP_COUNT");
+    display.print("DEV  MODE");
     display.setCursor(70, 30);
-    display.print(menu.getStepCount());
-
-    display.setCursor(3, 40);
-    display.print("DEV MODE");
-    display.setCursor(70, 40);
     display.print(menu.isDeveloperModeEnabled() ? "ON" : "OFF");
-
-    display.setCursor(3, 50);
-    display.print("FPS");
-    display.setCursor(70, 50);
-    display.print(perf.currentFps(), 1);
 
     display.setCursor(3, 40);
     display.print("OLED  I2C");
