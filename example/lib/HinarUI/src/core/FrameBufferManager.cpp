@@ -24,25 +24,31 @@ FrameBufferManager::FrameBufferManager(HinarUIDisplay& display)
             uint32_t lastDisplayMs = millis();
             for (;;) {
                 FrameRequest req{};
-                if (mgr->dequeueFrame(req) && req.buffer) {
+                bool hasFrame = mgr->dequeueFrame(req) && req.buffer;
+
+                uint32_t nowMs = millis();
+                uint32_t frameMs = nowMs - lastDisplayMs;
+                lastDisplayMs = nowMs;
+
+                if (hasFrame) {
                     mgr->display_.useExternalBuffer(req.buffer);
                     if (req.full) {
                         mgr->display_.commitFrame();
                     } else {
                         mgr->display_.flushRegion(req.x, req.y, req.w, req.h, req.buffer);
                     }
-
-                    uint32_t nowMs = millis();
-                    uint32_t frameMs = nowMs - lastDisplayMs;
-                    lastDisplayMs = nowMs;
-                    mgr->lastFrameMs_ = frameMs;
                     mgr->lastPixelCount_ = req.full ? mgr->totalPixels_ : (req.w * req.h);
                     mgr->coveragePercent_ = mgr->totalPixels_ ? (100.0f * mgr->lastPixelCount_) / mgr->totalPixels_ : 0.0f;
-                    ++mgr->frameCounter_;
-                    perf.onFrame(frameMs, mgr->lastPixelCount_, mgr->coveragePercent_);
-
                     mgr->display_.releaseFrameBuffer(req.buffer);
+                } else {
+                    mgr->lastPixelCount_ = 0;
+                    mgr->coveragePercent_ = 0.0f;
                 }
+
+                mgr->lastFrameMs_ = frameMs;
+                ++mgr->frameCounter_;
+                perf.onFrame(frameMs, mgr->lastPixelCount_, mgr->coveragePercent_);
+
                 TickType_t period = pdMS_TO_TICKS(1000 / mgr->targetFps_);
                 vTaskDelayUntil(&last, period);
             }

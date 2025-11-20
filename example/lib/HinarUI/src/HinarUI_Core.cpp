@@ -21,6 +21,7 @@ Menu menu;
 
 void Menu::create() {
     if (!board_init()) return;
+    frameBuffer.setTargetFps(60);
     draw(0, true, true);
 }
 
@@ -67,6 +68,7 @@ void Menu::loop() {
 
         switch (currentState) {
             case MenuState::Idle:
+                frameBuffer.setTargetFps(10);
                 if (keyEnterState == LOW && forwardPointer == config.moduleForward) {
                     isBackward = true;
                     frameBuffer.beginFrame();
@@ -85,10 +87,12 @@ void Menu::loop() {
                 break;
 
             case MenuState::Forward:
+                frameBuffer.setTargetFps(60);
                 animator.renderDynamic(keyCycleState, true);
                 break;
 
             case MenuState::Backward:
+                frameBuffer.setTargetFps(60);
                 if (keyEnterState == LOW) {
                     isUP = true;
                     while (keyEnterState == LOW) {
@@ -100,6 +104,7 @@ void Menu::loop() {
                 break;
 
             case MenuState::BackwardSelected:
+                frameBuffer.setTargetFps(60);
                 animator.renderDynamic(keyCycleState, false);
                 if (keyBackState == LOW) {
                     frameBuffer.beginFrame();
@@ -118,6 +123,7 @@ void Menu::loop() {
                 break;
 
             case MenuState::Module: {
+                frameBuffer.setTargetFps(30);
                 static unsigned long lastUpdateTime = 0;
                 unsigned long now = millis();
                 if (now - lastUpdateTime >= 1000) {
