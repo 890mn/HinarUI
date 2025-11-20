@@ -38,6 +38,7 @@ private:
     float coveragePercent_ = 0.0f;
     uint32_t totalPixels_ = 0;
     uint32_t frameCounter_ = 0;
+    uint8_t* drawingBuffer_ = nullptr;
 
 #if defined(ARDUINO_ARCH_ESP32)
     void* frameQueue_ = nullptr;  // QueueHandle_t*

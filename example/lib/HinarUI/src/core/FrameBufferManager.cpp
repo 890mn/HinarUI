@@ -1,4 +1,4 @@
-#include "HinarUI/core/FrameBufferManager.h"
+  #include "HinarUI/core/FrameBufferManager.h"
 
 #include <string.h>
 
@@ -51,23 +51,21 @@ FrameBufferManager::FrameBufferManager(HinarUIDisplay& display)
 
 void FrameBufferManager::beginFrame() {
     frameStartMs_ = millis();
+    drawingBuffer_ = acquireBackBuffer();
+    if (drawingBuffer_) {
+        display_.useExternalBuffer(drawingBuffer_);
+    }
 }
 
 void FrameBufferManager::endFrame() {
-    uint8_t* backBuffer = display_.getBuffer();
-    if (!backBuffer) return;
-
-    uint8_t* frameCopy = display_.acquireFrameBuffer();
-    if (frameCopy && frameCopy != backBuffer) {
-        const int16_t width = display_.width();
-        const int16_t height = display_.height();
-        const int16_t pages = (height + 7) / 8;
-        const size_t byteCount = width * pages;
-        memcpy(frameCopy, backBuffer, byteCount);
+    uint8_t* backBuffer = drawingBuffer_ ? drawingBuffer_ : display_.getBuffer();
+    if (!backBuffer) {
+        drawingBuffer_ = nullptr;
+        return;
     }
 
-    // 若无法拿到独立缓冲，直接同步刷屏（避免显示任务读取被改写的数据）
-    if (!frameCopy || frameCopy == backBuffer) {
+    // 如果当前缓冲不是外部独立缓冲，则直接推屏
+    if (backBuffer == display_.getBuffer()) {
         const int16_t width = display_.width();
         const int16_t height = display_.height();
         display_.commitFrame();
@@ -77,11 +75,11 @@ void FrameBufferManager::endFrame() {
         fullRefreshRequested_ = false;
         ++frameCounter_;
         perf.onFrame(lastFrameMs_, lastPixelCount_, coveragePercent_);
-        return;
+    } else {
+        submitFrame(backBuffer);
+        fullRefreshRequested_ = false;
     }
-
-    submitFrame(frameCopy);
-    fullRefreshRequested_ = false;
+    drawingBuffer_ = nullptr;
 }
 
 void FrameBufferManager::forceFullRefresh() {
