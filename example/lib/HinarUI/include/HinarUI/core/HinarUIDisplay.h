@@ -17,6 +17,7 @@ public:
     // Frame pool helpers
     uint8_t* acquireFrameBuffer();
     void releaseFrameBuffer(uint8_t* buf);
+    void useExternalBuffer(uint8_t* buf) { if (buf) buffer = buf; }
 
 private:
     void freeBuffers();

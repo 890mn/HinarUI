@@ -8,6 +8,7 @@
 #if defined(ARDUINO_ARCH_ESP32)
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
+#include <freertos/task.h>
 #endif
 
 FrameBufferManager::FrameBufferManager(HinarUIDisplay& display)
@@ -16,6 +17,33 @@ FrameBufferManager::FrameBufferManager(HinarUIDisplay& display)
     totalPixels_ = display_.width() * display_.height();
 #if defined(ARDUINO_ARCH_ESP32)
     frameQueue_ = xQueueCreate(8, sizeof(uint8_t*));
+    xTaskCreatePinnedToCore(
+        [](void* param) {
+            FrameBufferManager* mgr = static_cast<FrameBufferManager*>(param);
+            const TickType_t period = pdMS_TO_TICKS(1000 / 60);
+            TickType_t last = xTaskGetTickCount();
+            uint32_t lastDisplayMs = millis();
+            for (;;) {
+                uint8_t* nextBuf = nullptr;
+                if (mgr->dequeueFrame(nextBuf) && nextBuf) {
+                    mgr->display_.useExternalBuffer(nextBuf);
+                    mgr->display_.commitFrame();
+
+                    uint32_t nowMs = millis();
+                    uint32_t frameMs = nowMs - lastDisplayMs;
+                    lastDisplayMs = nowMs;
+                    mgr->lastFrameMs_ = frameMs;
+                    mgr->lastPixelCount_ = mgr->totalPixels_;
+                    mgr->coveragePercent_ = 100.0f;
+                    ++mgr->frameCounter_;
+                    perf.onFrame(frameMs, mgr->lastPixelCount_, mgr->coveragePercent_);
+
+                    mgr->display_.releaseFrameBuffer(nextBuf);
+                }
+                vTaskDelayUntil(&last, period);
+            }
+        },
+        "disp_task", 2048, this, 2, nullptr, 0);
 #else
     pendingValid_ = false;
 #endif
@@ -29,20 +57,31 @@ void FrameBufferManager::endFrame() {
     uint8_t* backBuffer = display_.getBuffer();
     if (!backBuffer) return;
 
-    const int16_t width = display_.width();
-    const int16_t height = display_.height();
-    const int16_t pages = (height + 7) / 8;
-    const size_t byteCount = width * pages;
+    uint8_t* frameCopy = display_.acquireFrameBuffer();
+    if (frameCopy && frameCopy != backBuffer) {
+        const int16_t width = display_.width();
+        const int16_t height = display_.height();
+        const int16_t pages = (height + 7) / 8;
+        const size_t byteCount = width * pages;
+        memcpy(frameCopy, backBuffer, byteCount);
+    }
 
-    memcpy(frontBuffer_.data(), backBuffer, byteCount);
-    display_.commitFrame();
+    // 若无法拿到独立缓冲，直接同步刷屏（避免显示任务读取被改写的数据）
+    if (!frameCopy || frameCopy == backBuffer) {
+        const int16_t width = display_.width();
+        const int16_t height = display_.height();
+        display_.commitFrame();
+        lastPixelCount_ = width * height;
+        lastFrameMs_ = millis() - frameStartMs_;
+        coveragePercent_ = totalPixels_ ? (100.0f * lastPixelCount_) / totalPixels_ : 0.0f;
+        fullRefreshRequested_ = false;
+        ++frameCounter_;
+        perf.onFrame(lastFrameMs_, lastPixelCount_, coveragePercent_);
+        return;
+    }
 
-    lastPixelCount_ = width * height;
-    lastFrameMs_ = millis() - frameStartMs_;
-    coveragePercent_ = totalPixels_ ? (100.0f * lastPixelCount_) / totalPixels_ : 0.0f;
+    submitFrame(frameCopy);
     fullRefreshRequested_ = false;
-    perf.onFrame(lastFrameMs_, lastPixelCount_, coveragePercent_);
-    ++frameCounter_;
 }
 
 void FrameBufferManager::forceFullRefresh() {

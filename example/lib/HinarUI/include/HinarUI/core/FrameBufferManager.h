@@ -40,10 +40,6 @@ private:
     uint32_t frameCounter_ = 0;
 
 #if defined(ARDUINO_ARCH_ESP32)
-    void initQueue();
-    void releaseFrame(uint8_t* buf);
-    void initializeOnce();
-    bool initialized_ = false;
     void* frameQueue_ = nullptr;  // QueueHandle_t*
 #else
     uint8_t* pendingFrame_ = nullptr;
