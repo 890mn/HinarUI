@@ -132,3 +132,21 @@ void HinarUIDisplay::freeBuffers() {
     }
     usingPSRAM_ = false;
 }
+
+uint8_t* HinarUIDisplay::acquireFrameBuffer() {
+    if (usingPSRAM_) {
+        uint8_t* buf = static_cast<uint8_t*>(allocatePsram(bufferSize_));
+        if (buf) {
+            memcpy(buf, buffer, bufferSize_);
+            return buf;
+        }
+    }
+    return buffer;
+}
+
+void HinarUIDisplay::releaseFrameBuffer(uint8_t* buf) {
+    if (!buf) return;
+    if (usingPSRAM_ && buf != buffer && buf != buffers_[0] && buf != buffers_[1]) {
+        freePsram(buf);
+    }
+}

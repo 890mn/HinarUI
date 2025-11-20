@@ -14,6 +14,10 @@ public:
     void flushRegion(int16_t x, int16_t y, int16_t width, int16_t height,
                      const uint8_t* sourceBuffer);
 
+    // Frame pool helpers
+    uint8_t* acquireFrameBuffer();
+    void releaseFrameBuffer(uint8_t* buf);
+
 private:
     void freeBuffers();
 
