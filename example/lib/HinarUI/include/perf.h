@@ -14,7 +14,7 @@ public:
 
 private:
     float currentFps_ = 0.0f;
-    String fpsLabel_ = "N/A";
+    String fpsLabel_ = "0.0FPS";
     float avgCoverage_ = 0.0f;
 };
 

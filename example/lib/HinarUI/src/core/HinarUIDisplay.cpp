@@ -31,6 +31,8 @@ bool HinarUIDisplay::begin(uint8_t switchvcc, uint8_t i2caddr, bool reset,
     bool ok = Adafruit_SSD1306::begin(switchvcc, i2caddr, reset, periphBegin);
     if (!ok) return false;
 
+    Adafruit_SSD1306::wireClk = 3400000;
+
     uint8_t* defaultBuffer = buffer;
     freeBuffers();
     bufferSize_ = WIDTH * ((HEIGHT + 7) / 8);
