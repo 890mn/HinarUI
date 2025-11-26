@@ -35,7 +35,7 @@ void PerfMonitor::begin() {
     coverageAccum = 0.0f;
     lastPixels = 0;
     lastFrameMsValue = 0.0f;
-    fpsLabel_ = "N/A";
+    fpsLabel_ = "0.0";
     currentFps_ = 0.0f;
     gPerf = this;
 
@@ -64,7 +64,7 @@ void PerfMonitor::begin() {
 
                         char buf[16];
                         dtostrf(gPerf->currentFps_, 0, 1, buf);
-                        gPerf->fpsLabel_ = String(buf) + "fps";
+                        gPerf->fpsLabel_ = String(buf) + "FPS";
                         gPerf->avgCoverage_ = avgCoverage;
                     }
 
@@ -93,7 +93,7 @@ void PerfMonitor::loop() {
 
         char buf[16];
         dtostrf(currentFps_, 0, 1, buf);
-        fpsLabel_ = String(buf) + "fps";
+        fpsLabel_ = String(buf) + "FPS";
 
         lastWindowStart = now;
         framesInWindow = 0;

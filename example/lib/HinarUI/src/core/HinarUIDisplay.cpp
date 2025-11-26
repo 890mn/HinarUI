@@ -31,6 +31,8 @@ bool HinarUIDisplay::begin(uint8_t switchvcc, uint8_t i2caddr, bool reset,
     bool ok = Adafruit_SSD1306::begin(switchvcc, i2caddr, reset, periphBegin);
     if (!ok) return false;
 
+    Adafruit_SSD1306::wireClk = 3400000;
+
     uint8_t* defaultBuffer = buffer;
     freeBuffers();
     bufferSize_ = WIDTH * ((HEIGHT + 7) / 8);
@@ -131,4 +133,22 @@ void HinarUIDisplay::freeBuffers() {
         }
     }
     usingPSRAM_ = false;
+}
+
+uint8_t* HinarUIDisplay::acquireFrameBuffer() {
+    if (usingPSRAM_) {
+        uint8_t* buf = static_cast<uint8_t*>(allocatePsram(bufferSize_));
+        if (buf) {
+            memcpy(buf, buffer, bufferSize_);
+            return buf;
+        }
+    }
+    return buffer;
+}
+
+void HinarUIDisplay::releaseFrameBuffer(uint8_t* buf) {
+    if (!buf) return;
+    if (usingPSRAM_ && buf != buffer && buf != buffers_[0] && buf != buffers_[1]) {
+        freePsram(buf);
+    }
 }
