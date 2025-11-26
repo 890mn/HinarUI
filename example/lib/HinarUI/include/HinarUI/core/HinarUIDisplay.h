@@ -19,6 +19,9 @@ public:
     void releaseFrameBuffer(uint8_t* buf);
     void useExternalBuffer(uint8_t* buf) { if (buf) buffer = buf; }
 
+    void setDisplayPower(bool on);
+    bool isDisplayOn() const { return displayOn_; }
+
 private:
     void freeBuffers();
 
@@ -26,6 +29,7 @@ private:
     size_t bufferSize_ = 0;
     uint8_t activeIndex_ = 0;
     bool usingPSRAM_ = false;
+    bool displayOn_ = true;
 };
 
 #endif

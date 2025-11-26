@@ -41,26 +41,25 @@ void Menu::loop() {
         int keyBackState  = digitalRead(KEY_BACK);
         int keyOffState   = digitalRead(KEY_OFF);
 
-        if (keyEnterState != prevKeyEnterState) {
-            //Serial.print("Enter Status Changed: ");
-            //Serial.println(keyEnterState == 0 ? "Pressed" : "Exited");
-            prevKeyEnterState = keyEnterState;
+        // OFF 键：单击切换息屏/唤醒
+        if (keyOffState == LOW && prevKeyOffState == HIGH) {
+            if (currentState == MenuState::Sleep) {
+                display.setDisplayPower(true);
+                frameBuffer.forceFullRefresh();
+                lastIdleRefresh = 0;
+                currentState = MenuState::Idle;
+            } else {
+                currentState = MenuState::Sleep;
+                display.setDisplayPower(false);
+                frameBuffer.setTargetFps(1);
+            }
         }
-        if (keyCycleState != prevKeyCycleState) {
-            //Serial.print("Cycle Status Changed: ");
-            //Serial.println(keyCycleState == 0 ? "Pressed" : "Exited");
-            prevKeyCycleState = keyCycleState;
-        }
-        if (keyBackState != prevKeyBackState) {
-            //Serial.print("Back Status Changed: ");
-            //Serial.println(keyBackState == 0 ? "Pressed" : "Exited");
-            prevKeyBackState = keyBackState;
-        }
-        if (keyOffState != prevKeyOffState) {
-            //Serial.print("Off Status Changed: ");
-            //Serial.println(keyOffState == 0 ? "Pressed" : "Exited");
-            prevKeyOffState = keyOffState;
-        }
+
+        prevKeyEnterState = keyEnterState;
+        prevKeyCycleState = keyCycleState;
+        prevKeyBackState  = keyBackState;
+        prevKeyOffState   = keyOffState;
+
         if (currentState != previousState) {
             Serial.print("State Changed to: ");
             Serial.println(stateToString());
@@ -131,6 +130,10 @@ void Menu::loop() {
                 }
                 break;
 
+            case MenuState::Sleep:
+                frameBuffer.setTargetFps(1);
+                break;
+
             case MenuState::Module: {
                 frameBuffer.setTargetFps(30);
                 static unsigned long lastUpdateTime = 0;
@@ -175,8 +178,6 @@ void Menu::loop() {
                         keyCycleState = digitalRead(KEY_CYCLE);
                         delay(3);
                     }
-                    //Serial.println(i_back);
-                    //Serial.println(module_UICORE_page);
                     if (i_back == backwardPointer) {
                         module_UICORE_page = (module_UICORE_page + 1) % module_UICORE_totalPages;
                     }
@@ -212,6 +213,7 @@ String Menu::stateToString() {
         case MenuState::Backward:          return "BACKWARD";
         case MenuState::BackwardSelected:  return "BACKWARD_SELECTED";
         case MenuState::Module:            return "MODULE";
+        case MenuState::Sleep:             return "SLEEP";
     }
     return "ERROR";
 }

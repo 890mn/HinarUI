@@ -53,6 +53,7 @@ bool HinarUIDisplay::begin(uint8_t switchvcc, uint8_t i2caddr, bool reset,
         freeBuffers();
         buffer = defaultBuffer;
     }
+    displayOn_ = true;
     return true;
 }
 
@@ -151,4 +152,13 @@ void HinarUIDisplay::releaseFrameBuffer(uint8_t* buf) {
     if (usingPSRAM_ && buf != buffer && buf != buffers_[0] && buf != buffers_[1]) {
         freePsram(buf);
     }
+}
+
+void HinarUIDisplay::setDisplayPower(bool on) {
+    if (on) {
+        ssd1306_command(SSD1306_DISPLAYON);
+    } else {
+        ssd1306_command(SSD1306_DISPLAYOFF);
+    }
+    displayOn_ = on;
 }
