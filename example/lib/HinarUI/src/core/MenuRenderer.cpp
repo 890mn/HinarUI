@@ -46,18 +46,18 @@ void MenuRenderer::drawSleepScreen(int percent, float voltage, bool charging, bo
     display.setTextSize(1);
     display.setTextColor(SELECTED_COLOR);
 
-    display.setCursor(7, 10);
+    display.setCursor(7, 12);
     display.setTextSize(2);
     display.print("HinarUI");
     display.setTextSize(1);
 
-    int bx = 95, by = 10, bw = 12, bh = 6;
+    int bx = 95, by = 12, bw = 12, bh = 6;
     display.drawRect(bx, by, bw, bh, SELECTED_COLOR);
     display.fillRect(bx + bw, by + bh / 4, 2, bh / 2, SELECTED_COLOR);
     int miniFill = (bw - 2) * percent / 100;
     display.fillRect(bx + 1, by + 1, miniFill, bh - 2, SELECTED_COLOR);
 
-    display.setCursor(95, 17);
+    display.setCursor(95, 19);
     display.print("zzz..");
     
     int segCount = 8;
@@ -65,38 +65,49 @@ void MenuRenderer::drawSleepScreen(int percent, float voltage, bool charging, bo
     int lineY = 2;
     int lineW = 128;
     int segW = lineW / segCount;
+    int thickness = 1 + (millis() % 3);  // 1~3px 随时间抖动厚度
     for (int i = 0; i < segCount; ++i) {
         int sx = lineX + i * segW;
         int ex = (i == segCount - 1) ? (lineX + lineW) : (sx + segW - 3);
         int threshold = (i + 1) * 100 / segCount;
         bool on = percent >= threshold;
-        display.drawLine(sx, lineY, ex, lineY, on ? SELECTED_COLOR : UNSELECTED_COLOR);
+        if (on) {
+            display.fillRect(sx, lineY, ex - sx, thickness, SELECTED_COLOR);
+        } else {
+            display.drawRect(sx, lineY, ex - sx, thickness, UNSELECTED_COLOR);
+        }
     }
 
     // Status list
     auto drawStatus = [&](int x, int y, const char* label, bool on) {
         display.setCursor(x, y);
-        display.print(label);
         int16_t x1, y1;
         uint16_t w, h;
         display.getTextBounds(label, x, y, &x1, &y1, &w, &h);
-        int dotX = x + w + 5;
+        int dotX = x - 6;
         int dotY = y + h / 2 - 1;
         if (on) {
             display.fillCircle(dotX, dotY, 2, SELECTED_COLOR);
+            display.print(label);
         } else {
             display.drawCircle(dotX, dotY, 2, UNSELECTED_COLOR);
         }
     };
-    drawStatus(7, 31, "CHARGING", charging);
+    drawStatus(14, 31, "CHARGING", charging);
     drawStatus(80, 31, "FULL", full);
 
     // SHT30 line
-    display.setCursor(7, 53);
-    if (!isnan(temp) && !isnan(hum)) {
-        display.printf("T:%.1fC H:%.1f%%", temp, hum);
+    display.setCursor(7, 43);
+    if (!isnan(temp)) {
+        display.printf("Temp:%.1fC", temp);
     } else {
-        display.print("T:--.-C H:--.-%");
+        display.print("Temp:--.-C");
+    }
+    display.setCursor(7, 54);
+    if (!isnan(hum)) {
+        display.printf("Humi:%.1f%%", hum);
+    } else {
+        display.print("Humi:--.-%");
     }
 
     display.display();

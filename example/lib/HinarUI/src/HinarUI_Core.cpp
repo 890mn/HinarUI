@@ -58,34 +58,34 @@ void Menu::loop() {
 
         // OFF 键：单击切换息屏/唤醒
         if (keyOffState == LOW && prevKeyOffState == HIGH) {
-            Serial.println("[OFF] button pressed.");
+            //Serial.println("[OFF] button pressed.");
             if (currentState == MenuState::Sleep) {
-                Serial.println("[OFF] Waking up from Sleep mode.");
+                //Serial.println("[OFF] Waking up from Sleep mode.");
                 currentState = stateBeforeSleep;
                 if (stateBeforeSleep == MenuState::Module) {
-                    Serial.println("[OFF] Refreshing Module screen upon wakeup.");
+                    //Serial.println("[OFF] Refreshing Module screen upon wakeup.");
                     int targetIndex = forwardPointer != config.moduleForward ? forwardPointer : i_back;
                     if (auto handler = registry.handler(targetIndex)) {
                         frameBuffer.forceFullRefresh();
                         handler();
                     }
                 } else {
-                    Serial.println("[OFF] Waking up from OTHER.");
+                    //Serial.println("[OFF] Waking up from OTHER.");
                     display.setDisplayPower(true);
                     frameBuffer.forceFullRefresh();
                 }
             } else {
-                Serial.println("[OFF] Entering Sleep mode.");
+                //Serial.println("[OFF] Entering Sleep mode.");
                 stateBeforeSleep = currentState;
                 if (currentState == MenuState::Module) {
-                    Serial.println("[OFF] Drawing Sleep screen.");
+                    //Serial.println("[OFF] Drawing Sleep screen.");
                     auto bat = batteryReadStatus(millis(), 0, true);
                     auto sht = sht30ReadStatus(millis(), 0, true);
                     frameBuffer.beginFrame();
-                    renderer.drawSleepScreen(bat.percent, bat.voltage, false, bat.percent >= 95, sht.temp, sht.hum);
+                    renderer.drawSleepScreen(bat.percent, bat.voltage, bat.charging, bat.percent >= 100, sht.temp, sht.hum);
                     frameBuffer.endFrame(); 
                 } else {
-                    Serial.println("[OFF] Turning off display.");
+                    //Serial.println("[OFF] Turning off display.");
                     display.setDisplayPower(false);
                 }
                 currentState = MenuState::Sleep;
@@ -176,7 +176,7 @@ void Menu::loop() {
                     auto bat = batteryReadStatus(millis(), 0, true);
                     auto sht = sht30ReadStatus(millis(), 0, true);
                     frameBuffer.beginFrame();
-                    renderer.drawSleepScreen(bat.percent, bat.voltage, false, bat.percent >= 95, sht.temp, sht.hum);
+                    renderer.drawSleepScreen(bat.percent, bat.voltage, bat.charging, bat.percent >= 100, sht.temp, sht.hum);
                     frameBuffer.endFrame();
                     lastSleepUpdate = millis();
                 }

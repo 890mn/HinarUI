@@ -4,6 +4,7 @@
 struct BatteryStatus {
     float voltage;
     int percent;
+    bool charging;
 };
 
 float readBatteryVoltage();
