@@ -41,6 +41,67 @@ void MenuRenderer::drawTopBar(const String& page, const String& ui) {
     display.print(ui);
 }
 
+void MenuRenderer::drawSleepScreen(int percent, float voltage, bool charging, bool full, float temp, float hum) {
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SELECTED_COLOR);
+
+    display.setCursor(7, 10);
+    display.setTextSize(2);
+    display.print("HinarUI");
+    display.setTextSize(1);
+
+    int bx = 95, by = 10, bw = 12, bh = 6;
+    display.drawRect(bx, by, bw, bh, SELECTED_COLOR);
+    display.fillRect(bx + bw, by + bh / 4, 2, bh / 2, SELECTED_COLOR);
+    int miniFill = (bw - 2) * percent / 100;
+    display.fillRect(bx + 1, by + 1, miniFill, bh - 2, SELECTED_COLOR);
+
+    display.setCursor(95, 17);
+    display.print("zzz..");
+    
+    int segCount = 8;
+    int lineX = 3;
+    int lineY = 2;
+    int lineW = 128;
+    int segW = lineW / segCount;
+    for (int i = 0; i < segCount; ++i) {
+        int sx = lineX + i * segW;
+        int ex = (i == segCount - 1) ? (lineX + lineW) : (sx + segW - 3);
+        int threshold = (i + 1) * 100 / segCount;
+        bool on = percent >= threshold;
+        display.drawLine(sx, lineY, ex, lineY, on ? SELECTED_COLOR : UNSELECTED_COLOR);
+    }
+
+    // Status list
+    auto drawStatus = [&](int x, int y, const char* label, bool on) {
+        display.setCursor(x, y);
+        display.print(label);
+        int16_t x1, y1;
+        uint16_t w, h;
+        display.getTextBounds(label, x, y, &x1, &y1, &w, &h);
+        int dotX = x + w + 5;
+        int dotY = y + h / 2 - 1;
+        if (on) {
+            display.fillCircle(dotX, dotY, 2, SELECTED_COLOR);
+        } else {
+            display.drawCircle(dotX, dotY, 2, UNSELECTED_COLOR);
+        }
+    };
+    drawStatus(7, 31, "CHARGING", charging);
+    drawStatus(80, 31, "FULL", full);
+
+    // SHT30 line
+    display.setCursor(7, 53);
+    if (!isnan(temp) && !isnan(hum)) {
+        display.printf("T:%.1fC H:%.1f%%", temp, hum);
+    } else {
+        display.print("T:--.-C H:--.-%");
+    }
+
+    display.display();
+}
+
 void MenuRenderer::drawSelectedModule(ModuleVisual& icon) {
     icon.width = 30;
     display.drawRoundRect(icon.x, icon.y, icon.width, icon.height, menu_.config.radiusRect, SELECTED_COLOR);

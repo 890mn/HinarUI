@@ -3,11 +3,15 @@
 
 #include "HinarUI/core/FilteredValue.h"
 #include "HinarUI/core/FrameBufferManager.h"
+#include "modules/module_sht30.h"
 
 Adafruit_SHT31 SHT = Adafruit_SHT31(&Wire1);
 
 static FilteredValue tempFilter(0.2f, 0.05f);
 static FilteredValue humFilter(0.5f, 0.1f);
+static float lastTemp = NAN;
+static float lastHum = NAN;
+static unsigned long lastReadMs = 0;
 
 bool SHT30_Setup(void) {
 #if defined(BOARD_ESP_WROVER_KIT)
@@ -54,5 +58,20 @@ void module_SHT30() {
     display.setCursor(93, 39);
     display.print("%");
 
+    if (!isnan(t)) lastTemp = t;
+    if (!isnan(h)) lastHum = h;
+
     frameBuffer.endFrame();
+}
+
+float SHT30_LastTemp() { return lastTemp; }
+float SHT30_LastHum() { return lastHum; }
+
+Sht30Status sht30ReadStatus(unsigned long now, unsigned long intervalMs, bool force) {
+    if (force || now - lastReadMs >= intervalMs) {
+        lastTemp = tempFilter.update(SHT.readTemperature());
+        lastHum = humFilter.update(SHT.readHumidity());
+        lastReadMs = now;
+    }
+    return {lastTemp, lastHum};
 }

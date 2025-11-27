@@ -54,6 +54,7 @@ private:
     bool   isAnimating         = false;
     bool   isBackward          = false;
     bool   isUP                = false;
+    MenuState stateBeforeSleep = MenuState::Idle;
 
     int    currentTime         = 0;
     int    CyclePress          = 0;

@@ -3,6 +3,21 @@
 String PAGE_NAME = "FORWARD";
 String UI_NAME   = "HinarUI";
 
+namespace {
+float readBatteryVoltageSleep() {
+    int raw = analogRead(VBAT_PIN);
+    float voltage = raw * 3.3 / 4095.0 * 2.0 + 0.31;
+    return voltage;
+}
+
+int calcBatteryPercentSleep(float voltage) {
+    float percent = 101.0 / (1 + exp(-20 * (voltage - 3.7)));
+    if (percent > 100) return 100;
+    if (percent < 0) return 0;
+    return static_cast<int>(percent);
+}
+}
+
 Menu::Menu()
     : config(DefaultMenuConfig()),
       registry(),
@@ -43,14 +58,37 @@ void Menu::loop() {
 
         // OFF 键：单击切换息屏/唤醒
         if (keyOffState == LOW && prevKeyOffState == HIGH) {
+            Serial.println("[OFF] button pressed.");
             if (currentState == MenuState::Sleep) {
-                display.setDisplayPower(true);
-                frameBuffer.forceFullRefresh();
-                lastIdleRefresh = 0;
-                currentState = MenuState::Idle;
+                Serial.println("[OFF] Waking up from Sleep mode.");
+                currentState = stateBeforeSleep;
+                if (stateBeforeSleep == MenuState::Module) {
+                    Serial.println("[OFF] Refreshing Module screen upon wakeup.");
+                    int targetIndex = forwardPointer != config.moduleForward ? forwardPointer : i_back;
+                    if (auto handler = registry.handler(targetIndex)) {
+                        frameBuffer.forceFullRefresh();
+                        handler();
+                    }
+                } else {
+                    Serial.println("[OFF] Waking up from OTHER.");
+                    display.setDisplayPower(true);
+                    frameBuffer.forceFullRefresh();
+                }
             } else {
+                Serial.println("[OFF] Entering Sleep mode.");
+                stateBeforeSleep = currentState;
+                if (currentState == MenuState::Module) {
+                    Serial.println("[OFF] Drawing Sleep screen.");
+                    auto bat = batteryReadStatus(millis(), 0, true);
+                    auto sht = sht30ReadStatus(millis(), 0, true);
+                    frameBuffer.beginFrame();
+                    renderer.drawSleepScreen(bat.percent, bat.voltage, false, bat.percent >= 95, sht.temp, sht.hum);
+                    frameBuffer.endFrame(); 
+                } else {
+                    Serial.println("[OFF] Turning off display.");
+                    display.setDisplayPower(false);
+                }
                 currentState = MenuState::Sleep;
-                display.setDisplayPower(false);
                 frameBuffer.setTargetFps(1);
             }
         }
@@ -132,6 +170,16 @@ void Menu::loop() {
 
             case MenuState::Sleep:
                 frameBuffer.setTargetFps(1);
+                static unsigned long lastSleepUpdate = 0;
+                static unsigned long sleepIntervalMs = 5000;
+                if ((millis() - lastSleepUpdate >= sleepIntervalMs) && stateBeforeSleep == MenuState::Module) {
+                    auto bat = batteryReadStatus(millis(), 0, true);
+                    auto sht = sht30ReadStatus(millis(), 0, true);
+                    frameBuffer.beginFrame();
+                    renderer.drawSleepScreen(bat.percent, bat.voltage, false, bat.percent >= 95, sht.temp, sht.hum);
+                    frameBuffer.endFrame();
+                    lastSleepUpdate = millis();
+                }
                 break;
 
             case MenuState::Module: {
@@ -185,6 +233,7 @@ void Menu::loop() {
                 break;
             }
         }
+
     }
 }
 
