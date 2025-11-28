@@ -65,18 +65,22 @@ void MenuRenderer::drawSleepScreen(int percent, float voltage, bool charging, bo
     int lineY = 2;
     int lineW = 128;
     int segW = lineW / segCount;
-    int thickness = 1 + (millis() % 3);  // 1~3px 随时间抖动厚度
-    for (int i = 0; i < segCount; ++i) {
+    static int waveIndex = segCount - 1;  // 初始最后一段为 4px
+    for (int i = segCount - 1; i >= 0; --i) {
+        int thickness = (i == waveIndex) ? 4 : 2;
         int sx = lineX + i * segW;
         int ex = (i == segCount - 1) ? (lineX + lineW) : (sx + segW - 3);
+        int width = ex - sx;
+        if (width < 1) width = 1;
         int threshold = (i + 1) * 100 / segCount;
         bool on = percent >= threshold;
         if (on) {
-            display.fillRect(sx, lineY, ex - sx, thickness, SELECTED_COLOR);
+            display.fillRect(sx, lineY, width, thickness, SELECTED_COLOR);
         } else {
-            display.drawRect(sx, lineY, ex - sx, thickness, UNSELECTED_COLOR);
+            display.drawRect(sx, lineY, width, thickness, UNSELECTED_COLOR);
         }
     }
+    if (--waveIndex < 0) waveIndex = segCount - 1;
 
     // Status list
     auto drawStatus = [&](int x, int y, const char* label, bool on) {
@@ -93,17 +97,17 @@ void MenuRenderer::drawSleepScreen(int percent, float voltage, bool charging, bo
             display.drawCircle(dotX, dotY, 2, UNSELECTED_COLOR);
         }
     };
-    drawStatus(14, 31, "CHARGING", charging);
-    drawStatus(80, 31, "FULL", full);
+    drawStatus(81, 37, "FULL", full);
+    drawStatus(81, 50, "CHARGE", charging);
 
     // SHT30 line
-    display.setCursor(7, 43);
+    display.setCursor(7, 37);
     if (!isnan(temp)) {
         display.printf("Temp:%.1fC", temp);
     } else {
         display.print("Temp:--.-C");
     }
-    display.setCursor(7, 54);
+    display.setCursor(7, 50);
     if (!isnan(hum)) {
         display.printf("Humi:%.1f%%", hum);
     } else {

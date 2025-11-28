@@ -4,12 +4,12 @@
 
 float readBatteryVoltage() {
     int raw = analogRead(VBAT_PIN);
-    float voltage = raw * 3.3 / 4095.0 * 2.0 + 0.31;
+    float voltage = raw * 3.3 / 4095.0 * 2.0 + 0.27;
     return voltage;
 }
 
 int calcBatteryPercent(float voltage) {
-    float percent = 101.0 / (1 + exp(-20 * (voltage - 3.7)));
+    float percent = 100.3 / (1 + exp(-20 * (voltage - 3.7)));
     if (percent > 100) return 100;
     if (percent < 0) return 0;
     return (int)percent;
