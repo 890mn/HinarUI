@@ -64,7 +64,7 @@ private:
     ModuleVisual IconTrans {0, 25, 20, 30, "INIT"};
 
     MenuState currentState = MenuState::Idle;
-    bool developerModeEnabled = true;
+    bool developerModeEnabled = false;
 
     String stateToString();
     void draw(int offset, bool init, bool isForward);

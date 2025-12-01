@@ -36,6 +36,7 @@ Menu menu;
 
 void Menu::create() {
     if (!board_init()) return;
+    if (developerModeEnabled) perf.begin();
     frameBuffer.setTargetFps(60);
     draw(0, true, true);
 }
@@ -226,15 +227,15 @@ void Menu::loop() {
                         keyCycleState = digitalRead(KEY_CYCLE);
                         delay(3);
                     }
-                    if (i_back == backwardPointer) {
+                    if (i_back == backwardPointer + 1) {
                         module_UICORE_page = (module_UICORE_page + 1) % module_UICORE_totalPages;
                     }
                 }
                 break;
             }
         }
-
     }
+    if (developerModeEnabled) perf.loop();
 }
 
 void Menu::draw(int offset, bool init, bool isForward) {

@@ -3,10 +3,8 @@
 
 void setup() {
     menu.create();
-    perf.begin();
 }
 
 void loop() {
     menu.loop();
-    perf.loop();
 }

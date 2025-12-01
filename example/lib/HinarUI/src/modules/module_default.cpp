@@ -4,9 +4,9 @@
 #include "HinarUI/core/FrameBufferManager.h"
 
 int module_UICORE_page = 0;
-const int module_UICORE_totalPages = 2;
+const int module_UICORE_totalPages = 3;
 
-void module_UICORE() {
+void module_PIN() {
     frameBuffer.beginFrame();
     display.clearDisplay();
     Serial.println("UI-CORE module loaded");
@@ -31,29 +31,64 @@ void module_UICORE() {
             display.drawLine(95, 58, 105, 63, SELECTED_COLOR);
             break;
         case 1:
-            display.setCursor(5, 23);
-            display.print("VSCode/PlatformIO");
-            display.setCursor(5, 37);
-            display.print("SSD1306/Adafruit_GFX");
-            display.setCursor(5, 51);
-            display.print("Adafruit_SHT31");
+            display.setTextSize(1);
+            display.setCursor(3, 20);
+            display.print("KEY_OFF");
+            display.setCursor(70, 20);
+            display.print(KEY_OFF);
+
+            display.setCursor(3, 31);
+            display.print("KEY_ENTER");
+            display.setCursor(70, 31);
+            display.print(KEY_ENTER);
+
+            display.setCursor(3, 42);
+            display.print("KEY_CYCLE");
+            display.setCursor(70, 42);
+            display.print(KEY_CYCLE);
+
+            display.setCursor(3, 53);
+            display.print("KEY_BACK");
+            display.setCursor(70, 53);
+            display.print(KEY_BACK);
+            break;
+        case 2:
+            display.setCursor(3, 20);
+            display.print("VBAT");
+            display.setCursor(70, 20);
+            display.print(VBAT_PIN);
+
+            display.setCursor(3, 31);
+            display.print("CHG_SENSE");
+            display.setCursor(70, 31);
+            display.print(CHARGE_SENSE_PIN);
+
+            display.setCursor(3, 42);
+            display.print("COM_TX");
+            display.setCursor(70, 42);
+            display.print(COM_TX_PIN);
+
+            display.setCursor(3, 53);
+            display.print("COM_RX");
+            display.setCursor(70, 53);
+            display.print(COM_RX_PIN);
             break;
     }
     SET_FONT_DEFAULT;
     frameBuffer.endFrame();
 }
 
-void module_github() {
+void module_core() {
     frameBuffer.beginFrame();
     display.clearDisplay();
-    menu.drawTopBar("REFACTOR", "0.4");
+    menu.drawTopBar("RELEASE", "0.4");
     menu.drawFrame();
 
     display.setTextSize(2);
     display.setCursor(8, 25);
     display.print("HinarUI");
 
-    display.drawBitmap(98, 23, bitmap_github, 24, 24, SELECTED_COLOR);
+    display.drawBitmap(98, 23, bitmap_core, 24, 24, SELECTED_COLOR);
     display.setCursor(10, 48);
 
     display.setTextSize(1);
@@ -74,19 +109,19 @@ void module_ABOUT() {
     display.setCursor(70, 20);
     display.print(menu.getFlowSpeed());
 
-    display.setCursor(3, 30);
+    display.setCursor(3, 31);
     display.print("DEV  MODE");
-    display.setCursor(70, 30);
+    display.setCursor(70, 31);
     display.print(menu.isDeveloperModeEnabled() ? "ON" : "OFF");
 
-    display.setCursor(3, 40);
+    display.setCursor(3, 42);
     display.print("OLED  I2C");
-    display.setCursor(70, 40);
+    display.setCursor(70, 42);
     display.printf("0x%02X", OLED_ADDR);
 
-    display.setCursor(3, 50);
+    display.setCursor(3, 53);
     display.print("SHT30 I2C");
-    display.setCursor(70, 50);
+    display.setCursor(70, 53);
     display.printf("0x%02X", SHT30_ADDR);
 
     frameBuffer.endFrame();
