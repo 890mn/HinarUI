@@ -1,17 +1,32 @@
 #include "profile.h"
 #include "HinarUI_Core.h"
+#include "modules/module_vbat.h"
 
 float readBatteryVoltage() {
     int raw = analogRead(VBAT_PIN);
-    float voltage = raw * 3.3 / 4095.0 * 2.0 + 0.25;
+    float voltage = raw * 3.3 / 4095.0 * 2.0 + 0.27;
     return voltage;
 }
 
 int calcBatteryPercent(float voltage) {
-    float percent = 100.0 / (1 + exp(-20 * (voltage - 3.7)));
+    float percent = 100.3 / (1 + exp(-20 * (voltage - 3.7)));
     if (percent > 100) return 100;
     if (percent < 0) return 0;
     return (int)percent;
+}
+
+BatteryStatus batteryReadStatus(unsigned long now, unsigned long intervalMs, bool force) {
+    static unsigned long lastReadMs = 0;
+    static BatteryStatus cached{0.0f, 0, false};
+    constexpr int chargeAdcThreshold = 400;
+    if (force || now - lastReadMs >= intervalMs) {
+        cached.voltage = readBatteryVoltage();
+        cached.percent = calcBatteryPercent(cached.voltage);
+        int chargeAdc = analogRead(CHARGE_SENSE_PIN);
+        cached.charging = chargeAdc > chargeAdcThreshold;
+        lastReadMs = now;
+    }
+    return cached;
 }
 
 void module_battery() {

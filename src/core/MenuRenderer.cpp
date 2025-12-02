@@ -8,7 +8,7 @@ MenuRenderer::MenuRenderer(Menu& owner) : menu_(owner) {}
 
 void MenuRenderer::drawMenu(int offset, bool init, bool isForward) {
     display.clearDisplay();
-    drawTopBar(PAGE_NAME, UI_NAME);
+    drawTopBar(PAGE_NAME, menu_.isDeveloperModeEnabled() ? perf.fpsLabel() : UI_NAME);
     if (isForward) {
         drawForwardModules(offset, init);
     } else {
@@ -27,7 +27,7 @@ void MenuRenderer::drawFrame() const {
     display.drawLine(0  , 40, 0  , 63, SELECTED_COLOR); // LEFT   2
     display.drawLine(127, 16, 127, 63, SELECTED_COLOR); // RIGHT  2
     display.drawLine(0  , 63, 30 , 63, SELECTED_COLOR); // BOTTOM 2-1
-    display.drawLine(105, 63, 127, 63, SELECTED_COLOR); // BOTTOM 2-2
+    display.drawLine(115, 63, 127, 63, SELECTED_COLOR); // BOTTOM 2-2
 }
 
 void MenuRenderer::drawTopBar(const String& page, const String& ui) {
@@ -39,6 +39,82 @@ void MenuRenderer::drawTopBar(const String& page, const String& ui) {
     display.getTextBounds(ui, 0, 0, &x1, &y1, &w, &h);
     display.setCursor(SCREEN_WIDTH - w - 4, 5);
     display.print(ui);
+}
+
+void MenuRenderer::drawSleepScreen(int percent, float voltage, bool charging, bool full, float temp, float hum) {
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SELECTED_COLOR);
+
+    display.setCursor(7, 12);
+    display.setTextSize(2);
+    display.print("HinarUI");
+    display.setTextSize(1);
+
+    int bx = 95, by = 12, bw = 12, bh = 6;
+    display.drawRect(bx, by, bw, bh, SELECTED_COLOR);
+    display.fillRect(bx + bw, by + bh / 4, 2, bh / 2, SELECTED_COLOR);
+    int miniFill = (bw - 2) * percent / 100;
+    display.fillRect(bx + 1, by + 1, miniFill, bh - 2, SELECTED_COLOR);
+
+    display.setCursor(95, 19);
+    display.print("zzz..");
+    
+    int segCount = 8;
+    int lineX = 3;
+    int lineY = 2;
+    int lineW = 128;
+    int segW = lineW / segCount;
+    static int waveIndex = segCount - 1;  // 初始最后一段为 4px
+    for (int i = segCount - 1; i >= 0; --i) {
+        int thickness = (i == waveIndex) ? 4 : 2;
+        int sx = lineX + i * segW;
+        int ex = (i == segCount - 1) ? (lineX + lineW) : (sx + segW - 3);
+        int width = ex - sx;
+        if (width < 1) width = 1;
+        int threshold = (i + 1) * 100 / segCount;
+        bool on = percent >= threshold;
+        if (on) {
+            display.fillRect(sx, lineY, width, thickness, SELECTED_COLOR);
+        } else {
+            display.drawRect(sx, lineY, width, thickness, UNSELECTED_COLOR);
+        }
+    }
+    if (--waveIndex < 0) waveIndex = segCount - 1;
+
+    // Status list
+    auto drawStatus = [&](int x, int y, const char* label, bool on) {
+        display.setCursor(x, y);
+        int16_t x1, y1;
+        uint16_t w, h;
+        display.getTextBounds(label, x, y, &x1, &y1, &w, &h);
+        int dotX = x - 6;
+        int dotY = y + h / 2 - 1;
+        if (on) {
+            display.fillCircle(dotX, dotY, 2, SELECTED_COLOR);
+            display.print(label);
+        } else {
+            display.drawCircle(dotX, dotY, 2, UNSELECTED_COLOR);
+        }
+    };
+    drawStatus(81, 37, "FULL", full);
+    drawStatus(81, 50, "CHARGE", charging);
+
+    // SHT30 line
+    display.setCursor(7, 37);
+    if (!isnan(temp)) {
+        display.printf("Temp:%.1fC", temp);
+    } else {
+        display.print("Temp:--.-C");
+    }
+    display.setCursor(7, 50);
+    if (!isnan(hum)) {
+        display.printf("Humi:%.1f%%", hum);
+    } else {
+        display.print("Humi:--.-%");
+    }
+
+    display.display();
 }
 
 void MenuRenderer::drawSelectedModule(ModuleVisual& icon) {

@@ -5,8 +5,8 @@
 void module_serial();
 void module_battery();
 void module_SHT30();
-void module_UICORE();
-void module_github();
+void module_PIN();
+void module_core();
 void module_ABOUT();
 
 MenuModuleRegistry::MenuModuleRegistry() {
@@ -22,17 +22,17 @@ MenuModuleRegistry::MenuModuleRegistry() {
     descriptors_[2].icon = bitmap_sht;
     descriptors_[2].handler = module_SHT30;
 
-    descriptors_[3].label = "UICORE";
-    descriptors_[3].icon = bitmap_chip;
-    descriptors_[3].handler = module_UICORE;
+    descriptors_[3].label = "ABOUT";
+    descriptors_[3].icon = bitmap_ABOUT;
+    descriptors_[3].handler = module_ABOUT;
+    
+    descriptors_[4].label = "PINSET";
+    descriptors_[4].icon = bitmap_PIN;
+    descriptors_[4].handler = module_PIN;
 
-    descriptors_[4].label = "GITHUB";
-    descriptors_[4].icon = bitmap_github;
-    descriptors_[4].handler = module_github;
-
-    descriptors_[5].label = "ABOUT";
-    descriptors_[5].icon = bitmap_about;
-    descriptors_[5].handler = module_ABOUT;
+    descriptors_[5].label = "UICORE";
+    descriptors_[5].icon = bitmap_core;
+    descriptors_[5].handler = module_core;
 }
 
 ModuleDescriptor& MenuModuleRegistry::at(size_t index) {

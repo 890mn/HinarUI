@@ -21,6 +21,7 @@ bool ESP_WROVER_KIT_SHT30_Setup(void);
 // VBAT_ESP_WROVER_KIT
 #define MODULE_VBAT
 static constexpr int     VBAT_PIN     = 36;
+static constexpr int     CHARGE_SENSE_PIN = 13;  // USB 插入检测，分压输入，高=充电
 bool ESP_WROVER_KIT_VBAT_Setup(void);
 
 // Serial_Communication_ESP_WROVER_KIT

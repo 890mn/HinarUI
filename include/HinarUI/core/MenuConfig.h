@@ -4,10 +4,10 @@ struct MenuConfig {
     static constexpr int kMaxModules = 6;
 
     int stepCount           = 12;
-    int flowSpeedFastPlus   = 5;
-    int flowSpeedFast       = 20;
-    int flowSpeedNormal     = 25;
-    int flowSpeedSlow       = 35;
+    int flowSpeedFastPlus   = 15;
+    int flowSpeedFast       = 25;
+    int flowSpeedNormal     = 35;
+    int flowSpeedSlow       = 45;
     int moduleMax           = kMaxModules;
     int moduleOffset        = 45;
     int moduleDirection     = -1;

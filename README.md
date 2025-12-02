@@ -1,24 +1,23 @@
 ![head](pic/HinarUI.jpg)
 
-# HinarUI v3
+# HinarUI v4
 <img alt="Bilibili" src="https://img.shields.io/badge/Bilibili-EE979F?link=https%3A%2F%2Fspace.bilibili.com%2F45409103"> <img alt="oshwhub" src="https://img.shields.io/badge/%E7%AB%8B%E5%88%9B%E5%BC%80%E6%BA%90%E7%A4%BE%E5%8C%BA-4672F5?link=https%3A%2F%2Foshwhub.com%2Flink_joestar%2Fhinarui-open-source-embedded-sel"> <img alt="MakerWorld" src="https://img.shields.io/badge/MakerWorld-white?link=https%3A%2F%2Fmakerworld.com.cn%2Fzh%2Fmodels%2F1583584-hinarui-shell-v1">  ![GitHub Created At](https://img.shields.io/github/created-at/890mn/HinarUI?labelColor=%2339354A&color=%239BB9B4)
 ![GitHub last commit](https://img.shields.io/github/last-commit/890mn/HinarUI?labelColor=%2339354A&color=%239BB9B4)
 ![Static Badge](https://img.shields.io/github/v/release/890mn/HinarUI?color=%23263C53)
 
-Original OLED UI Design based on Embedded Platform, Develop in「 HinarUI Shell 」, with complete software, hardware and shell design
+Original OLED UI Design based on Embedded Platform, with complete software, hardware and shell design.
 
-基于嵌入式平台的原创 OLED UI 设计，基于「 HinarUI Shell 」开发，具有完整的软硬件及外壳设计
-
-By the way, all of it just try something i wanna to do...why not LVGL or other solution? Only because im excited about creating something by my own :)
+基于嵌入式平台的原创 OLED UI 设计，包含软硬件与外壳方案
 
 ## Current Status
 
-It seems to be a little slow because everyday get so busy :(
-
+- **Next Version will come to 1.0 Stable!**
+- 2025.12.02 | Full advance of modules and performance (V4)
+- 2025.11.14 | Refactor Core of HinarUI
 - 2025.09.19 | Add Li Ver of PCB/Shell (V3)
 - 2025.05.06 | Create Shell of the board (V2)
-- 2025.03.25 | Complete TESTVer.0.2 and PCB (Scale with 1:1)
-- 2025.01.02 | Draw PCB (imperfect so not here)
+- 2025.03.25 | Complete TESTVer.0.2 and PCB
+- 2025.01.02 | Draw PCB (imperfect)
 - 2024.11.17 | Module init
 - 2024.10.14 | Status Machine Rebuild
 - 2024.10.12 | Icon on
@@ -26,29 +25,22 @@ It seems to be a little slow because everyday get so busy :(
 
 ## Project Structure
 
-Clone this project down will include these part, the Library "HinarUI" and an Example  
-
 ```plaintext
 HinarUI
-├─ example
-│   ├─ .pio
-│   ├─ include
-│   ├─ lib ― HinarUI
-│   ├─ src
-│   └─ test
-├─ resource
-│   ├─ asset.h
-│   ├─ icon.h
-│   └─ module.h
-├─ fonts
-│   ├─ Arame_Regular[5:10pt]7b.h
-│   ├─ Cubano7pt7b.h
-│   └─ optional.md  // Add custom font see this
-├─ cpp
-│   ├─ asset.cpp
-│   └─ module.cpp
-├─ UI.h
-└─ UI.cpp
+├─ example/              # PlatformIO demo (esp-wrover-kit by default)
+│  ├─ include/
+│  ├─ lib/HinarUI/       # Linked library for the demo
+│  └─ src/
+├─ include/              
+│  ├─ boards/            # Board-level pin/I2C config
+│  │  └─ esp_wrover_kit.h
+│  ├─ fonts/             # Built-in fonts + optional.md for custom fonts
+│  ├─ HinarUI/           # Core headers
+│  └─ modules/
+└─ src/                  # Library sources (core + modules)
+   ├─ boards/
+   ├─ core/
+   └─ modules/
 ```
 
 ## Usage
@@ -63,35 +55,33 @@ Shell at [Makerworld](https://makerworld.com.cn/zh/models/1583584-hinarui-shell-
 
 About how to adapt this project on your board, here gives some tips:
 
-- open `resource/asset.h` and modify these GPIO by your own
+- Quick start as a library:
+    ```c++
+    #include <Arduino.h>
+    #include "HinarUI_Core.h"
 
-    ```cpp
-    #define OLED_SDA            21
-    #define OLED_SCL            22
+    void setup() {
+        menu.create();
+    }
 
-    #define SHT30_SDA           18
-    #define SHT30_SCL           19
-
-    #define KEY_ENTER           32
-    #define KEY_BACK            35 
-    #define KEY_CYCLE           33
-
-    #define KEY_BACKUP          15
+    void loop() {
+        menu.loop();
+    }
     ```
 
-- open `resource/asset.h` and modify the OLED / SHT30 I2C address if not Default
-
+- Board / pin adaptation:
+    - Edit `include/boards/esp_wrover_kit.h` for pins and I2C addresses:
     ```cpp
-    // Default
-    #define OLED_ADDR           0x3C
-    #define SHT30_ADDR          0x44
-    
-    // Another Possible
-    #define OLED_ADDR           0x3D
-    #define SHT30_ADDR          0x45
+    static constexpr int I2C_SDA = 21;
+    static constexpr int I2C_SCL = 22;
+    static constexpr uint8_t OLED_ADDR = 0x3C;
+    static constexpr int KEY_ENTER = 32;
+    static constexpr int KEY_BACK  = 35;
+    // ... KEY_OFF/KEY_CYCLE/VBAT/CHARGE_SENSE etc.
+    // SHT30_ADDR, OLED_ADDR 可按需要改为 0x3D/0x45
     ```
-
-- It can normally run at this time of everything alright
+    - 其他传感器/模块可参考现有模块的实现
+    - 若作为库引入其他工程，只需 `#include "HinarUI_Core.h"` 并确保上述 pins 地址匹配
 
 ## Postscript
 

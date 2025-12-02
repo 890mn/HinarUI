@@ -9,7 +9,8 @@ enum class MenuState {
     Forward,
     Backward,
     BackwardSelected,
-    Module
+    Module,
+    Sleep
 };
 
 struct ModuleVisual {

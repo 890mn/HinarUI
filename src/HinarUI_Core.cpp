@@ -3,6 +3,31 @@
 String PAGE_NAME = "FORWARD";
 String UI_NAME   = "HinarUI";
 
+namespace {
+#if defined(ARDUINO_ARCH_ESP32)
+#include <esp_sleep.h>
+#endif
+float readBatteryVoltageSleep() {
+    int raw = analogRead(VBAT_PIN);
+    float voltage = raw * 3.3 / 4095.0 * 2.0 + 0.27;
+    return voltage;
+}
+
+int calcBatteryPercentSleep(float voltage) {
+    float percent = 100.3 / (1 + exp(-20 * (voltage - 3.7)));
+    if (percent > 100) return 100;
+    if (percent < 0) return 0;
+    return static_cast<int>(percent);
+}
+
+#if defined(ARDUINO_ARCH_ESP32)
+void enterLightSleepForMs(uint64_t ms) {
+    esp_sleep_enable_timer_wakeup(ms * 1000ULL);
+    esp_light_sleep_start();
+}
+#endif
+}
+
 Menu::Menu()
     : config(DefaultMenuConfig()),
       registry(),
@@ -21,6 +46,8 @@ Menu menu;
 
 void Menu::create() {
     if (!board_init()) return;
+    if (developerModeEnabled) perf.begin();
+    frameBuffer.setTargetFps(60);
     draw(0, true, true);
 }
 
@@ -29,6 +56,7 @@ void Menu::loop() {
     static int prevKeyCycleState = HIGH;
     static int prevKeyBackState  = HIGH;
     static int prevKeyOffState   = HIGH;
+    static unsigned long lastIdleRefresh = 0;
 
     static MenuState previousState = MenuState::Idle;
     currentTime = millis();
@@ -39,26 +67,48 @@ void Menu::loop() {
         int keyBackState  = digitalRead(KEY_BACK);
         int keyOffState   = digitalRead(KEY_OFF);
 
-        if (keyEnterState != prevKeyEnterState) {
-            //Serial.print("Enter Status Changed: ");
-            //Serial.println(keyEnterState == 0 ? "Pressed" : "Exited");
-            prevKeyEnterState = keyEnterState;
+        // OFF 键：单击切换息屏/唤醒
+        if (keyOffState == LOW && prevKeyOffState == HIGH) {
+            //Serial.println("[OFF] button pressed.");
+            if (currentState == MenuState::Sleep) {
+                //Serial.println("[OFF] Waking up from Sleep mode.");
+                currentState = stateBeforeSleep;
+                if (stateBeforeSleep == MenuState::Module) {
+                    //Serial.println("[OFF] Refreshing Module screen upon wakeup.");
+                    int targetIndex = forwardPointer != config.moduleForward ? forwardPointer : i_back;
+                    if (auto handler = registry.handler(targetIndex)) {
+                        frameBuffer.forceFullRefresh();
+                        handler();
+                    }
+                } else {
+                    //Serial.println("[OFF] Waking up from OTHER.");
+                    display.setDisplayPower(true);
+                    frameBuffer.forceFullRefresh();
+                }
+            } else {
+                //Serial.println("[OFF] Entering Sleep mode.");
+                stateBeforeSleep = currentState;
+                if (currentState == MenuState::Module) {
+                    //Serial.println("[OFF] Drawing Sleep screen.");
+                    auto bat = batteryReadStatus(millis(), 0, true);
+                    auto sht = sht30ReadStatus(millis(), 0, true);
+                    frameBuffer.beginFrame();
+                    renderer.drawSleepScreen(bat.percent, bat.voltage, bat.charging, bat.percent >= 99, sht.temp, sht.hum);
+                    frameBuffer.endFrame(); 
+                } else {
+                    //Serial.println("[OFF] Turning off display.");
+                    display.setDisplayPower(false);
+                }
+                currentState = MenuState::Sleep;
+                frameBuffer.setTargetFps(1);
+            }
         }
-        if (keyCycleState != prevKeyCycleState) {
-            //Serial.print("Cycle Status Changed: ");
-            //Serial.println(keyCycleState == 0 ? "Pressed" : "Exited");
-            prevKeyCycleState = keyCycleState;
-        }
-        if (keyBackState != prevKeyBackState) {
-            //Serial.print("Back Status Changed: ");
-            //Serial.println(keyBackState == 0 ? "Pressed" : "Exited");
-            prevKeyBackState = keyBackState;
-        }
-        if (keyOffState != prevKeyOffState) {
-            //Serial.print("Off Status Changed: ");
-            //Serial.println(keyOffState == 0 ? "Pressed" : "Exited");
-            prevKeyOffState = keyOffState;
-        }
+
+        prevKeyEnterState = keyEnterState;
+        prevKeyCycleState = keyCycleState;
+        prevKeyBackState  = keyBackState;
+        prevKeyOffState   = keyOffState;
+
         if (currentState != previousState) {
             Serial.print("State Changed to: ");
             Serial.println(stateToString());
@@ -67,6 +117,15 @@ void Menu::loop() {
 
         switch (currentState) {
             case MenuState::Idle:
+                frameBuffer.setTargetFps(5);
+                if (millis() - lastIdleRefresh >= 100) {
+                    frameBuffer.beginFrame();
+                    display.fillRoundRect(80, 2, 46, 12, 0, UNSELECTED_COLOR);
+                    renderer.drawTopBar(PAGE_NAME, developerModeEnabled ? perf.fpsLabel() : UI_NAME);
+                    renderer.drawFrame();
+                    frameBuffer.endFrame();
+                    lastIdleRefresh = millis();
+                }
                 if (keyEnterState == LOW && forwardPointer == config.moduleForward) {
                     isBackward = true;
                     frameBuffer.beginFrame();
@@ -85,10 +144,12 @@ void Menu::loop() {
                 break;
 
             case MenuState::Forward:
+                frameBuffer.setTargetFps(60);
                 animator.renderDynamic(keyCycleState, true);
                 break;
 
             case MenuState::Backward:
+                frameBuffer.setTargetFps(60);
                 if (keyEnterState == LOW) {
                     isUP = true;
                     while (keyEnterState == LOW) {
@@ -100,6 +161,7 @@ void Menu::loop() {
                 break;
 
             case MenuState::BackwardSelected:
+                frameBuffer.setTargetFps(60);
                 animator.renderDynamic(keyCycleState, false);
                 if (keyBackState == LOW) {
                     frameBuffer.beginFrame();
@@ -117,7 +179,24 @@ void Menu::loop() {
                 }
                 break;
 
+            case MenuState::Sleep:
+                frameBuffer.setTargetFps(1);
+                static unsigned long lastSleepUpdate = 0;
+                static unsigned long sleepIntervalMs = 5000;
+                if (stateBeforeSleep == MenuState::Module && (millis() - lastSleepUpdate >= sleepIntervalMs)) {
+                    auto bat = batteryReadStatus(millis(), 0, true);
+                    auto sht = sht30ReadStatus(millis(), 0, true);
+                    frameBuffer.beginFrame();
+                    renderer.drawSleepScreen(bat.percent, bat.voltage, bat.charging, bat.percent >= 99, sht.temp, sht.hum);
+                    frameBuffer.endFrame();
+                    lastSleepUpdate = millis();
+                } else if (stateBeforeSleep != MenuState::Module) {
+                    delay(50);  // 保持按键轮询，避免无法唤醒
+                }
+                break;
+
             case MenuState::Module: {
+                frameBuffer.setTargetFps(30);
                 static unsigned long lastUpdateTime = 0;
                 unsigned long now = millis();
                 if (now - lastUpdateTime >= 1000) {
@@ -160,9 +239,7 @@ void Menu::loop() {
                         keyCycleState = digitalRead(KEY_CYCLE);
                         delay(3);
                     }
-                    //Serial.println(i_back);
-                    //Serial.println(module_UICORE_page);
-                    if (i_back == backwardPointer) {
+                    if (i_back == backwardPointer + 1) {
                         module_UICORE_page = (module_UICORE_page + 1) % module_UICORE_totalPages;
                     }
                 }
@@ -170,6 +247,7 @@ void Menu::loop() {
             }
         }
     }
+    if (developerModeEnabled) perf.loop();
 }
 
 void Menu::draw(int offset, bool init, bool isForward) {
@@ -183,7 +261,7 @@ void Menu::drawFrame() {
 }
 
 void Menu::drawTopBar(String page, String ui) {
-    renderer.drawTopBar(page, ui);
+    renderer.drawTopBar(page, developerModeEnabled ? perf.fpsLabel() : ui);
 }
 
 String Menu::getFlowSpeed() {
@@ -197,6 +275,7 @@ String Menu::stateToString() {
         case MenuState::Backward:          return "BACKWARD";
         case MenuState::BackwardSelected:  return "BACKWARD_SELECTED";
         case MenuState::Module:            return "MODULE";
+        case MenuState::Sleep:             return "SLEEP";
     }
     return "ERROR";
 }

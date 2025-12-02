@@ -12,6 +12,7 @@ public:
     void drawTopBar(const String& page, const String& ui);
     void drawFrame() const;
     void drawMenu(int offset, bool init, bool isForward);
+    void drawSleepScreen(int percent, float voltage, bool charging, bool full, float temp, float hum);
 
 private:
     void drawSelectedModule(ModuleVisual& icon);
