@@ -4,6 +4,9 @@ String PAGE_NAME = "FORWARD";
 String UI_NAME   = "HinarUI";
 
 namespace {
+#if defined(ARDUINO_ARCH_ESP32)
+#include <esp_sleep.h>
+#endif
 float readBatteryVoltageSleep() {
     int raw = analogRead(VBAT_PIN);
     float voltage = raw * 3.3 / 4095.0 * 2.0 + 0.27;
@@ -16,6 +19,13 @@ int calcBatteryPercentSleep(float voltage) {
     if (percent < 0) return 0;
     return static_cast<int>(percent);
 }
+
+#if defined(ARDUINO_ARCH_ESP32)
+void enterLightSleepForMs(uint64_t ms) {
+    esp_sleep_enable_timer_wakeup(ms * 1000ULL);
+    esp_light_sleep_start();
+}
+#endif
 }
 
 Menu::Menu()
@@ -83,7 +93,7 @@ void Menu::loop() {
                     auto bat = batteryReadStatus(millis(), 0, true);
                     auto sht = sht30ReadStatus(millis(), 0, true);
                     frameBuffer.beginFrame();
-                    renderer.drawSleepScreen(bat.percent, bat.voltage, bat.charging, bat.percent >= 100, sht.temp, sht.hum);
+                    renderer.drawSleepScreen(bat.percent, bat.voltage, bat.charging, bat.percent >= 99, sht.temp, sht.hum);
                     frameBuffer.endFrame(); 
                 } else {
                     //Serial.println("[OFF] Turning off display.");
@@ -173,13 +183,15 @@ void Menu::loop() {
                 frameBuffer.setTargetFps(1);
                 static unsigned long lastSleepUpdate = 0;
                 static unsigned long sleepIntervalMs = 5000;
-                if ((millis() - lastSleepUpdate >= sleepIntervalMs) && stateBeforeSleep == MenuState::Module) {
+                if (stateBeforeSleep == MenuState::Module && (millis() - lastSleepUpdate >= sleepIntervalMs)) {
                     auto bat = batteryReadStatus(millis(), 0, true);
                     auto sht = sht30ReadStatus(millis(), 0, true);
                     frameBuffer.beginFrame();
-                    renderer.drawSleepScreen(bat.percent, bat.voltage, bat.charging, bat.percent >= 100, sht.temp, sht.hum);
+                    renderer.drawSleepScreen(bat.percent, bat.voltage, bat.charging, bat.percent >= 99, sht.temp, sht.hum);
                     frameBuffer.endFrame();
                     lastSleepUpdate = millis();
+                } else if (stateBeforeSleep != MenuState::Module) {
+                    delay(50);  // 保持按键轮询，避免无法唤醒
                 }
                 break;
 
