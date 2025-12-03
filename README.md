@@ -46,7 +46,7 @@ HinarUI
 ## Usage
 
 Main Doc on my website: [Link2hinar](https://link2hinar.fun/p/hinarui/) |
-Supporting design PCB at [oshwhub](https://oshwhub.com/link_joestar/hinarui-open-source-embedded-sel) |
+Supporting design PCB at [oshwhub](https://oshwhub.com/link_joestar/hinarui-v4) |
 Shell at [Makerworld](https://makerworld.com.cn/zh/models/1583584-hinarui-shell-v1)
 
 ![cover](pic/HinarUI_Cover.jpg)
