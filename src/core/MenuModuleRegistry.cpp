@@ -51,11 +51,11 @@ const String& MenuModuleRegistry::label(size_t index) const {
     return descriptors_.at(index).label;
 }
 
-unsigned char*& MenuModuleRegistry::icon(size_t index) {
+MenuIcon& MenuModuleRegistry::icon(size_t index) {
     return descriptors_.at(index).icon;
 }
 
-unsigned char* MenuModuleRegistry::icon(size_t index) const {
+MenuIcon MenuModuleRegistry::icon(size_t index) const {
     return descriptors_.at(index).icon;
 }
 
@@ -63,3 +63,13 @@ MenuEntry MenuModuleRegistry::handler(size_t index) const {
     return descriptors_.at(index).handler;
 }
 
+bool MenuModuleRegistry::registerModule(size_t index, const ModuleDescriptor& descriptor) {
+    if (index >= descriptors_.size()) {
+        return false;
+    }
+    if (descriptor.label.length() == 0 || descriptor.icon == nullptr || descriptor.handler == nullptr) {
+        return false;
+    }
+    descriptors_[index] = descriptor;
+    return true;
+}

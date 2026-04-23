@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 typedef void (*MenuEntry)();
+using MenuIcon = const unsigned char*;
 
 enum class MenuState {
     Idle,
@@ -19,15 +20,15 @@ struct ModuleVisual {
     int width = 0;
     int height = 0;
     String label = "INIT";
-    unsigned char* icon = nullptr;
+    MenuIcon icon = nullptr;
 
     ModuleVisual() {}
-    ModuleVisual(int xVal, int yVal, int w, int h, const String& text = "INIT", unsigned char* data = 0)
+    ModuleVisual(int xVal, int yVal, int w, int h, const String& text = "INIT", MenuIcon data = nullptr)
         : x(xVal), y(yVal), width(w), height(h), label(text), icon(data) {}
 };
 
 struct ModuleDescriptor {
     String label;
-    unsigned char* icon = 0;
-    MenuEntry handler = 0;
+    MenuIcon icon = nullptr;
+    MenuEntry handler = nullptr;
 };

@@ -1,4 +1,4 @@
-#include "profile.h"
+#include "Profile.h"
 #include "HinarUI_Core.h"
 
 #include "HinarUI/core/FilteredValue.h"

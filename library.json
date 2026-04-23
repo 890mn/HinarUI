@@ -1,0 +1,33 @@
+{
+  "name": "HinarUI",
+  "version": "1.0.0",
+  "description": "Original OLED UI design for ESP32 embedded projects.",
+  "keywords": [
+    "esp32",
+    "oled",
+    "ssd1306",
+    "ui",
+    "arduino"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/890mn/HinarUI.git"
+  },
+  "authors": [
+    {
+      "name": "890mn"
+    }
+  ],
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "dependencies": {
+    "adafruit/Adafruit BusIO": "^1.17.0",
+    "adafruit/Adafruit SSD1306": "^2.5.1",
+    "adafruit/Adafruit GFX Library": "^1.10.10",
+    "adafruit/Adafruit SHT31 Library": "^2.2.2"
+  },
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src"
+  }
+}

@@ -1,5 +1,6 @@
 #include "Profile.h"
 #include "HinarUI_Core.h"
+#include "HinarUI/version.h"
 
 #include "HinarUI/core/FrameBufferManager.h"
 
@@ -81,7 +82,7 @@ void module_PIN() {
 void module_core() {
     frameBuffer.beginFrame();
     display.clearDisplay();
-    menu.drawTopBar("RELEASE", "0.4");
+    menu.drawTopBar("RELEASE", HINARUI_VERSION_STRING);
     menu.drawFrame();
 
     display.setTextSize(2);

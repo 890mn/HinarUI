@@ -260,6 +260,10 @@ void Menu::drawFrame() {
     renderer.drawFrame();
 }
 
+bool Menu::registerModule(uint8_t index, const ModuleDescriptor& descriptor) {
+    return registry.registerModule(index, descriptor);
+}
+
 void Menu::drawTopBar(String page, String ui) {
     renderer.drawTopBar(page, developerModeEnabled ? perf.fpsLabel() : ui);
 }

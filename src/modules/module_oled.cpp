@@ -1,4 +1,4 @@
-#include "profile.h"
+#include "Profile.h"
 #include "HinarUI/core/HinarUIDisplay.h"
 
 HinarUIDisplay display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);

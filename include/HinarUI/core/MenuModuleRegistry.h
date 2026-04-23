@@ -17,10 +17,11 @@ public:
     String& label(size_t index);
     const String& label(size_t index) const;
 
-    unsigned char*& icon(size_t index);
-    unsigned char* icon(size_t index) const;
+    MenuIcon& icon(size_t index);
+    MenuIcon icon(size_t index) const;
 
     MenuEntry handler(size_t index) const;
+    bool registerModule(size_t index, const ModuleDescriptor& descriptor);
 
 private:
     std::array<ModuleDescriptor, MenuConfig::kMaxModules> descriptors_;

@@ -4,6 +4,7 @@
 #include "Profile.h"
 #include "icon.h"
 #include "perf.h"
+#include "HinarUI/version.h"
 
 #include "HinarUI/core/FrameBufferManager.h"
 #include "HinarUI/core/MenuAnimator.h"
@@ -24,6 +25,7 @@ public:
     void drawTopBar(String page = PAGE_NAME, String ui = UI_NAME);
     void drawFrame();
     int getIback() const { return i_back; }
+    bool registerModule(uint8_t index, const ModuleDescriptor& descriptor);
 
     String getFlowSpeed();
     int getStepCount() const { return config.stepCount; }
@@ -40,7 +42,7 @@ private:
     MenuRenderer renderer;
 
     String tmpLabel;
-    unsigned char* tmpIcons = nullptr;
+    MenuIcon tmpIcons = nullptr;
 
     int    curStep             = 0;
     int    wordStep            = 0;

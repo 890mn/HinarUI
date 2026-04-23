@@ -1,88 +1,108 @@
-![head](pic/HinarUI.jpg)
+![HinarUI](pic/HinarUI.jpg)
 
-# HinarUI v4
-<img alt="Bilibili" src="https://img.shields.io/badge/Bilibili-EE979F?link=https%3A%2F%2Fspace.bilibili.com%2F45409103"> <img alt="oshwhub" src="https://img.shields.io/badge/%E7%AB%8B%E5%88%9B%E5%BC%80%E6%BA%90%E7%A4%BE%E5%8C%BA-4672F5?link=https%3A%2F%2Foshwhub.com%2Flink_joestar%2Fhinarui-open-source-embedded-sel"> <img alt="MakerWorld" src="https://img.shields.io/badge/MakerWorld-white?link=https%3A%2F%2Fmakerworld.com.cn%2Fzh%2Fmodels%2F1583584-hinarui-shell-v1">  ![GitHub Created At](https://img.shields.io/github/created-at/890mn/HinarUI?labelColor=%2339354A&color=%239BB9B4)
-![GitHub last commit](https://img.shields.io/github/last-commit/890mn/HinarUI?labelColor=%2339354A&color=%239BB9B4)
-![Static Badge](https://img.shields.io/github/v/release/890mn/HinarUI?color=%23263C53)
+# HinarUI v1.0
 
-Original OLED UI Design based on Embedded Platform, with complete software, hardware and shell design.
+Original OLED UI design for ESP32 embedded projects. HinarUI provides a compact
+SSD1306 menu system, board profile configuration, sensor/status modules, and a
+PlatformIO example for quick hardware bring-up.
 
-基于嵌入式平台的原创 OLED UI 设计，包含软硬件与外壳方案
+基于 ESP32 和 SSD1306 OLED 的嵌入式 UI 库，包含菜单动画、板级配置、传感器/状态模块和
+PlatformIO 示例工程。
 
-## Current Status
+## Status
 
-- **Next Version will come to 1.0 Stable!**
-- 2025.12.02 | Full advance of modules and performance (V4)
-- 2025.11.14 | Refactor Core of HinarUI
-- 2025.09.19 | Add Li Ver of PCB/Shell (V3)
-- 2025.05.06 | Create Shell of the board (V2)
-- 2025.03.25 | Complete TESTVer.0.2 and PCB
-- 2025.01.02 | Draw PCB (imperfect)
-- 2024.11.17 | Module init
-- 2024.10.14 | Status Machine Rebuild
-- 2024.10.12 | Icon on
-- 2024.10.09 | base on
+- Target release: 1.0 Stable
+- Default board profile: ESP-WROVER-KIT
+- Default display: 128x64 SSD1306 over I2C
+- Maintained library source: root `include/` and `src/`
+- Example project: `example/`
 
 ## Project Structure
 
-```plaintext
-HinarUI
-├─ example/              # PlatformIO demo (esp-wrover-kit by default)
-│  ├─ include/
-│  ├─ lib/HinarUI/       # Linked library for the demo
-│  └─ src/
-├─ include/              
-│  ├─ boards/            # Board-level pin/I2C config
-│  │  └─ esp_wrover_kit.h
-│  ├─ fonts/             # Built-in fonts + optional.md for custom fonts
-│  ├─ HinarUI/           # Core headers
-│  └─ modules/
-└─ src/                  # Library sources (core + modules)
-   ├─ boards/
-   ├─ core/
-   └─ modules/
+```text
+HinarUI/
+  include/                 Library public headers
+    HinarUI/               Core types and renderer/display components
+    boards/                Board profiles and pin/I2C definitions
+    fonts/                 Built-in fonts
+    modules/               Built-in module interfaces
+  src/                     Library implementation
+    boards/                Board initialization
+    core/                  Display, framebuffer, animator, renderer, registry
+    modules/               Built-in modules
+  example/                 PlatformIO example project
+  pic/                     README images
+  library.json             PlatformIO/Arduino library manifest
 ```
 
-## Usage
+The example depends on the root library through `symlink://..`, so changes in
+`include/` and `src/` are used directly by the example build.
 
-Main Doc on my website: [Link2hinar](https://link2hinar.fun/p/hinarui/) |
-Supporting design PCB at [oshwhub](https://oshwhub.com/link_joestar/hinarui-v4) |
-Shell at [Makerworld](https://makerworld.com.cn/zh/models/1583584-hinarui-shell-v1)
+## Quick Start
 
-![cover](pic/HinarUI_Cover.jpg)
+```cpp
+#include <Arduino.h>
+#include "HinarUI_Core.h"
 
-*One way is to open the [EXAMPLE](/example/README.md) to understand.*
+void setup() {
+    menu.create();
+}
 
-About how to adapt this project on your board, here gives some tips:
+void loop() {
+    menu.loop();
+}
+```
 
-- Quick start as a library:
-    ```c++
-    #include <Arduino.h>
-    #include "HinarUI_Core.h"
+Build the example from the repository root:
 
-    void setup() {
-        menu.create();
-    }
+```powershell
+C:\Users\17760\.platformio\penv\Scripts\platformio.exe run -d example -e esp-wrover-kit
+```
 
-    void loop() {
-        menu.loop();
-    }
-    ```
+Upload to a connected board:
 
-- Board / pin adaptation:
-    - Edit `include/boards/esp_wrover_kit.h` for pins and I2C addresses:
-    ```cpp
-    static constexpr int I2C_SDA = 21;
-    static constexpr int I2C_SCL = 22;
-    static constexpr uint8_t OLED_ADDR = 0x3C;
-    static constexpr int KEY_ENTER = 32;
-    static constexpr int KEY_BACK  = 35;
-    // ... KEY_OFF/KEY_CYCLE/VBAT/CHARGE_SENSE etc.
-    // SHT30_ADDR, OLED_ADDR 可按需要改为 0x3D/0x45
-    ```
-    - 其他传感器/模块可参考现有模块的实现
-    - 若作为库引入其他工程，只需 `#include "HinarUI_Core.h"` 并确保上述 pins 地址匹配
+```powershell
+C:\Users\17760\.platformio\penv\Scripts\platformio.exe run -d example -e esp-wrover-kit --target upload
+```
 
-## Postscript
+## Board Adaptation
 
-Thanks for u here whatever this project can or not helps you, any problem please use `issue` or contact me by [Gmail](mailto:linkjoestar402212@gmail.com)
+Start with `include/boards/esp_wrover_kit.h`. A board profile should define:
+
+- OLED I2C pins and address
+- SHT30 I2C pins and address, if enabled
+- key pins for OFF, ENTER, CYCLE, and BACK
+- battery ADC and charge-sense pins, if enabled
+- board initialization functions used by `Profile.h`
+
+The default profile is selected by the `BOARD_ESP_WROVER_KIT` build flag in
+`example/platformio.ini`.
+
+## Module Extension
+
+Built-in modules are registered by `MenuModuleRegistry`. User code can replace a
+slot at startup:
+
+```cpp
+void myModule();
+
+void setup() {
+    menu.registerModule(0, {"CUSTOM", bitmap_default, myModule});
+    menu.create();
+}
+```
+
+The descriptor must provide a non-empty label, a bitmap pointer, and a handler.
+
+## Links
+
+- Main documentation: [link2hinar.fun](https://link2hinar.fun/p/hinarui/)
+- Hardware design: [OSHWHub](https://oshwhub.com/link_joestar/hinarui-v4)
+- Shell model: [MakerWorld](https://makerworld.com.cn/zh/models/1583584-hinarui-shell-v1)
+
+![HinarUI Cover](pic/HinarUI_Cover.jpg)
+
+## License / Contact
+
+For questions or issues, use GitHub issues or contact
+[linkjoestar402212@gmail.com](mailto:linkjoestar402212@gmail.com).
