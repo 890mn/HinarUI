@@ -26,6 +26,25 @@ void enterLightSleepForMs(uint64_t ms) {
     esp_light_sleep_start();
 }
 #endif
+
+bool moduleUsesDedicatedKeys(int index) {
+#if defined(MODULE_DAC)
+    return index == HINARUI_DAC_MODULE_INDEX;
+#else
+    (void)index;
+    return false;
+#endif
+}
+
+void forceDedicatedModuleOff(int index) {
+#if defined(MODULE_DAC)
+    if (index == HINARUI_DAC_MODULE_INDEX) {
+        module_DAC_ForceOff();
+    }
+#else
+    (void)index;
+#endif
+}
 }
 
 Menu::Menu()
@@ -66,9 +85,11 @@ void Menu::loop() {
         int keyCycleState = digitalRead(KEY_CYCLE);
         int keyBackState  = digitalRead(KEY_BACK);
         int keyOffState   = digitalRead(KEY_OFF);
+        int activeModuleIndex = forwardPointer != config.moduleForward ? forwardPointer : i_back;
+        bool activeModuleUsesOwnKeys = currentState == MenuState::Module && moduleUsesDedicatedKeys(activeModuleIndex);
 
         // OFF 键：单击切换息屏/唤醒
-        if (keyOffState == LOW && prevKeyOffState == HIGH) {
+        if (keyOffState == LOW && prevKeyOffState == HIGH && !activeModuleUsesOwnKeys) {
             //Serial.println("[OFF] button pressed.");
             if (currentState == MenuState::Sleep) {
                 //Serial.println("[OFF] Waking up from Sleep mode.");
@@ -198,16 +219,59 @@ void Menu::loop() {
             case MenuState::Module: {
                 frameBuffer.setTargetFps(30);
                 static unsigned long lastUpdateTime = 0;
+                static unsigned long dedicatedBackDownSince = 0;
+                static bool dedicatedBackExitConsumed = false;
+                constexpr unsigned long dedicatedBackExitMs = 650;
                 unsigned long now = millis();
-                if (now - lastUpdateTime >= 1000) {
+                int targetIndex = forwardPointer != config.moduleForward ? forwardPointer : i_back;
+                bool dedicatedKeys = moduleUsesDedicatedKeys(targetIndex);
+                unsigned long updateIntervalMs = dedicatedKeys ? 25UL : 1000UL;
+                if (now - lastUpdateTime >= updateIntervalMs) {
                     lastUpdateTime = now;
-                    int targetIndex = forwardPointer != config.moduleForward ? forwardPointer : i_back;
                     if (auto handler = registry.handler(targetIndex)) {
-                        frameBuffer.forceFullRefresh();
+                        if (!dedicatedKeys) {
+                            frameBuffer.forceFullRefresh();
+                        }
                         handler();
                     }
                 }
-                if (keyBackState == LOW && forwardPointer == config.moduleForward) {
+                bool allowBackExit = !dedicatedKeys;
+                if (dedicatedKeys) {
+                    if (keyBackState == LOW) {
+                        if (dedicatedBackDownSince == 0) {
+                            dedicatedBackDownSince = now;
+                        }
+                        if (!dedicatedBackExitConsumed && now - dedicatedBackDownSince >= dedicatedBackExitMs) {
+                            dedicatedBackExitConsumed = true;
+                            forceDedicatedModuleOff(targetIndex);
+                            if (forwardPointer == config.moduleForward) {
+                                PAGE_NAME = "BACKWARD";
+                                UI_NAME   = "HinarUI";
+                                --i_back;
+
+                                curStep = totalStep - 1;
+                                draw(1, false, false);
+
+                                ++i_back;
+                                currentState = MenuState::BackwardSelected;
+                            } else {
+                                --forwardPointer;
+
+                                curStep = totalStep - 1;
+                                draw(1, false, true);
+
+                                ++forwardPointer;
+                                currentState = MenuState::Idle;
+                            }
+                            break;
+                        }
+                    } else {
+                        dedicatedBackDownSince = 0;
+                        dedicatedBackExitConsumed = false;
+                    }
+                }
+
+                if (allowBackExit && keyBackState == LOW && forwardPointer == config.moduleForward) {
                     while (keyBackState == LOW) {
                         keyBackState = digitalRead(KEY_BACK);
                         delay(3);
@@ -221,7 +285,7 @@ void Menu::loop() {
 
                     ++i_back;
                     currentState = MenuState::BackwardSelected;
-                } else if (keyBackState == LOW && forwardPointer != config.moduleForward) {
+                } else if (allowBackExit && keyBackState == LOW && forwardPointer != config.moduleForward) {
                     while (keyBackState == LOW) {
                         keyBackState = digitalRead(KEY_BACK);
                         delay(3);
@@ -234,7 +298,7 @@ void Menu::loop() {
                     ++forwardPointer;
                     currentState = MenuState::Idle;
                 }
-                if (keyCycleState == LOW) {
+                if (!dedicatedKeys && keyCycleState == LOW) {
                     while (keyCycleState == LOW) {
                         keyCycleState = digitalRead(KEY_CYCLE);
                         delay(3);

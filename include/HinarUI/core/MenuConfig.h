@@ -1,7 +1,7 @@
 #pragma once
 
 struct MenuConfig {
-    static constexpr int kMaxModules = 6;
+    static constexpr int kMaxModules = 7;
 
     int stepCount           = 12;
     int flowSpeedFastPlus   = 15;
@@ -11,7 +11,7 @@ struct MenuConfig {
     int moduleMax           = kMaxModules;
     int moduleOffset        = 45;
     int moduleDirection     = -1;
-    int moduleForward       = 3;
+    int moduleForward       = 4;
     int radiusPall          = 2;
     int radiusRect          = 5;
 

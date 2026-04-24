@@ -26,6 +26,12 @@ bool ESP_WROVER_KIT_Board_Init(void) {
         return false;
     }
 #endif
+#if defined(MODULE_DAC)
+    Serial.println(F("[INFO] SUPPORT DAC Module"));
+    if (!ESP_WROVER_KIT_DAC_Setup()) {
+        return false;
+    }
+#endif
     if (!ESP_WROVER_KIT_KEY_Setup()) {
         return false;
     }
@@ -73,10 +79,15 @@ bool ESP_WROVER_KIT_SERIAL_COMMUNICATION_Setup(void) {
     return true;
 }
 
+bool ESP_WROVER_KIT_DAC_Setup(void) {
+    dacWrite(HINARUI_DAC_PIN, 0);
+    return true;
+}
+
 bool ESP_WROVER_KIT_KEY_Setup(void) {
     pinMode(KEY_ENTER, INPUT_PULLUP);
     pinMode(KEY_CYCLE, INPUT_PULLUP);
-    pinMode(KEY_BACK , INPUT_PULLUP);
+    pinMode(KEY_BACK , INPUT);
     pinMode(KEY_OFF  , INPUT_PULLUP);
     return true;
 }

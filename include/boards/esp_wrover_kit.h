@@ -26,9 +26,14 @@ bool ESP_WROVER_KIT_VBAT_Setup(void);
 
 // Serial_Communication_ESP_WROVER_KIT
 #define MODULE_COM
-static constexpr int     COM_TX_PIN   = 26;
-static constexpr int     COM_RX_PIN   = 25;
+static constexpr int     COM_TX_PIN   = 27;
+static constexpr int     COM_RX_PIN   = 14;
 bool ESP_WROVER_KIT_SERIAL_COMMUNICATION_Setup(void);
+
+// DAC_ESP_WROVER_KIT
+#define MODULE_DAC
+static constexpr int     HINARUI_DAC_PIN = 25;
+bool ESP_WROVER_KIT_DAC_Setup(void);
 
 // Keys_ESP_WROVER_KIT
 static constexpr int     KEY_OFF      = 15;

@@ -26,6 +26,10 @@
     #include "modules/module_com.h"
 #endif
 
+#if defined(MODULE_DAC)
+    #include "modules/module_dac.h"
+#endif
+
 static bool board_init(void) {
     Serial.begin(115200);
 #if defined(BOARD_ESP_WROVER_KIT)

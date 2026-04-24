@@ -5,7 +5,7 @@
 #include "HinarUI/core/FrameBufferManager.h"
 
 int module_UICORE_page = 0;
-const int module_UICORE_totalPages = 3;
+const int module_UICORE_totalPages = 4;
 
 void module_PIN() {
     frameBuffer.beginFrame();
@@ -71,6 +71,27 @@ void module_PIN() {
 
             display.setCursor(3, 53);
             display.print("COM_RX");
+            display.setCursor(70, 53);
+            display.print(COM_RX_PIN);
+            break;
+        case 3:
+            display.setCursor(3, 20);
+            display.print("DAC_OUT");
+            display.setCursor(70, 20);
+            display.print(HINARUI_DAC_PIN);
+
+            display.setCursor(3, 31);
+            display.print("DAC_MAX");
+            display.setCursor(70, 31);
+            display.print("2.00V");
+
+            display.setCursor(3, 42);
+            display.print("SER_TX");
+            display.setCursor(70, 42);
+            display.print(COM_TX_PIN);
+
+            display.setCursor(3, 53);
+            display.print("SER_RX");
             display.setCursor(70, 53);
             display.print(COM_RX_PIN);
             break;

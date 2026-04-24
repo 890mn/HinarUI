@@ -8,6 +8,7 @@ void module_SHT30();
 void module_PIN();
 void module_core();
 void module_ABOUT();
+void module_DAC();
 
 MenuModuleRegistry::MenuModuleRegistry() {
     descriptors_[0].label = "SERIAL";
@@ -18,21 +19,25 @@ MenuModuleRegistry::MenuModuleRegistry() {
     descriptors_[1].icon = bitmap_battery;
     descriptors_[1].handler = module_battery;
 
-    descriptors_[2].label = "SHT30";
-    descriptors_[2].icon = bitmap_sht;
-    descriptors_[2].handler = module_SHT30;
+    descriptors_[2].label = "DAC";
+    descriptors_[2].icon = bitmap_dac;
+    descriptors_[2].handler = module_DAC;
 
-    descriptors_[3].label = "ABOUT";
-    descriptors_[3].icon = bitmap_ABOUT;
-    descriptors_[3].handler = module_ABOUT;
+    descriptors_[3].label = "SHT30";
+    descriptors_[3].icon = bitmap_sht;
+    descriptors_[3].handler = module_SHT30;
     
-    descriptors_[4].label = "PINSET";
-    descriptors_[4].icon = bitmap_PIN;
-    descriptors_[4].handler = module_PIN;
+    descriptors_[4].label = "ABOUT";
+    descriptors_[4].icon = bitmap_ABOUT;
+    descriptors_[4].handler = module_ABOUT;
 
-    descriptors_[5].label = "UICORE";
-    descriptors_[5].icon = bitmap_core;
-    descriptors_[5].handler = module_core;
+    descriptors_[5].label = "PINSET";
+    descriptors_[5].icon = bitmap_PIN;
+    descriptors_[5].handler = module_PIN;
+
+    descriptors_[6].label = "UICORE";
+    descriptors_[6].icon = bitmap_core;
+    descriptors_[6].handler = module_core;
 }
 
 ModuleDescriptor& MenuModuleRegistry::at(size_t index) {
