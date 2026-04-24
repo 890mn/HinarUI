@@ -1,5 +1,6 @@
 #include "Profile.h"
 #include "HinarUI_Core.h"
+#include "HinarUI/core/DacMath.h"
 #include "modules/module_dac.h"
 
 #include <math.h>
@@ -11,7 +12,6 @@ constexpr unsigned long BACK_EXIT_MS = 650;
 constexpr unsigned long CYCLE_FAST_START_MS = 450;
 constexpr unsigned long CYCLE_FAST_REPEAT_MS = 90;
 
-constexpr float DAC_REF_V = 3.3f;
 constexpr float OUTPUT_MIN_V = 0.0f;
 constexpr float OUTPUT_MAX_V = 2.0f;
 
@@ -93,24 +93,11 @@ bool cyclePressedOrRepeated() {
 }
 
 float clampVoltage(float value) {
-    if (value < OUTPUT_MIN_V) {
-        return OUTPUT_MIN_V;
-    }
-    if (value > OUTPUT_MAX_V) {
-        return OUTPUT_MAX_V;
-    }
-    return value;
+    return HinarUI::clampDacVoltage(value, OUTPUT_MIN_V, OUTPUT_MAX_V);
 }
 
 uint8_t voltageToDac(float volts) {
-    float ratio = clampVoltage(volts) / DAC_REF_V;
-    if (ratio < 0.0f) {
-        ratio = 0.0f;
-    }
-    if (ratio > 1.0f) {
-        ratio = 1.0f;
-    }
-    return static_cast<uint8_t>(lroundf(ratio * 255.0f));
+    return HinarUI::dacValueFromVoltage(volts, 3.3f, OUTPUT_MIN_V, OUTPUT_MAX_V);
 }
 
 void applyOutput() {

@@ -71,6 +71,7 @@ bool ESP_WROVER_KIT_SHT30_Setup(void) {
 
 bool ESP_WROVER_KIT_VBAT_Setup(void) {
     pinMode(VBAT_PIN , INPUT_PULLDOWN);
+    pinMode(CHARGE_SENSE_PIN, INPUT);
     return true;
 }
 
