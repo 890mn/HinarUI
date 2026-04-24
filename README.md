@@ -1,6 +1,6 @@
 ![HinarUI](pic/HinarUI.jpg)
 
-# HinarUI v1.0
+# HinarUI V1.0
 
 Original OLED UI design for ESP32 embedded projects. HinarUI provides a compact
 SSD1306 menu system, board profile configuration, sensor/status modules, and a
@@ -56,13 +56,13 @@ void loop() {
 Build the example from the repository root:
 
 ```powershell
-C:\Users\17760\.platformio\penv\Scripts\platformio.exe run -d example -e esp-wrover-kit
+pio run -d example -e esp-wrover-kit
 ```
 
 Upload to a connected board:
 
 ```powershell
-C:\Users\17760\.platformio\penv\Scripts\platformio.exe run -d example -e esp-wrover-kit --target upload
+pio run -d example -e esp-wrover-kit --target upload
 ```
 
 ## Board Adaptation
